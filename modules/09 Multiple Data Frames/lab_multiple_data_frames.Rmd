@@ -1,0 +1,197 @@
+---
+title: "Working with Multiple Data Frames"
+output: html_notebook
+---
+
+# Overview
+
+This week, we will practice combining data frames. This will include using real health data from the National Health and Nutrition Examination Survey (NHANES). NHANES data is publicly available via the CDC website. There are different data sets corresponding to demographics, laboratory data, questionnaire data, and examination data. First, however, we will practice by combining data about three different cities — each stored in a separate sheet of a single Excel file. 
+
+* [Click here to download city_ses.xlsx](https://www.dropbox.com/s/6nt00hmdzfdigp3/city_ses.xlsx?dl=1).
+
+```{r message=FALSE}
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(haven)
+```
+
+# Task 1
+
+Please download `cities_ses.xlsx` and import all three sheets (Houston, Atlanta, and Charlotte) into your R global environment as separate data frames. Please name the data frames `houston`, `atlanta`, and `charlotte` respectively.
+
+```{r}
+houston <- read_excel(
+  "/Users/bradcannell/Dropbox/Datasets/Cities SES/city_ses.xlsx",
+  sheet = "Houston"
+)
+```
+
+```{r}
+atlanta <- read_excel(
+  "/Users/bradcannell/Dropbox/Datasets/Cities SES/city_ses.xlsx",
+  sheet = "Atlanta"
+)
+```
+
+```{r}
+charlotte <- read_excel(
+  "/Users/bradcannell/Dropbox/Datasets/Cities SES/city_ses.xlsx",
+  sheet = "Charlotte"
+)
+```
+
+# Task 2
+
+Vertically combine the data frames you created in Task 1. Name the resulting data frame `cities_ses.` Please make sure that the column names in `cities_ses` match the column names in `houston`.
+
+```{r}
+cities_ses <- houston %>%
+  # Add city column to houston before adding rows from atlanta and charlotte
+  mutate(city = "Houston") %>% 
+  bind_rows(
+    # Add rows from atlanta - rename columns to match houston
+    # Add city column
+    atlanta %>% 
+      rename(pid = id, sex = gender) %>% 
+      mutate(city = "Atlanta"),
+    # Add rows from charlotte - rename columns to match houston
+    # Add city column
+    charlotte %>% 
+      rename(ses_score = ses) %>% 
+      mutate(city = "Charlotte")
+  )
+```
+
+## Notes to students
+
+1. There are many different ways to complete the task above. For example, you may have broken adding the city column and binding the rows into separate code chunks. If so, that's totally fine. Additionally, you may have renamed the columns outside of the `bind_rows()` function. Again, totally fine. Maybe you did something entirely different. As long as you got the same result, then it's totally fine.
+
+# Task 3
+
+View the structure of `cities_ses` using the `str()` function.
+
+```{r}
+str(cities_ses)
+```
+
+## Question:
+
+1. The `cities_ses` data frame contains ____ rows and ____ columns.
+
+* The `cities_ses` data frame contains 15 rows and 5 columns.
+
+# Task 4
+
+Please sort the `cities_ses` data frame by `PID` in ascending order.
+
+```{r}
+cities_ses <- cities_ses %>% 
+  arrange(pid)
+```
+
+## Question:
+
+2. What value is in the third row of the `city` column in the sorted `cities_ses` data frame?
+
+```{r}
+cities_ses %>% 
+  slice(3) %>% 
+  pull(city)
+```
+
+* "Houston" is the value in the third row of the `city` column in the sorted `cities_ses` data frame.
+
+# Task 5
+
+Please create a boxplot of `ses_score` by `city`.
+
+```{r}
+ggplot(cities_ses) +
+  geom_boxplot(aes(city, ses_score)) +
+  # Improve axis labels
+  ggplot2::labs(
+    x = "City",
+    y = "SES Score"
+  ) +
+  theme_classic()
+```
+
+## Question:
+
+3.  Looking at the boxplots you created in Task 5, which city appears to have the lowest SES scores?
+
+* Atlanta appears to have the lowest SES scores.
+
+# Task 6
+
+Please navigate to the [NHANES website](https://wwwn.cdc.gov/nchs/nhanes/). Please import the following data sets for the year 2017-2018:    
+* Demographics   
+    - Demographic Variables and Sample Weights   
+* Questionnaire   
+    - Medical Conditions   
+    - Smoking - Cigarette Use   
+
+Please name your data frames to match the names of the data sets on the NHANES website. For example, `demo_j`.
+
+```{r}
+# Demographics
+demo_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.XPT")
+```
+
+```{r}
+# Medical Conditions
+mcq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/MCQ_J.XPT")
+```
+
+```{r}
+# Smoking - Cigarette Use
+smq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/SMQ_J.XPT")
+```
+
+## Questions:
+
+4. The `mcq_j` data frame contains ____ rows and ____ columns.
+
+* The `mcq_j` data frame contains 8897 rows and 76 columns.
+
+5. Which data frame contains 6,724 rows?
+
+* The `smq_j` data frame contains 6,724 rows.
+
+# Task 7
+
+Familiarize yourself with the codebook for the data set `smq_j`, which is available on the [NHANES website](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Questionnaire&CycleBeginYear=2017).
+
+## Questions:
+6. What variable in the `smq_j` data set contains information regarding whether or not a participant has smoked 100 cigarettes in their life?
+
+* The variable named `smq_020` contains responses to the question, "These next questions are about cigarette smoking and other tobacco use. {Have you/Has SP} smoked at least 100 cigarettes in {your/his/her} entire life?"
+
+7. According to the codebook, how many participants have smoked 100 cigarettes in their life?
+
+* According to the codebook, 2,359 participants have smoked 100 cigarettes in their life?
+
+8. If the participant tells the interviewer that they have not smoked 100 cigarettes in their life, what is the next question they are asked?
+
+* If the participant tells the interviewer that they have not smoked 100 cigarettes in their life, the next question they are asked is `smq890`, "{Have you/Has SP} ever smoked a regular cigar, cigarillo or little filtered cigar even one time? This hand card shows examples of some cigars; however there are others not included here."? You can find this answer by looking at the value associated with a "No" response in the "Skip to Item" column.
+
+# Task 8. 
+
+Please merge the 3 separate NHANES data frames into a single combined data frame. Please name the combined data frame `nhanes`.
+
+```{r}
+nhanes <- demo_j %>% 
+  left_join(mcq_j, by = "SEQN") %>% 
+  left_join(smq_j, by = "SEQN")
+```
+
+## Notes to students
+
+1. You didn't necessarily need to use the same join functions and data frame ordering that I used above. However, you do need to make sure that your combined data frame has the correct number of rows and columns. Using different join functions than I used or passing the data frames in a different order than I did definitely could have resulted in a combined data frame with a different number of rows and columns.
+
+## Questions:
+
+9. The `nhanes` data frame contains ____ rows and ____ columns.
+
+* The `nhanes` data frame contains 9,254 rows and 157 columns.

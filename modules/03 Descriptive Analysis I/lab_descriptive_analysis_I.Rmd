@@ -1,0 +1,612 @@
+---
+title: "Lab: Descriptive Analysis I"
+output: html_notebook
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that your file will use up at the top of the file.
+
+```{r message=FALSE}
+library(dplyr)
+library(freqtables)
+library(ggplot2)
+```
+
+# Overview
+
+In today’s lab we will practice performing an interpreting descriptive analysis on categorical and numerical variables using R. Examples 2 and 3 are taken from the Daniels Biostatistics textbook. Sometimes calculating statistics by hand, and then checking them with statistical software, can help you develop a better intuition for interpreting output.
+
+# Example 1. Descriptive analysis of 2010 Census data
+
+The following data comes from the [United States Census Bureau website](https://data.census.gov/cedsci/).
+
+"AL", "South", 4779736, 657792, 37.9,   
+"AK", "West", 710231, 54938, 33.8,   
+"AZ", "West", 6392017, 881831, 35.9,   
+"AR", "South", 2915918, 419981, 37.4,   
+"CA", "West", 37253956, 4246514, 35.2,    
+"CO", "West", 5029196, 549625, 36.1,     
+"CT", "NE", 3574097, 506559, 40.0,     
+"DE", "South", 897934, 129277, 38.8,    
+"FL", "South", 18801310, 3259602, 40.7,   
+"GA", "South", 9687653, 1032035, 35.3,   
+"HI", "West", 1360301, 195138, 38.6,   
+"ID", "West", 1567582, 194668, 34.6,   
+"IL", "NCntrl", 12830632, 1609213, 36.6,   
+"IN", "NCntrl", 6483802, 6483802, 37.0,   
+"IA", "NCntrl", 3046355, 452888, 38.1,   
+"KS", "NCntrl", 2853118, 376116, 36.0,   
+"KY", "South", 4339367, 578227, 38.1,   
+"LA", "South", 4533372, 557857, 35.8,   
+"ME", "NE", 1328361, 211080, 42.7,   
+"MD", "South", 5773552, 707642, 38.0,   
+"MA", "NE", 6547629, 902724, 39.1,   
+"MI", "NCntrl", 9883640, 1361530, 38.9,   
+"MN", "NCntrl", 5303925, 683121, 37.4,   
+"MS", "South", 2967297, 380407, 36.0,   
+"MO", "NCntrl", 5988927, 838294, 37.9,   
+"MT", "West", 989415, 146742, 39.8,   
+"NE", "NCntrl", 1826341, 246677, 36.2,   
+"NV", "West", 2700551, 324359, 36.3,   
+"NH", "NE", 1316470, 178268, 41.1,   
+"NJ", "NE", 8791894, 1185993, 39.0,   
+"NM", "West", 2059179, 272255, 36.7,   
+"NY", "NE", 19378102, 2617943, 38.0,   
+"NC", "South", 9535483, 1234079, 37.4,   
+"ND", "NCntrl", 672591, 97477, 37.0,   
+"OH", "NCntrl", 11536504, 1622015, 38.8,   
+"OK", "South", 3751351, 506714, 36.2,   
+"OR", "West", 3831074, 533533, 38.4,   
+"PA", "NE", 12702379, 1959307, 40.1,   
+"RI", "NE", 1052567, 151881, 39.4,   
+"SC", "South", 4625364, 631874, 37.9,   
+"SD", "NCntrl", 814180, 116581, 36.9,   
+"TN", "South", 6346105, 853462, 38.0,   
+"TX", "South", 25145561, 2601886, 33.6,   
+"UT", "West", 2763885, 249462, 29.2,   
+"VT", "NE", 625741, 91078, 41.5,   
+"VA", "South", 8001024, 976937, 37.5,   
+"WA", "West", 6724540, 827677, 37.3,   
+"WV", "South", 1852994, 297404, 41.3,   
+"WI", "NCntrl", 5686986, 777314, 38.5,   
+"WY", "West", 563626, 70090, 36.8   
+
+## Task 1. 
+
+Please create a data frame in R from this data.
+
+* Name the data census   
+* When creating the census data frame, please use the following column names (you don’t need to type the definitions anywhere. They are just written below for your benefit):    
+    - state: Abbreviated state name.   
+    - region: Region the state is located in.     
+    - pop: The total population of the state.   
+    - pop65: The population of people in the state who are age 65 or older.    
+    - medage: The median age of the state.   
+    
+```{r}
+census <- tibble::tribble(
+  ~state, ~region,  ~pop,     ~pop65,  ~medage,
+  "AL",   "South",  4779736,  657792,  37.9,
+  "AK",   "West",   710231,   54938,   33.8,
+  "AZ",   "West",   6392017,  881831,  35.9,
+  "AR",   "South",  2915918,  419981,  37.4,
+  "CA",   "West",   37253956, 4246514, 35.2, 
+  "CO",   "West",   5029196,  549625,  36.1, 
+  "CT",   "NE",     3574097,  506559,  40.0, 
+  "DE",   "South",  897934,   129277,  38.8,
+  "FL",   "South",  18801310, 3259602, 40.7,
+  "GA",   "South",  9687653,  1032035, 35.3,
+  "HI",   "West",   1360301,  195138,  38.6,
+  "ID",   "West",   1567582,  194668,  34.6,
+  "IL",   "NCntrl", 12830632, 1609213, 36.6,
+  "IN",   "NCntrl", 6483802,  6483802, 37.0,
+  "IA",   "NCntrl", 3046355,  452888,  38.1,
+  "KS",   "NCntrl", 2853118,  376116,  36.0,
+  "KY",   "South",  4339367,  578227,  38.1,
+  "LA",   "South",  4533372,  557857,  35.8,
+  "ME",   "NE",     1328361,  211080,  42.7,
+  "MD",   "South",  5773552,  707642,  38.0,
+  "MA",   "NE",     6547629,  902724,  39.1,
+  "MI",   "NCntrl", 9883640,  1361530, 38.9,
+  "MN",   "NCntrl", 5303925,  683121,  37.4,
+  "MS",   "South",  2967297,  380407,  36.0,
+  "MO",   "NCntrl", 5988927,  838294,  37.9,
+  "MT",   "West",   989415,   146742,  39.8,
+  "NE",   "NCntrl", 1826341,  246677,  36.2,
+  "NV",   "West",   2700551,  324359,  36.3,
+  "NH",   "NE",     1316470,  178268,  41.1,
+  "NJ",   "NE",     8791894,  1185993, 39.0,
+  "NM",   "West",   2059179,  272255,  36.7,
+  "NY",   "NE",     19378102, 2617943, 38.0,
+  "NC",   "South",  9535483,  1234079, 37.4,
+  "ND",   "NCntrl", 672591,   97477,   37.0,
+  "OH",   "NCntrl", 11536504, 1622015, 38.8,
+  "OK",   "South",  3751351,  506714,  36.2,
+  "OR",   "West",   3831074,  533533,  38.4,
+  "PA",   "NE",     12702379, 1959307, 40.1,
+  "RI",   "NE",     1052567,  151881,  39.4,
+  "SC",   "South",  4625364,  631874,  37.9,
+  "SD",   "NCntrl", 814180,   116581,  36.9,
+  "TN",   "South",  6346105,  853462,  38.0,
+  "TX",   "South",  25145561, 2601886, 33.6,
+  "UT",   "West",   2763885,  249462,  29.2,
+  "VT",   "NE",     625741,   91078,   41.5,
+  "VA",   "South",  8001024,  976937,  37.5,
+  "WA",   "West",   6724540,  827677,  37.3,
+  "WV",   "South",  1852994,  297404,  41.3,
+  "WI",   "NCntrl", 5686986,  777314,  38.5,
+  "WY",   "West",   563626,   70090,   36.8
+)
+```
+
+### Notes for students
+
+1. Notice that I used the `tribble()` function, which is loaded with the `dplyr` package (it's also in the `tibble` package). I did not have to use the `tribble()` function, but doing so saved me some time. I would have had to manually type in the values as columns (vectors) if I used the `data.frame()` function. Using the `tribble()` function allowed me to simply cut and past the data as it was given to me. 
+
+## Task 2. 
+
+Please create a new factor variable for each of the categorical variables in the census data frame (i.e., state and region). Please use the _f naming convention when you create these new columns.
+
+```{r}
+census <- census %>% 
+  mutate(
+    state_f = factor(state),
+    region_f = factor(region)
+  )
+```
+
+## Task 3. 
+
+Please view the structure of the data frame you created above using the `str()` or `dplyr::glimpse()` functions.
+
+```{r}
+glimpse(census)
+```
+
+## Task 4. 
+
+Use R to calculate the frequencies for the region_f variable.
+
+```{r}
+# Using base R
+table(census$region_f)
+```
+
+```{r}
+# Using gmodels::CrossTable
+gmodels::CrossTable(census$region_f)
+```
+
+```{r}
+# Using dplyr
+census %>% 
+  count(region_f)
+```
+
+```{r}
+# Using freqtables
+census %>% 
+  freq_table(region_f)
+```
+
+## Task 5. 
+
+Create a bar graph depicting the number of states in each region.
+
+```{r}
+ggplot(census) +
+  geom_bar(aes(x = region_f))
+```
+
+### Notes for students
+
+1. This one is deceptively simple. All we need to do is tell R to map `region_f` to the `x` aesthetic in the `geom_bar` layer. By default, `geom_bar()` will plot a count of the number of times each category of the variable mapped to `x` appears in the data frame (i.e., how many rows contain each value). For example, "NCntrl" appears in the data frame 12 times. Said another way, there are 12 rows with a value of "NCntrl" in the `region_f` column. Additionally, each row in this data frame corresponds to one, and only one, state, and each state can only have one value for `region_f`. Therefore, plotting the count of each value of `region_f` amounts to plotting the number of states in each region.
+
+## Task 6. 
+
+Reorder the region_f factor vector from the region that contains the fewest number of states to the region that contains the greatest number of states. Then, create another bar graph depicting the number of states in each region. The region that contains the fewest number of states should be the farthest left bar on the graph and the region containing the greatest number of states should be the farthest right bar on the graph.
+
+```{r}
+census %>% 
+  mutate(region_f = factor(region, c("NE", "NCntrl", "West", "South"))) %>% 
+  ggplot() +
+    geom_bar(aes(x = region_f))
+```
+
+### Notes for students
+
+1. We can't reorder character vectors, but we can reorder factors vectors. That's one of the big advantages to using them. If you look at the section in R4Epi titled [coerce a character variable](https://www.r4epi.com/numerical-descriptions-of-categorical-variables.html#coerce-a-character-variable), you'll see that the when we coerce a character vector to a factor vector the order of the values passed to the levels argument matters. It will be the order that the factor levels will be displayed in our analyses.
+
+2. Notice that we passed `region` and `c("NE", "NCntrl", "West", "South")` to the `x` and `levels` arguments by _position_ rather than by _name_. In other words, typed `region` and `c("NE", "NCntrl", "West", "South")` instead of `x = region` and `levels = c("NE", "NCntrl", "West", "South")`. R knew that we wanted to pass these values to the `x` argument and the `levels` argument because they are the first and second argument to the `factor()` function respectively. If you'd like to check for yourself and see what order R expects the arguments to be passed to the `factor()` function in, just type `?base::factor` into the R console. The "Usage" section of the help documentation will tell you which arguments the `factor()` function accepts, what order it expects them in, and what the default values for each argument are. 
+
+3. Notice that we passed the `census` data frame with the reordered `region_f` column to the `ggplot()` function using a pipe operator. Alternatively, we could have overwritten the `census` data with the reordered `region_f` column, and then passed the new `census` data directly to the `data` argument of the `ggplot()` function as we did when we created the first bar plot.
+
+## Questions   
+
+1. When you viewed the structure of the `census` data frame above, how many columns were there?
+
+* There are 7 columns in the `census` data frame. They are `state`, `region`, `pop`, `pop65`, `medage`, `state_f1`, and `region_f`.
+
+2. Which region contains the largest number of states?
+
+* The South region has the largest number of states (n = 16). We can see this in our calculated frequencies and in our bar graph. 
+
+3. How many states are in the NCntrl AND NE region?  
+
+* This is sort of a trick question. There are 12 states in the NCntrl region and there are 9 states in the NE region. However, there aren't any states that appear in both the NCntrl _AND_ NE region. There is a reason for creating a tricky question like this. In most programming languages (including R), the words AND and OR have special meaning and are interpreted very literally. It's best if you start adjusting to it now. This concept typically causes some students problems in later learning modules.
+
+# Example 2. Numerical descriptions of numerical variables
+
+Porcellini et al. studied 13 HIV-positive patients who were treated with highly active antiretroviral therapy (HAART) for at least 6 months. The CD4 T cell counts at baseline for the 13 participants are listed below (Daniel, 2005).
+
+230 205 313 207 227 245 173 58 103 181 105 301 169
+
+## Task 7. 
+
+Use this data to create a numerical vector in R.
+
+```{r}
+cd4_counts <- c(230, 205, 313, 207, 227, 245, 173, 58, 103, 181, 105, 301, 169)
+```
+
+## Task 8. 
+
+Use R to calculate the mean, median, mode, standard deviation, minimum value, and maximum value of this vector.
+
+```{r}
+mode_val <- function(x) {
+  
+  # Count the number of occurrences for each value of x
+  value_counts <- table(x)
+  
+  # Get the maximum number of times any value is observed
+  max_count <- max(value_counts)
+  
+  # Create and index vector that identifies the positions that correspond to
+  # count values that are the same as the maximum count value: TRUE if so
+  # and false otherwise
+  index <- value_counts == max_count
+  
+  # Use the index vector to get all values that are observed the same number 
+  # of times as the maximum number of times that any value is observed
+  unique_values <- names(value_counts)
+  result <- unique_values[index]
+  
+  # If result is the same length as value counts that means that every value
+  # occured the same number of times. If every value occurred the same number
+  # of times, then there is no mode
+  no_mode <- length(value_counts) == length(result)
+  
+  # If there is no mode then change the value of result to NA
+  if (no_mode) {
+    result <- NA
+  }
+  
+  # Return result
+  result
+}
+```
+
+```{r}
+data.frame(
+  mean   = mean(cd4_counts),
+  median = median(cd4_counts),
+  mode   = mode_val(cd4_counts),
+  sd     = sd(cd4_counts),
+  min    = min(cd4_counts),
+  max    = max(cd4_counts)
+)
+```
+
+### Notes for students
+
+1. You may remember that base R does not include a function for calculating the mode value(s) of a vector. In the measures of central tendency chapter of R for Epidemiology, we created our own function for calculating the mode. I just copied and pasted that code above.    
+
+2. Notice that I nested all the individual statistical calculations above inside of the `data.frame()` function. You do not _have_ to do this. I just think it makes the output easier to read when they are labeled and presented side-by-side like this. Additionally, adding all of our descriptive statistics to a data frame like this would allow us to save them as a group. This can sometimes be useful when we want to use these statistics again later -- either in our final presentation of results or as inputs to additional calculations. 
+
+## Questions
+
+4. What is the mean CD4 T cell count for these 13 participants (rounded to the nearest tenth)?
+
+* 193.6
+
+5. What is the median CD4 T cell count for these 13 participants?
+
+* 205
+
+6. What is the mode CD4 T cell count for these 13 participants (rounded to the nearest tenth)?
+
+* There is no mode CD4 T cell count for these 13 participants. This makes sense because if you look at the data, you can see there are no repeating numbers.
+
+7. Which measure of central tendency is best to report based on your results?
+
+* The median value is probably the best choice. There is no mode value, and because the difference between the mean and the median is clinically relevant, and because the difference is like due to outlying values, the median is probably the best choice.
+
+# Example 3. Numerical and graphical descriptions of numerical variables
+
+Thilothammal et al. designed a study to determine the efficacy of BCG (bacillus Calmette-
+Guérin) vaccine in preventing tuberculosis meningitis. Among the data collected on each subject
+was a measure of nutritional status (actual weight expressed as a percentage of expected weight
+for actual height). The nutritional status values of the 107 cases studied are listed below (Daniel,
+2005).
+
+73.3 54.6 82.4 76.5 72.2 73.6 74.0 80.5 71.0 56.8 80.6 100.0 79.6 67.3 50.4 66.0 83.0 72.3 55.7
+64.1 66.3 50.9 71.0 76.5 99.6 79.3 76.9 96.0 64.8 74.0 72.6 80.7 109.0 68.6 73.8 74.0 72.7 65.9
+73.3 84.4 73.2 70.0 72.8 73.6 70.0 77.4 76.4 66.3 50.5 72.0 97.5 130.0 68.1 86.4 70.0 73.0 59.7
+89.6 76.9 74.6 67.7 91.9 55.0 90.9 70.5 88.2 70.5 74.0 55.5 80.0 76.9 78.1 63.4 58.8 92.3 100.0
+84.0 71.4 84.6 123.7 93.7 76.9 79.6 45.6 92.5 65.6 61.3 64.5 72.7 77.5 76.9 80.2 76.9 88.7 78.1
+60.6 59.0 84.7 78.2 72.4 68.3 67.5 76.9 82.6 85.4 65.7 65.9
+
+## Task 9. 
+
+Use the data above to create a numerical vector in R.
+
+```{r}
+nutritional_status <- c(73.3, 54.6, 82.4, 76.5, 72.2, 73.6, 74.0, 80.5, 71.0, 56.8, 80.6, 100.0, 79.6, 67.3, 50.4, 66.0, 83.0, 72.3, 55.7, 64.1, 66.3, 50.9, 71.0, 76.5, 99.6, 79.3, 76.9, 96.0, 64.8, 74.0, 72.6, 80.7, 109.0, 68.6, 73.8, 74.0, 72.7, 65.9, 73.3, 84.4, 73.2, 70.0, 72.8, 73.6, 70.0, 77.4, 76.4, 66.3, 50.5, 72.0, 97.5, 130.0, 68.1, 86.4, 70.0, 73.0, 59.7, 89.6, 76.9, 74.6, 67.7, 91.9, 55.0, 90.9, 70.5, 88.2, 70.5, 74.0, 55.5, 80.0, 76.9, 78.1, 63.4, 58.8, 92.3, 100.0, 84.0, 71.4, 84.6, 123.7, 93.7, 76.9, 79.6, 45.6, 92.5, 65.6, 61.3, 64.5, 72.7, 77.5, 76.9, 80.2, 76.9, 88.7, 78.1, 60.6, 59.0, 84.7, 78.2, 72.4, 68.3, 67.5, 76.9, 82.6, 85.4, 65.7, 65.9)
+```
+
+### Notes for students
+
+1. Typing all of these commas in manually can be really tedious. Here's a little tip to make it easier. Use RStudio's find a replace tool.    
+  - Place your cursor right in front of the first number in the vector (73.3).  
+  - Click the icon for RStudio's find and replace tool. It's at the tope of the source pane and looks like a little magnifying glass.   
+  - Type a single empty space in the "Find" box using the space bar.   
+  - Type a comma followed by a single empty space in the Replace box.    
+  - Click the Replace button repeatedly until you've added a comma between all the values in the vector.   
+  - Close the find and replace tool.   
+  
+2. There's actually a way to make the process above even easier!
+  - Click before the 73.3 and drag your mouse to highlight the entire section of numbers.   
+  - Open the find and replace tool in the same manner as before.    
+  - This time, click the little "In selection" box directly below the "Find" box.   
+  - As before, type a single empty space in the "Find" box using the space bar, and type a comma followed by a single empty space in the Replace box.   
+  - Now, click the "All" button to the right of the replace button. RStudio will then tell you how many replacements were made.    
+  - BE CAREFUL!!! If you forget to check the "In selection" box, then every single space in your file will replaced with a comma and space. If you accidently do this, you can quickly undo it by typing Command + z (on Mac) or Control + z (on Windows).
+  
+## Task 10. 
+
+Use R to calculate the mean, median, mode, standard deviation, minimum value, and maximum value of this vector.
+
+```{r}
+data.frame(
+  mean   = mean(nutritional_status),
+  median = median(nutritional_status),
+  mode   = mode_val(nutritional_status),
+  sd     = sd(nutritional_status),
+  min    = min(nutritional_status),
+  max    = max(nutritional_status)
+)
+```
+
+### Notes for students
+
+1. I hope you didn't type the code above again. Copy and paste is your friend here!!
+
+## Task 11. 
+
+Create a histogram of these values (hint: you _must_ pass a data frame to `ggplot2`. It will not plot a standalone vector).
+
+```{r}
+thilothammal_data <- data.frame(
+  nutritional_status 
+)
+```
+
+```{r}
+ggplot(thilothammal_data) +
+  geom_histogram(aes(x = nutritional_status))
+```
+
+### Notes for students
+
+1. Notice that I had to add our `nutritional_status` vector to a data frame in order to plot it with `ggplot2`. This is because `ggplot` is designed to work with data frames. It is not designed to work with standalone vector.
+
+2. I think the rest of the code is relatively straightforward. As always, we passed the `thilothammal_data` data frame to the `ggplot()` function. Then, we mapped the `nutritional_status` column to x aesthetic inside the `geom_histogram` layer.   
+
+## Questions
+
+8. What is the standard deviation of these participants’ nutritional status (rounded to the nearest tenth)?
+
+* The result of `sd(nutritional_status)` was 13.64424, which is 13.6 after rounding to the nearest tenth.
+
+9. What argument in the geom_histogram() function can you use to adjust the number of bins in your histogram?
+
+* The `bins` argument. When you create a histogram with `ggplot2`, it will pick a default bin width value for you. You can, and sometimes should, adjust the value passed the `bins` argument to improve the appearance of your histogram. 
+
+For example:
+```{r}
+ggplot(thilothammal_data) +
+  geom_histogram(aes(x = nutritional_status), bins = 10)
+```
+
+Students often ask what bin width they select. While there are some rules of thumb that exist for selecting bin widths, none of them are perfect in all situations. Typically, I just play around with bin widths until I feel like I've landed on a histogram that is both _informative_ (i.e., send a clear message) and _honest_ (i.e., does not represent the data as having a shape that it does not actually have). 
+
+# Example 4. Analyze some class survey data
+
+The data below was collected from students in a class. It contains eight variables: id, height, weight, male (coded as 1 if the student is male and 0 if the student is female), bach5300 (coded as 1 if the student took the course BACH5300 and 0 if the student did not take BACH5300), bios5300 (coded as 1 if the student took the course BIOS5300 and 0 if the student did not take BIOS5300), epid5300 (coded as 1 if the student took the course EPID5300 and 0 if the student did not take EPID5300), and gpa.
+
+1 170 185 1 1 1 1 3.6
+2 175 162 1 1 1 1 3.7
+3 231 180 1 1 1 1 3.8
+4 189 190 1 1 0 1 3.8
+5 164 175 1 1 0 1 .
+6 178 178 1 1 0 0 3.78
+7 . 192 1 1 1 0 3.87
+8 184 178 1 1 1 0 3.99
+9 186 169 1 1 1 0 3.98
+10 174 130 1 1 0 0 4
+11 165 140 0 1 0 1 2.8
+12 155 125 0 1 1 . 3.56
+13 158 126 0 1 1 1 .	
+14 156 138 0 1 1 1 2.9
+15 168 116 0 1 1 1 3.5
+16 145 114 0 1 0 1 3.4
+17 158 135 0 1 1 0 3.3
+18 110 141 0 1 0 0 3.8
+19 153 137 0 1 0 0 3.4
+20 165 129 0 1 0 0 3.6
+
+## Task 12. 
+
+Please create a data frame in R from this data.
+
+```{r}
+class <- tibble::tribble(
+  ~id, ~height, ~weight, ~male, ~bach5300, ~bios5300, ~epid5300, ~gpa,
+  1,  170, 185, 1, 1, 1, 1, 3.6,
+  2,  175, 162, 1, 1, 1, 1, 3.7,
+  3,  231, 180, 1, 1, 1, 1, 3.8,
+  4,  189, 190, 1, 1, 0, 1, 3.8,
+  5,  164, 175, 1, 1, 0, 1, NA,
+  6,  178, 178, 1, 1, 0, 0, 3.78,
+  7,  NA,  192, 1, 1, 1, 0, 3.87,
+  8,  184, 178, 1, 1, 1, 0, 3.99,
+  9,  186, 169, 1, 1, 1, 0, 3.98,
+  10, 174, 130, 1, 1, 0, 0, 4,
+  11, 165, 140, 0, 1, 0, 1, 2.8,
+  12, 155, 125, 0, 1, 1, NA, 3.56,
+  13, 158, 126, 0, 1, 1, 1, NA,
+  14, 156, 138, 0, 1, 1, 1, 2.9,
+  15, 168, 116, 0, 1, 1, 1, 3.5,
+  16, 145, 114, 0, 1, 0, 1, 3.4,
+  17, 158, 135, 0, 1, 1, 0, 3.3,
+  18, 110, 141, 0, 1, 0, 0, 3.8,
+  19, 153, 137, 0, 1, 0, 0, 3.4,
+  20, 165, 129, 0, 1, 0, 0, 3.6
+)
+```
+
+### Notes for students
+
+1. I once again used the find and replace tool to add commas to the data. If you missed the explanation for how to do this, it's in the "Notes for students" section between Task 8 and Task 9.    
+
+2. When I copied and pasted the data lines into the R code chunk above, only the first line was properly indented. I could have clicked in front of each id number and hit the tab key to properly indent each line, but there is an easier way! If you just click and drag to select all the lines you want to indent, then hit the tab key, all the lines will be indented at once.
+
+3. A period was used to represent missing values in the raw data you were given. R, of course, uses the special NA value to represent missing data. So, you had to change all the periods to NA in order to create an R data frame. It's fine if you did this manually, but I'm hoping some of you once again used the find and replace tool. Not only does this make things easier for you, but it is also less error prone. We are pretty likely to overlook a period that needs to be changed. R is not. Here's a second little related tip. If you just entered a period in the find box, then all the periods in the gpa column were highlighted and had to be skipped over. If you entered a period followed by a comma (.,) in the find and replace tool, then only the "missing value" periods should have been highlighted (this assumes that you added the commas first). 
+
+## Task 13. 
+
+Use R to calculate the number of missing values, mean, median, minimum value, and maximum value of all of the numeric vectors in this data frame (i.e., height, weight, and gpa).
+
+```{r}
+class %>% 
+  summarise(
+    n_miss = sum(is.na(height)),
+    mean   = mean(height, na.rm = TRUE),
+    median = median(height, na.rm = TRUE),
+    min    = min(height, na.rm = TRUE),
+    max    = max(height, na.rm = TRUE)
+  )
+```
+
+```{r}
+class %>% 
+  summarise(
+    n_miss = sum(is.na(weight)),
+    mean   = mean(weight, na.rm = TRUE),
+    median = median(weight, na.rm = TRUE),
+    min    = min(weight, na.rm = TRUE),
+    max    = max(weight, na.rm = TRUE)
+  )
+```
+
+```{r}
+class %>% 
+  summarise(
+    n_miss = sum(is.na(gpa)),
+    mean   = mean(gpa, na.rm = TRUE),
+    median = median(gpa, na.rm = TRUE),
+    min    = min(gpa, na.rm = TRUE),
+    max    = max(gpa, na.rm = TRUE)
+  )
+```
+
+### Notes for students
+
+1. Notice that I did not use `filter(!is.na(height))`, `filter(!is.na(weight))`, or `filter(!is.na(gpa))` to remove rows with missing data in any of the code chunks above. If I had, then we would not have been able to count the number of missing values. Those rows would have been dropped before the data frame was passed to the `summarise()` function. Instead, we set the `na.rm` argument for the `mean()`, `median()`, `min()`, and `max()` functions to `TRUE`. As you've probably guessed, this tells R to remove the missing values from the vector before calculating the mean, median, min, and max respectively. We could have been using these options all along, but it's more efficient to use a single `filter(!is.na(variable))` in your code when that is an option.
+
+2. Notice how we calculated the number of missing values above -- we nested `is.na()` inside of `sum()`. We did this because the `is.na()` function alone returns a logical vector (i.e., TRUE or FALSE). Specifically, it returns TRUE when a value is missing (`NA`) and FALSE when it is not. For example:
+
+```{r}
+na_example <- c(1, 3, NA, 7, NA)
+is.na(na_example)
+```
+
+* As you've already seen, the `sum()` function just adds the numbers passed to it. For example:
+
+```{r}
+sum_example <- c(0, 0, 1, 0, 1)
+sum(sum_example)
+```
+
+* When you pass a logical vector to an R function that performs calculations on numeric vectors, R will treat `TRUE` as the value `1` and `FALSE` as the value `0`. Therefore, when we pass the `na_example` vector we created above to the `sum()` function, R will treat `FALSE + FALSE + TRUE + FALSE + TRUE` (2) exactly the same as `0 + 0 + 1 + 0 + 1` (2). And of course, the value 2 returned from adding up `FALSE + FALSE + TRUE + FALSE + TRUE` is the same as adding the number of `NA` values.
+
+```{r}
+na_example <- c(1, 3, NA, 7, NA)
+sum(is.na(na_example))
+```
+
+* This little trick (i.e., performing calculations on logical vectors) comes in handy a lot.
+
+## Task 14. 
+
+Create a boxplot for each of the numeric vectors in this data frame (i.e., height, weight, and gpa).
+
+```{r}
+ggplot(class) +
+  geom_boxplot(aes(y = height))
+```
+
+### Notes for students
+
+1. Notice the little warning message that pops up: "Removed 1 rows Removed 1 rows containing non-finite values (stat_boxplot)." It just means that there was a missing value in the variable height that had to be dropped from the data before the boxplot could be created. The warning doesn't hurt anything, but if it bothers you, you can get rid of it by dropping the row with the missing value for `heights` yourself. You can do this with the `filter()` function as we've seen before. 
+
+```{r}
+class %>% 
+  filter(!is.na(height)) %>% 
+  ggplot() +
+    geom_boxplot(aes(y = height))
+```
+
+### Notes for students
+
+1. Notice that I am now passing the filtered data into the `ggplot()` function with a pipe. This is can be a really convenient little trick, but there a couple of things to be careful about. First, make sure you remove the data frame name from inside of the parentheses of `ggplot()` function. In other words, use `df %>% ggplot()` NOT `df %>% ggplot(df)`. Second, remember that ggplot uses the plus sign (`+`) to add layers, not the pipe operator (`%>%`). For some reason, I frequently forget and try to use the pipe operator in my `ggplot2` layers when I pipe data into the `ggplot()` function.
+
+```{r}
+class %>% 
+  filter(!is.na(weight)) %>% 
+  ggplot() +
+    geom_boxplot(aes(y = weight))
+```
+
+```{r}
+class %>% 
+  filter(!is.na(gpa)) %>% 
+  ggplot() +
+    geom_boxplot(aes(y = gpa))
+```
+
+## Questions
+
+10. Which numeric vectors in this data frame (i.e., height, weight, and gpa) have a missing value in at least one observation?
+
+* height and gpa
+
+11. How many non-missing values are there for the variable gpa?
+
+* The variable gpa has 2 missing values. One at id = 5 and one at id = 13. Therefore, there are 18 non-missing values.
+
+12. How many outlying values are there for the variable weight? 
+
+* The variable weight contains zero outlying values. You can see this in the boxplot you created in Task 13. 
+
+13. Which variable has the greatest number of outlying values?
+
+* The variable height contains the greatest number of outlying values (2)
+
+### Notes for students
+
+1. Notice that manually typing in all these lines of data (or even copying and pasting them) is tedious and error prone. Soon, we will learn how to get import saved data directly into R.   
+
+2. Notice that in the code above we often repeat ourselves. For example, each of the code chunks we used above for Task 12 above were identical except for the variable names. This is typically considered bad practice because it's inefficient and error prone. Soon, we will learn a couple of different techniques for removing some of the repetition from our R code.

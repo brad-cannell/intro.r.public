@@ -1,0 +1,209 @@
+---
+title: "Cleaning Hospital Admissions data"
+output: html_notebook
+---
+
+# Overview
+
+A local hospital asked the NTRHD to survey a random sample of its patients about their experience at their most recent admission. We need your help cleaning the data and doing a couple of descriptive analyses. 
+
+```{r message=FALSE}
+library(readr)
+library(dplyr)
+library(lubridate)
+library(stringr)
+```
+
+# Task 1
+
+Click the link below to download the raw data file to your computer:
+
+[hospital_survey.csv](https://www.dropbox.com/s/aqnarnes5fh8udf/hospital_survey.csv?dl=1)
+
+[Click here to view and/or download the data dictionary](https://www.dropbox.com/s/d2cq63eliif2bc7/Codebook%20for%20Hospital%20Survey%20Data.pdf?dl=0).
+
+# Task 2
+
+Import `hospital_survey.csv` into your R global environment as `hospital`.
+
+```{r}
+hospital <- read_csv("/Users/bradcannell/Dropbox/Datasets/Hospital Survey/hospital_survey.csv")
+```
+
+# Task 3
+
+View the structure of hospital using the `str()` function.
+
+```{r}
+str(hospital)
+```
+
+## Question:
+
+1. The `hospital` data frame contains ____ rows and ____ columns.
+
+* The `hospital` data frame contains 100 rows and 16 columns.
+
+# Task 4
+
+As part of the data management process, please coerce the following columns from character type to date type: date of birth, date of admission to the hospital, date of discharge from the hospital.
+
+```{r}
+hospital <- hospital %>%
+  mutate(
+    dob     = as.Date(dob, "%B %d, %Y"),
+    addate  = as.Date(addate, "%B %d, %Y"),
+    disdate = as.Date(disdate, "%B %d, %Y")
+  )
+```
+
+## Notes to students
+
+1. Notice the three lines of code inside the mutate function above are all identical aside from the column name. It's generally a good idea to try to remove this kind of repetition from your code. We will discuss this more in module on repeated operations.  
+
+## Question
+
+2. What is patient 37’s date of admission?
+
+```{r}
+hospital %>% 
+  filter(id == 37) %>% 
+  pull(addate)
+```
+
+* Patient 37’s date of admission is 2020-01-11
+
+# Task 5
+
+Please create a new column in the `hospital` data frame that contains each patient's age in years, as of their last birthday, on the day they were admitted to the hospital. Please name this column `age`.
+
+```{r}
+hospital <- hospital %>% 
+  mutate(age = (dob %--% addate) %/% years(1))
+```
+
+# Task 6
+
+Please create 8 new dummy variables in the `hospital` data frame based on categories from the type of insurance used column.
+
+```{r}
+hospital <- hospital %>% 
+  mutate(
+    ins_none = str_detect(ins, "0"), # No insurance
+    ins_empl = str_detect(ins, "1"), # Employer
+    ins_priv = str_detect(ins, "2"), # Privately purchased
+    ins_mdcr = str_detect(ins, "3"), # Medicare
+    ins_mdcd = str_detect(ins, "4"), # Medicaid
+    ins_mil  = str_detect(ins, "5"), # Military
+    ins_va   = str_detect(ins, "6"), # VA
+    ins_ihs  = str_detect(ins, "7")  # Indian Health Service
+  )
+```
+
+
+# Task 7
+
+View the structure of hospital using the `str()` function.
+
+```{r}
+str(hospital)
+```
+
+## Question
+
+3. The hospital data frame contains ____ rows and ____ columns.
+
+* The hospital data frame contains 100 rows and 25 columns.
+
+# Task 8
+
+Calculate the count and percentage of patients who used Medicare insurance (with or without other forms of insurance).
+
+```{r}
+hospital %>% 
+  count(ins_mdcr) %>% 
+  mutate(percent = n / sum(n) * 100)
+```
+
+## Notes to students
+
+1. Because there are 100 people and no missing data, the count and the percentage are the same.
+
+## Question
+
+4. What percentage of patients used Medicare insurance (with or without other forms of insurance)?
+
+* 12 percent of patients used Medicare insurance (with or without other forms of insurance).
+
+# Task 9
+
+Please create a new column in the `hospital` data frame that contains the day of the week each patient was admitted. Please make sure the full name of the day is displayed. Please name this column `addmit_day`.
+
+```{r}
+hospital <- hospital %>% 
+  mutate(addmit_day = wday(addate, label = TRUE, abbr = FALSE))
+```
+
+# Task 10. 
+
+Calculate the count and percentage of patients who reported that they would recommend this hospital to their friends and family by day of admission. 
+
+```{r}
+hospital %>% 
+  mutate(reco_f = factor(reco, c(0, 1), c("No", "Yes"))) %>% 
+  group_by(addmit_day) %>% 
+  count(reco_f) %>% 
+  mutate(percent = n / sum(n) * 100) %>% 
+  filter(reco_f == "Yes") %>% 
+  arrange(desc(percent))
+```
+
+## Notes to students
+
+1. You didn't have to coerce `reco` to a factor. I just think it looks better and I feel like I'm less likely to make a mistake when interpreting my results. 
+
+2. You didn't have to filter out the "No" categories from the results above. I just think it makes the results easier to read. If you do filter out the "No"s, make sure you do so _after_ calculating the percent.
+
+3. You didn't have to arrange your results. I just feel like doing so makes me less likely to make a mistake when interpreting my results.
+
+## Question
+
+5. Patients admitted on which day most frequently reported (as a percentage) that they would recommend this hospital to their friends and family?
+
+* Patients admitted on Thursdays most frequently reported (64%) that they would recommend this hospital to their friends and family.
+
+# Task 11. 
+
+For each physician, please calculate the mean response value to the survey question, “How would you rate the professionalism of your physicians during your stay?”
+
+```{r message=FALSE}
+hospital %>% 
+  group_by(physician) %>% 
+  summarise(mean_sat = mean(pro2)) %>% 
+  arrange(desc(mean_sat))
+```
+
+## Notes to students
+
+1. I didn't create a task specifically instructing you to clean the physician names. However, I'm hoping the first time you ran the analysis above, you thought the results looked weird. If you go check the data dictionary, you should see that there are only four possible valid physician names. 
+
+```{r message=FALSE}
+hospital %>% 
+  mutate(
+    physician = str_to_lower(physician),
+    physician = str_replace(physician, "recse", "reese")
+  ) %>% 
+  group_by(physician) %>% 
+  summarise(mean_sat = mean(pro2)) %>% 
+  arrange(desc(mean_sat))
+```
+
+## Question
+
+5. Patients treated by which physician reported the highest mean response to the “How would you rate the professionalism of your physicians during your stay?” survey question?
+
+* Patients treated by Dr. Steele reported the highest mean response to the “How would you rate the professionalism of your physicians during your stay?” survey question (3.6).
+
+## Notes to students
+
+1. Even though `pro2` is sequentially numbered (i.e., values = 1 through 5), it isn't really a numeric variable. These are categories that have been assigned to numbers. Can we really say that a "No Opinion" is 2 better than a "Poor"? No, we can't. In cases like this, it can be a bad idea to analyze your data as though it were continuous. I just asked you to do it above because it is a convenient way for me to check to see if you did the data management correctly. Please do as I say, not as I do! 😂

@@ -1,0 +1,286 @@
+---
+title: "Restructuring Data Frames"
+output: html_notebook
+---
+
+# Overview
+
+This week, we will practice restructuring data frames. We will do so using a couple of different data sets:
+
+* [Click here to download dfwtemps2012.sas7bdat](https://www.dropbox.com/s/ok5athwxaecq3r8/dfwtemps2012.sas7bdat?dl=1). This data set contains the average daily temperature for Dallas, TX in the year 2012.
+
+* [Click here to download epcr_multi_treat.rds](https://www.dropbox.com/s/ax6cq3qo56jdrcl/epcr_multi_treat.rds?dl=1). This data is from a local Emergency Medical Services (EMS) provider’s Electronic Patient Care Reporting (EPCR) system. Each row in the EPCR data represents a unique 911 emergency response, but not a unique person. Each person has exactly two rows.
+
+```{r message=FALSE}
+library(haven)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(readr)
+library(lubridate)
+```
+
+# Task 1
+
+Please download `dfwtemps2012.sas7bdat`, import it into your R global environment as `temps_2012` and view the data.
+
+```{r}
+temps_2012 <- read_sas("/Users/bradcannell/Dropbox/Datasets/Average Temperatures/dfwtemps2012.sas7bdat")
+```
+
+```{r}
+temps_2012
+```
+
+## Questions
+
+1. The `temps_2012` data frame contains ____ rows and ____ columns.
+
+* The `temps_2012` data frame contains 12 rows and 32 columns.
+
+2. Does the `temps_2012` data frame currently have a person-period (long) structure or a person-level (wide) structure?
+
+* The `temps_2012` data frame currently has a person-level (wide) structure.
+
+3. Which of the tidy data guidelines does `temps_2012` violate?
+
+* In the `temps_2012` data frame, each variable does not have its own column. The day of the month variable does not have a column at all. Instead, it's embedded in the other column names. Additionally, each observation does not have its own row. In the `temps_2012` data frame, each observation is a single day; however, each row is not a single day.
+
+Looking at the `temps_2012` data frame, please consider each of the following questions. How would you calculate the mean overall temperature for the year? How you plot average monthly temperatures? How would you convert all the temperatures from Fahrenheit to Celcius? 
+
+All 3 tasks above (and probably many others) would be difficult to do with the `temps_2012` data frame. However, we will easily do all three of these things below after restructuring the `temps_2012` data frame from wide to long.
+
+# Task 2
+
+Restructure the `temps_2012` data from wide to long. Name the restructured data frame `temps_2012_long`. Please make sure the restructured data frame includes a column that contains the day of the month and a single column that contains the temperature in degrees Fahrenheit. Please name these columns `day` and `temp_fahrenheit` respectively.
+
+```{r}
+temps_2012_long <- temps_2012 %>% 
+  pivot_longer(
+    cols            = -month, 
+    names_to        = "day", 
+    names_prefix    = "temp_f",
+    names_transform = list(day = as.integer),
+    values_to       = "temp_fahrenheit"
+  ) %>% 
+  print()
+```
+
+## Question
+
+4. The `temps_2012_long` data frame contains ____ rows and ____ columns.
+
+* The `temps_2012_long` data frame contains 372 rows and 3 columns.
+
+# Task 3
+
+Please calculate the number of missing values and the mean, median, minimum, and maximum value of the `temp_fahrenheit` column.
+
+```{r}
+temps_2012_long %>% 
+  summarise(
+    n_miss = sum(is.na(temp_fahrenheit)),
+    mean   = mean(temp_fahrenheit, na.rm = TRUE),
+    median = median(temp_fahrenheit, na.rm = TRUE),
+    min    = min(temp_fahrenheit, na.rm = TRUE),
+    max    = max(temp_fahrenheit, na.rm = TRUE)
+  )
+```
+
+## Question
+
+5. What is the mean value of the `temp_fahrenheit` column (rounded to the nearest integer)?
+
+* The mean value of the `temp_fahrenheit` column is 9 degrees Fahrenheit. Does this seem like a reasonable estimate for the average temperature in Dallas over the course of a year?
+
+# Task 4
+
+In the previous task, you should have found temperature values that were equal to -999. The temperature in Dallas was obviously never -999 degrees Fahrenheit. It turns out that these values were just codes used to represent missing data. Please recode all instances of -999 for `temp_fahrenheit` to missing.
+
+```{r}
+temps_2012_long <- temps_2012_long %>% 
+  mutate(temp_fahrenheit = if_else(temp_fahrenheit == -999, NA_real_, temp_fahrenheit))
+```
+
+# Task 5
+
+Please once again calculate the number of missing values and the mean, median, minimum, and maximum value of the `temp_fahrenheit` column.
+
+```{r}
+temps_2012_long %>% 
+  summarise(
+    n_miss = sum(is.na(temp_fahrenheit)),
+    mean   = mean(temp_fahrenheit, na.rm = TRUE),
+    median = median(temp_fahrenheit, na.rm = TRUE),
+    min    = min(temp_fahrenheit, na.rm = TRUE),
+    max    = max(temp_fahrenheit, na.rm = TRUE)
+  )
+```
+
+## Question
+
+6. How many missing values are there in the `temp_fahrenheit` column?
+
+* There are 21 missing values in the `temp_fahrenheit` column.
+
+# Task 6
+
+Please use `temps_2012_long` to create a boxplot of temperature by month. Please map months to the x-axis and temperatures to the y-axis.
+
+```{r}
+ggplot(temps_2012_long) + 
+  geom_boxplot(aes(month, temp_fahrenheit))
+```
+
+## Notes to students
+
+1. The plot above may be what your first attempt looked like. It isn't technically wrong, but it could certainly be improved on. Most importantly, a very clear trend that exists in average temperatures throughout the year is completely lost in the plot above.
+
+2. The warning above that says "Removed 21 rows containing non-Finite values (stat_boxplot)" is just telling us that the 21 rows with a missing value for temp_fahrenheit were dropped in order to make this plot. It's not really a problem, but it is kind of ugly. We will fix it below by dropping the rows with missing values from the data frame ourselves.
+
+3. Currently, month is a character vector. Remember that character vectors are ordered alphabetically by default. I this case, the alphabetical, rather than chronological, ordering causes to the trend in temperature change throughout the year to be totally invisible. To fix this, we will coerce months to a factor vector below, and order the factor levels chronologically (i.e., Jan to Dec).
+
+4. Finally, we will get rid of the gray background and make the axis labels look a little bit better.
+
+```{r}
+temps_2012_long <- temps_2012_long %>% 
+  # Drop the 21 rows with missing data to get rid of the warning above
+  filter(!is.na(temp_fahrenheit)) %>% 
+  # Coerce month to a factor and order chronologically
+  mutate(
+    # First, have to change the case
+    # Currently some months are written in upper case
+    # Others are written in title case
+    month   = str_to_title(month),
+    # Use built-in month.abb vector to conveniently order month_f chronologically
+    month_f = factor(month, month.abb)
+  ) %>% 
+  print()
+```
+
+```{r}
+ggplot(temps_2012_long) + 
+  geom_boxplot(aes(month_f, temp_fahrenheit)) +
+  labs(
+    x = "Month",
+    y = "Temperature",
+    color = "Scale"
+  ) +
+  theme_classic()
+```
+
+## Questions
+
+7. Which month appears to have the highest average temperature?
+
+* July appears to have the highest average temperature. It's median (the black line in the middle of the boxplot) is highest of all the months.
+
+8. Which month appears to have the largest range of temperatures?
+
+* December appears to have the largest range of temperatures. The length between the top and bottom of its whiskers appears to be the longest of all the months.
+
+# Task 7
+
+The formula to convert Fahrenheit to Celsius is The temperature T in degrees Celsius (°C) is equal to the temperature T in degrees Fahrenheit (°F) minus 32, times 5/9. 
+
+$$T_{C} = (T_{F} - 32) * 5 / 9$$
+
+Please create a new column in the `temps_2012_long` data frame that contains the daily average temperature in degrees Celsius. Please name the new column temp_celsius.
+
+```{r}
+temps_2012_long <- temps_2012_long %>% 
+  mutate(temp_celsius = (temp_fahrenheit - 32) * 5 / 9) %>% 
+  print()
+```
+
+# Task 8
+
+Please calculate the number of missing values and the mean, median, minimum, and maximum value of the `temp_celsius` column.
+
+```{r}
+temps_2012_long %>% 
+  summarise(
+    n_miss = sum(is.na(temp_celsius)),
+    mean   = mean(temp_celsius, na.rm = TRUE),
+    median = median(temp_celsius, na.rm = TRUE),
+    min    = min(temp_celsius, na.rm = TRUE),
+    max    = max(temp_celsius, na.rm = TRUE)
+  )
+```
+
+## Question
+
+9. What is the mean value of `temp_celsiust` (rounded to the nearest integer)?
+
+* The mean value of `temp_celsius` (rounded to the nearest integer) is 21.
+
+# Task 9 
+
+Please download `epcr_multi_treat.rds`, import it into your R global environment as `epcr_multi_treat` and view the data.
+
+```{r}
+epcr_multi_treat <- read_rds("/Users/bradcannell/Dropbox/Datasets/epcr/epcr_multi_treat.Rds")
+```
+
+```{r}
+epcr_multi_treat
+```
+
+# Task 10 
+
+Please create a new column in `epcr_multi_treat` that sequentially counts the number of rows each person in the data frame has.
+
+```{r}
+epcr_multi_treat <- epcr_multi_treat %>% 
+  group_by(name) %>% 
+  mutate(incident_number = row_number()) %>% 
+  ungroup()
+```
+
+# Task 11
+
+Restructure the `epcr_multi_treat` data from long to wide. Name the restructured data frame `epcr_multi_treat_wide`. Please make sure the restructured data frame includes at least the following columns: the arrival time at each person’s first 911 response, the arrival time at each person’s second 911 response, the incident complaint(s) at each person’s first 911 response, and the incident complaint(s) at each person’s second 911 response.
+
+```{r}
+epcr_multi_treat_wide <- epcr_multi_treat %>% 
+  pivot_wider(
+    id_cols     = "name",
+    names_from  = "incident_number",
+    values_from = c("arrival_time", "incident_complaint")
+  )
+```
+
+## Notes to students
+
+1. We didn't talk about the `id_cols` argument in the readings for this module. Take a look at the help documentation for `pivot_wider` and play around with adding and removing the `id_cols` argument to get a feel for what it does.
+
+# Task 12
+
+Please create a new column in `epcr_multi_treat_wide` that contains the number of days that elapsed between each person’s first and second 911 response.
+
+```{r}
+epcr_multi_treat_wide <- epcr_multi_treat_wide %>% 
+  mutate(repeat_time = arrival_time_1 %--% arrival_time_2 %/% days(1))
+```
+
+# Task 13
+
+Please calculate the number of missing values and the mean, median, minimum, and maximum value of the `repeat_time` column.
+
+```{r}
+epcr_multi_treat_wide %>% 
+  summarise(
+    n_miss = sum(is.na(repeat_time)),
+    mean   = mean(repeat_time, na.rm = TRUE),
+    median = median(repeat_time, na.rm = TRUE),
+    min    = min(repeat_time, na.rm = TRUE),
+    max    = max(repeat_time, na.rm = TRUE)
+  )
+```
+
+## Question
+
+10. What is the minimum number of days that elapsed between any person’s first and second 911 response (rounded to the nearest integer)?
+
+* The minimum number of days that elapsed between any person’s first and second 911 response (rounded to the nearest integer) was 0.

@@ -1,0 +1,31 @@
+===============================================================================
+Comments for coding and best practices lab rubric
+2020-06-03
+===============================================================================
+
+All of the R code is styled in accordance with the guidelines in R4Epi.
+-----------------------------------------------------------------------
+* Please do not use upper-case letters in variable names.
+
+* Please indent all the code inside your data.frame() function.
+
+* Please use NA to represent missing values.
+
+
+The R Notebook makes appropriate use of comments for adding context around the R code.
+--------------------------------------------------------------------------------------
+* I know this scenario is a little contrived, but please try to add a few more comments around your code for the sake of getting used to it.
+
+* Please remove all the example text comments and code that are included by default in new R Notebooks.
+
+
+Overall comments:
+-----------------
+Hi ,
+Great first attempt. Please feel free to address the comments above and resubmit for full credit. 
+
+Great job, !
+
+In addition to the comments above, please print the data frame and view the structure of the data frame (tasks 3 and 4 in the assignment instructions).
+
+Next time, I would appreciate it if you also run each R code chunk before hitting the preview button. That way I can see your code AND your results. For example, I can't see the result of the str(form20) command in your HTML Notebook.

@@ -1,0 +1,312 @@
+---
+title: "Chocolate Study"
+output: html_notebook
+---
+
+# Overview
+
+The NTRHD is part of a study about the association between chocolate eating habits and academic ability. The study took place at multiple schools, chosen at random, from around the region. Graduate students administered the surveys to students at each school, recorded survey responses electronically, and then emailed them to us. Now, we need your help importing the data into R, doing a little bit of data cleaning, and saving the data again once it’s ready for analysis. 
+
+```{r message=FALSE}
+library(dplyr, warn.conflicts = FALSE)
+library(readxl)
+library(readr)
+library(haven)
+```
+
+# Task 1 
+
+Click the links below to download the raw data files to your computer: 
+
+* [chocolate study 1.xls](https://www.dropbox.com/s/9riqfhtf582o2az/Chocolate%20Study%201.xls?dl=1)   
+* [chocolate study 2.csv](https://www.dropbox.com/s/ggln051redw1g98/Chocolate%20Study%202.csv?dl=1)
+* [chocolate study 3.txt](https://www.dropbox.com/s/90ndmdc463ui88j/Chocolate%20Study%203.txt?dl=1)
+
+# Task 2
+
+Import `Chocolate Study 1.xls` into your R global environment as `choco_1`.
+
+## Question:
+
+1. Which of the following code chunks will correctly import the `Chocolate Study 1.xls` data into your R global environment as `choco_1`?
+
+```{r eval=FALSE}
+# Incorrect: chocolate_study_1.xls is not a csv file.
+choco_1 <- read_csv("Chocolate Study 1.xls")
+```
+
+```{r eval=FALSE}
+# Incorrect: readxl is the name of an R package, not a function.
+choco_1 <- readxl("Chocolate Study 1.xls")
+```
+
+```{r eval=FALSE}
+# Incorrect: readr is the name of an R package, not a function.
+choco_1 <- readr("Chocolate Study 1.xls")
+```
+
+```{r eval=FALSE}
+# Correct.
+choco_1 <- read_excel("Chocolate Study 1.xls")
+```
+
+```{r}
+# For Dr. Cannell's computer.
+choco_1 <- read_excel("/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 1.xls")
+```
+
+# Task 3 
+
+View the structure of `choco_1` using the `str()` function.
+
+```{r}
+str(choco_1)
+```
+
+## Question:
+
+2. The `choco_1` data frame contains ____ rows and ____ columns.
+
+* The `choco_1` data frame contains 50 rows and 21 columns.
+
+# Task 4
+
+Import `Chocolate Study 2.csv` into your R global environment as `choco_2`.
+
+## Question:
+
+3. Which of the following code chunks will correctly import the `Chocolate Study 2.csv` data into your R global environment?
+
+```{r eval=FALSE}
+# Incorrect: Although you can open chocolate_study_1.csv in Excel, it doesn't have a .xls or .xlsx file extension, which is what read_excel expects.
+choco_2 <- read_excel("Chocolate Study 2.csv")
+```
+
+```{r eval=FALSE}
+# Incorrect: There is a read.csv() function that will import this data. However, it isn't in the readr package. The double colon syntax used in the code readr::read.csv() tells R to look for the read.csv() function in the readr package, which doesn't exist. The read_csv() function is a base R function. 
+choco_2 <- readr::read.csv("Chocolate Study 2.csv")
+```
+
+```{r eval=FALSE}
+# Correct. However, I prefer read_csv() over read.csv().
+choco_2 <- read.csv("Chocolate Study 2.csv")
+```
+
+```{r eval=FALSE}
+# Correct.
+choco_2 <- read_csv("Chocolate Study 2.csv")
+```
+
+```{r}
+# For Dr. Cannell's computer.
+choco_2 <- read_csv("/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 2.csv")
+```
+
+# Task 5 
+
+View the structure of `choco_2` using the `str()` function.
+
+```{r}
+str(choco_2)
+```
+
+## Question:
+
+4. The `choco_2` data frame contains ____ rows and ____ columns.
+
+* The `choco_2` data frame contains 20 rows and 21 columns.
+
+# Task 6 
+
+Import `Chocolate Study 3.txt` into your R global environment as `choco_3`. Make sure to tell R how to correctly identify missing values in the raw data.
+
+## Question:
+
+5. Which of the following code chunks will correctly import the `Chocolate Study 3.txt` data into your R global environment?
+
+```{r eval=FALSE}
+# Incorrect: read_table will not correctly handle values that include spaces 
+# such as "Flower Grove" in the school column.
+choco_3 <- read_table("Chocolate Study 3.txt")
+```
+
+```{r eval=FALSE}
+# Incorrect: This code does not tell R how to correctly identify missing values in the raw data.
+choco_3 <- read_fwf(
+  "Chocolate Study 3.txt",
+  col_positions = fwf_widths(
+    widths    = c(5, 9, 8, 4, 6, 13, 9, 9, 6, 6, 6, 6, 6, 6, 8, 7, 7, 7, 7, 9, 6),
+    col_names = c(
+      "uin", "last", "first", "age", "grade", "school", "parent", "marry", 
+      "math1", "math2", "math3", "read1", "read2", "read3", "overall", "choco1", 
+      "choco2", "choco3", "extra1", "extra2", "veggie"
+    )
+  ),
+  skip = 1,
+  na.rm = TRUE
+)
+```
+
+```{r eval=FALSE}
+# Incorrect: This code gives column start values instead of column widths
+choco_3 <- read_fwf(
+  "Chocolate Study 3.txt",
+  col_positions = fwf_widths(
+    widths    = c(5, 9, 8, 4, 6, 13, 9, 9, 6, 6, 6, 6, 6, 6, 8, 7, 7, 7, 7, 9, 6),
+    col_names = c(
+      "uin", "last", "first", "age", "grade", "school", "parent", "marry", 
+      "math1", "math2", "math3", "read1", "read2", "read3", "overall", "choco1", 
+      "choco2", "choco3", "extra1", "extra2", "veggie"
+    )
+  ),
+  skip = 1,
+  na = "."
+)
+```
+
+```{r eval=FALSE}
+# Correct
+choco_3 <- read_fwf(
+  "Chocolate Study 3.txt",
+  col_positions = fwf_widths(
+    widths    = c(5, 9, 8, 4, 6, 13, 9, 9, 6, 6, 6, 6, 6, 6, 8, 7, 7, 7, 7, 9, 6),
+    col_names = c(
+      "uin", "last", "first", "age", "grade", "school", "parent", "marry", 
+      "math1", "math2", "math3", "read1", "read2", "read3", "overall", "choco1", 
+      "choco2", "choco3", "extra1", "extra2", "veggie"
+    )
+  ),
+  skip = 1,
+  na = "."
+)
+```
+
+```{r}
+# For Dr. Cannell's computer.
+choco_3 <- read_fwf(
+  "/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 3.txt",
+  col_positions = fwf_widths(
+    widths    = c(5, 9, 8, 4, 6, 13, 9, 9, 6, 6, 6, 6, 6, 6, 8, 7, 7, 7, 7, 9, 6),
+    col_names = c(
+      "uin", "last", "first", "age", "grade", "school", "parent", "marry", 
+      "math1", "math2", "math3", "read1", "read2", "read3", "overall", "choco1", 
+      "choco2", "choco3", "extra1", "extra2", "veggie"
+    )
+  ),
+  skip = 1,
+  na = "."
+)
+```
+
+# Task 7 
+
+View the structure of `choco_3` using the `str()` function.
+
+```{r}
+str(choco_3)
+```
+
+## Question:
+
+6. The `choco_3` data frame contains ____ rows and ____ columns.
+
+* The `choco_3` data frame contains 10 rows and 21 columns.
+
+# Task 8. 
+
+Please view the National Health and Nutrition Examination Survey (NHANES) questionnaires, datasets, and related documentation website here: https://wwwn.cdc.gov/nchs/nhanes/ 
+
+# Task 9. 
+
+Import the 2015-2016 Alcohol Use data. Alcohol use was part of the NHANES questionnaire data.
+
+```{r}
+alq_i <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/ALQ_I.XPT")
+```
+
+## Question:
+
+7. What R package contains the `read_xpt()` function we need to use to import the NHANES data in Task 9?
+
+* The [haven](https://haven.tidyverse.org/) package contains the `read_xpt()` function we need to use to import the NHANES data in Task 9.
+
+# Task 10. 
+
+Coerce all of the variable names in `alq_i` to lowercase.
+
+## Question:
+
+8. Which of the following code chunks will correctly coerce all of the variable names in `alq_i` to lowercase?
+
+```{r eval=FALSE}
+# Incorrect: This code passes the entire alq_i data frame, not just the column names from alq_i, to the tolower() function.
+names(alq_i) <- alq_i %>% tolower()
+```
+
+```{r eval=FALSE}
+# Incorrect: This code doesn't assign the lowercase variable names back to the alq_i data frame (or anywhere else).
+tolower(names(alq_i))
+```
+
+```{r eval=FALSE}
+# Incorrect: This code overwrites the alq_i data frame with a vector of lowercase variable names from the alq_i data frame.
+alq_i <- names(alq_i) %>% tolower()
+```
+
+```{r}
+# Correct.
+names(alq_i) <- names(alq_i) %>% tolower()
+```
+
+## Notes to students
+
+1. We can easily convert any character string to all lowercase letters using the `tolower()` function. The code above tells R to get the column names from alq_i (`names(alq_i)`), convert them all to lowercase (`%>% tolower()`), and finally assign the new lowercase versions back to the column names (`names(alq_i) <-`).
+
+# Task 11. 
+
+Coerce all of the categorical variables in `alq_i` to a factor variables. Use the value descriptions from the 2015-2016 NHANES Alcohol Use data codebook to make factor levels and labels. Name the factor version of each variable the same name as the original version, but add a `_f` to the end.
+
+```{r}
+# Create a numeric vector you can reuse for all yes/no factor levels
+yn_levs <- c(1, 2, 7, 9)
+# Create a character vector you can reuse for all yes/no factor labels
+yn_labs <- c("Yes", "No", "Refused", "Don't know")
+# Create a numeric vector you can reuse for all unit of time factor levels
+time_levs <- c(1, 2, 3, 7, 9)
+# Create a character vector you can reuse for all unit of time factor labels
+time_labs <- c("Week", "Month", "Year", "Refused", "Don't know")
+```
+
+## Notes to students
+
+1. You don't have to do what I did above. You could have entered these values directly into the `factor()` functions below. I did it this way for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes it easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
+
+```{r}
+alq_i <- alq_i %>% 
+  mutate(
+    alq101_f  = factor(alq101, yn_levs, yn_labs),
+    alq110_f  = factor(alq110, yn_levs, yn_labs),
+    alq120u_f = factor(alq120u, time_levs, time_labs),
+    alq141u_f = factor(alq141u, time_levs, time_labs),
+    alq151_f  = factor(alq151, yn_levs, yn_labs)
+  )
+```
+
+# Task 12
+
+View the structure of `alq_i` using the `str()` function.
+
+```{r}
+str(alq_i)
+```
+
+## Questions:
+
+9. The `alq_i` data frame contains ____ rows and ____ columns.
+
+* The `alq_i` data frame contains 5,735 rows and 15 columns.
+
+10. When you view the structure of `alq_i` using the `str()` function, what is the vector type shown for `alq101_f`? According to R, what kind of variable is `alq101_f`? 
+
+* When you view the structure of `alq_i` using the `str()` function, the vector type shown is `Factor`.
+

@@ -1,0 +1,217 @@
+---
+title: "NTRHD Client Data"
+output: html_notebook
+---
+
+# Overview
+
+As you may already know, we provide short-term mental health counseling services here at the NTRHD. Once enrolled in these services, our clients are invited to come in for a maximum of six sessions. At each session, our clients complete a brief health survey. The May data was just sent to me, and I could use your help preparing it for analysis.
+
+```{r message=FALSE}
+library(readr)
+library(dplyr)
+```
+
+# Task 1
+
+Click the link below to download the raw data file to your computer:
+
+[ntrhd_clients_may.csv](https://www.dropbox.com/s/i1myxu7u10uqz2l/ntrhd_clients_may.csv?dl=1)
+
+# Task 2
+
+Import `ntrhd_clients_may.csv` into your R global environment as `clients_may`.
+
+```{r}
+clients_may <- read_csv("/Users/bradcannell/Dropbox/Datasets/NTRHD Clients/ntrhd_clients_may.csv")
+```
+
+# Task 3
+
+View the structure of clients_may using the `str()` function.
+
+```{r}
+str(clients_may)
+```
+
+## Question:
+
+1. The `clients_may` data frame contains ____ rows and ____ columns.
+
+* The `clients_may` data frame contains 84 rows and 14 columns.
+
+# Task 4
+
+As part of the data management process, please make sure that all column names are in lowercase. Additionally, please change the following specific column names:
+
+* `First Name` to `name_first`   
+* `Last Name` to `name_last`   
+* `Alcohol 1` to `drink_eight`   
+* `Alcohol 2` to `drink_blackout`
+* `Alcohol 3` to `drink_fail_expectation`    
+* `Alcohol 4` to `drink_concern`
+
+```{r}
+clients_may <- clients_may %>% 
+  rename_with(tolower) %>% 
+  rename(
+    "name_first"             = "first name",
+    "name_last"              = "last name",
+    "drink_eight"            = "alcohol 1",
+    "drink_blackout"         = "alcohol 2",
+    "drink_fail_expectation" = "alcohol 3",
+    "drink_concern"          = "alcohol 4"
+  )
+```
+
+# Task 5
+
+Please drop all of the depression columns from the data frame. We will not analyze them this month.
+
+```{r}
+clients_may <- clients_may %>% 
+  select(-`depression 1`, -`depression 2`, -`depression 3`, -`depression 4`)
+```
+
+## Notes to students
+
+1. Remember that when column names contain spaces, we have to wrap them with backticks in order to use them in our R code. In general, I don't think it's a good idea to use column names that contain spaces.
+
+2. In this case, I kind of like the code we used to drop the depression columns above because it's very explicit. You can skim this code and easily see exactly which columns we are dropping from the data. However, here are some other options that would also get the job done:
+
+```{r eval=FALSE}
+clients_may %>% 
+  select(name_first:drink_concern)
+```
+
+```{r eval=FALSE}
+clients_may %>% 
+  select(-c(11:14))
+```
+
+```{r eval=FALSE}
+clients_may %>% 
+  select(-starts_with("depression"))
+```
+
+# Task 6
+
+We need to identify unique people in the data frame. 
+
+* Assume that unique combinations of first and last name uniquely identifies people. In other words, assume that no two people have the same first and last name.   
+* Add a column that sequentially numbers each row for each unique person in the data frame.   
+* Add a column that identifies duplicate (by first and last name) rows in the data frame. The value of this column should be `FALSE` the first time the client appears in the data and `TRUE` at each additional time (when applicable).   
+
+```{r}
+clients_may <- clients_may %>% 
+  group_by(name_first, name_last) %>% 
+  mutate(
+    count = row_number(),
+    dup   = count > 1
+  ) %>% 
+  ungroup()
+```
+
+# Task 7. 
+
+Create a new data frame named `clients_may_dedup` from `clients_may` by dropping all duplicate (by first and last name) rows from the data.
+
+```{r}
+clients_may_dedup <- clients_may %>% 
+  filter(!dup)
+```
+
+## Question
+
+2. How many unique people does `clients_may_dedup` contain?
+
+```{r}
+nrow(clients_may_dedup)
+```
+
+* There are 60 unique people in `clients_may`.
+
+# Task 8. 
+
+Create a new column in `clients_may_dedup` named `bmi` that contains the Body Mass Index for each client calculated using [the formula found on the CDC website here](https://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/index.html).
+
+```{r}
+clients_may_dedup <- clients_may_dedup %>% 
+  mutate(bmi = weight / height^2 * 703)
+```
+
+# Task 9. 
+
+Arrange the columns in `clients_may_dedup` such that the new `bmi` column immediately follows the `weight` column.
+
+```{r}
+clients_may_dedup <- clients_may_dedup %>% 
+  select(name_first:weight, bmi, everything())
+```
+
+# Task 10. 
+
+For all remaining calculations, we want to perform complete case analyses. Drop all rows from `clients_may_dedup` that have a missing value for `bmi`.
+
+```{r}
+clients_may_dedup <- clients_may_dedup %>% 
+  filter(!is.na(bmi))
+```
+
+# Task 11. 
+
+Calculate the mean value of BMI for the remaining May clients (round to one decimal place).
+
+```{r}
+clients_may_dedup %>% 
+  summarise(mean_bmi = mean(bmi) %>% round(1))
+```
+
+## Notes to students
+
+1. If you get an unexpected result here, make sure you go back and ungroup your data in Task 6.
+
+## Question:
+
+3. After listwise deletion, what is the mean BMI for May clients at their first session (round to one decimal place)?
+
+* After listwise deletion, the mean BMI for May clients at their first session was 21.8.
+
+# Task 12. 
+
+Create a new column in `clients_may_dedup` named `any_drink` that is `TRUE` if the client responded “yes” (i.e., had a value of 1) for any of the alcohol drinking questions and `FALSE` if the client responded “no” to all of the alcohol drinking questions.
+
+```{r}
+clients_may_dedup <- clients_may_dedup %>% 
+  rowwise() %>% 
+  mutate(any_drink = sum(drink_eight, drink_blackout, drink_fail_expectation, drink_concern) > 0) %>% 
+  ungroup()
+```
+
+# Task 13. 
+
+Calculate the number and percentage of May clients who had a “yes” response to any of the alcohol drinking questions.
+
+```{r}
+clients_may_dedup %>% 
+  count(any_drink) %>% 
+  mutate(percent = (n / sum(n) * 100) %>% round())
+```
+
+## Notes to students
+
+1. If you get an unexpected result here, make sure you ungrouped your data after creating `any_drink` in Task 12.
+
+## Questions:
+
+4. What percentage of May clients had a “yes” response to any of the alcohol drinking questions (round to the nearest whole percent — no decimals)?
+
+* 18%
+
+5. After completing all tasks above, the `clients_may_dedup` data frame contains ____ rows and ____ columns. 
+
+* After completing all tasks above, the `clients_may_dedup` data frame contains 34 rows and 14 columns.
+
+6. After completing all tasks above, the ninth column in the `clients_may_dedup` data frame is ____.
+
+* After completing all tasks above, the ninth column in the `clients_may_dedup` data frame is `drink_blackout`.
