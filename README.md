@@ -27,7 +27,7 @@ You can install the development version of project from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("brad-cannell/intro_r_public")
+devtools::install_github("brad-cannell/intro.r.public")
 ```
 
 Currently, there isn’t a reason to install this package. In the future,

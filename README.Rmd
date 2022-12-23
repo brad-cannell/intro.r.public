@@ -34,7 +34,7 @@ You can install the development version of project from [GitHub](https://github.
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("brad-cannell/intro_r_public")
+devtools::install_github("brad-cannell/intro.r.public")
 ```
 
 Currently, there isn't a reason to install this package. In the future, we imagine that we will use this package to share R code (including functions) and example data sets.
