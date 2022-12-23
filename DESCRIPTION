@@ -1,0 +1,11 @@
+Package: intro.r.public
+Title: Introduction to R Programming and Data Management Public Repository
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Brad", family = "Cannell", email = "Michael.B.Cannell@uth.tmc.edu", 
+    role = c("aut", "cph", "cre"))
+Description: Package to accompany Introduction to R Programming and Data Management.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1

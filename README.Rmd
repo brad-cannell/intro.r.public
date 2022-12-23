@@ -1,0 +1,41 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Introduction to R Programming and Data Management Public Repository
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![CRAN status](https://www.r-pkg.org/badges/version/project)](https://CRAN.R-project.org/package=project)
+<!-- badges: end -->
+
+This is the public repository for Brad Cannell’s Introduction to R Programming and Data Management Public Repository course at UTHealth. It is still under development. Currently, this repository is for:
+
+1. R code for lab warm-ups.
+2. R code for labs.
+3. Other files intended to be shared with students and/or the public.
+4. Loading practice data sets.
+
+
+## Installation
+
+You can install the development version of project from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("brad-cannell/intro_r_public")
+```
+
+Currently, there isn't a reason to install this package. In the future, we imagine that we will use this package to share R code (including functions) and example data sets.
+
