@@ -7,6 +7,8 @@ output: html_notebook
 
 The NTRHD is part of a study about the association between chocolate eating habits and academic ability. The study took place at multiple schools, chosen at random, from around the region. Graduate students administered the surveys to students at each school, recorded survey responses electronically, and then emailed them to us. Now, we need your help importing the data into R, doing a little bit of data cleaning, and saving the data again once it’s ready for analysis. 
 
+Additionally, we need you to download, clean, and save some NHANES data on alcohol use.
+
 ```{r message=FALSE}
 library(dplyr, warn.conflicts = FALSE)
 library(readxl)
@@ -214,14 +216,18 @@ str(choco_3)
 
 # Task 8. 
 
-Please view the National Health and Nutrition Examination Survey (NHANES) questionnaires, datasets, and related documentation website here: https://wwwn.cdc.gov/nchs/nhanes/ 
+Please view the National Health and Nutrition Examination Survey (NHANES) questionnaires, datasets, and related documentation website here: https://wwwn.cdc.gov/nchs/nhanes/Default.aspx. Then, locate and select the `NHANES 2017-2018 data`.
 
 # Task 9. 
 
-Import the 2015-2016 Alcohol Use data. Alcohol use was part of the NHANES questionnaire data.
+After locating the data from the correct years, import the `Alcohol Use` data into R. 
+
+* `Alcohol Use` was part of the `NHANES questionnaire data`. The link to the data file should be labeled as, "ALQ_J Data [XPT - 434.4 KB]". The `XPT` file extension tells us that this is a SAS Transport file.
+
+* Instead of downloading the data from the NHANES website to your computer, try passing a link to the XPT file directly to the `read_xpt()` function. [R4Epi](https://www.r4epi.com/importing-binary-files.html#importing-sas-data-sets) has an example that you can reference. 
 
 ```{r}
-alq_i <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/ALQ_I.XPT")
+alq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/ALQ_J.XPT")
 ```
 
 ## Question:
@@ -232,39 +238,39 @@ alq_i <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2015-2016/ALQ_I.XPT")
 
 # Task 10. 
 
-Coerce all of the variable names in `alq_i` to lowercase.
+Coerce all of the variable names in `alq_j` to lowercase.
 
 ## Question:
 
-8. Which of the following code chunks will correctly coerce all of the variable names in `alq_i` to lowercase?
+8. Which of the following code chunks will correctly coerce all of the variable names in `alq_j` to lowercase?
 
 ```{r eval=FALSE}
-# Incorrect: This code passes the entire alq_i data frame, not just the column names from alq_i, to the tolower() function.
-names(alq_i) <- alq_i %>% tolower()
+# Incorrect: This code passes the entire alq_j data frame, not just the column names from alq_j, to the tolower() function.
+names(alq_j) <- alq_j %>% tolower()
 ```
 
 ```{r eval=FALSE}
-# Incorrect: This code doesn't assign the lowercase variable names back to the alq_i data frame (or anywhere else).
-tolower(names(alq_i))
+# Incorrect: This code doesn't assign the lowercase variable names back to the alq_j data frame (or anywhere else).
+tolower(names(alq_j))
 ```
 
 ```{r eval=FALSE}
-# Incorrect: This code overwrites the alq_i data frame with a vector of lowercase variable names from the alq_i data frame.
-alq_i <- names(alq_i) %>% tolower()
+# Incorrect: This code overwrites the alq_j data frame with a vector of lowercase variable names from the alq_j data frame.
+alq_j <- names(alq_j) %>% tolower()
 ```
 
 ```{r}
 # Correct.
-names(alq_i) <- names(alq_i) %>% tolower()
+names(alq_j) <- names(alq_j) %>% tolower()
 ```
 
 ## Notes to students
 
-1. We can easily convert any character string to all lowercase letters using the `tolower()` function. The code above tells R to get the column names from alq_i (`names(alq_i)`), convert them all to lowercase (`%>% tolower()`), and finally assign the new lowercase versions back to the column names (`names(alq_i) <-`).
+1. We can easily convert any character string to all lowercase letters using the `tolower()` function. The code above tells R to get the column names from alq_j (`names(alq_j)`), convert them all to lowercase (`%>% tolower()`), and finally assign the new lowercase versions back to the column names (`names(alq_j) <-`).
 
 # Task 11. 
 
-Coerce all of the categorical variables in `alq_i` to a factor variables. Use the value descriptions from the 2015-2016 NHANES Alcohol Use data codebook to make factor levels and labels. Name the factor version of each variable the same name as the original version, but add a `_f` to the end.
+Coerce all of the categorical variables in `alq_j` to a factor variables. Use the value descriptions from the NHANES Alcohol Use data codebook to make factor levels and labels. Name the factor version of each variable the same name as the original version, but add a `_f` to the end.
 
 ```{r}
 # Create a numeric vector you can reuse for all yes/no factor levels
@@ -282,7 +288,7 @@ time_labs <- c("Week", "Month", "Year", "Refused", "Don't know")
 1. You don't have to do what I did above. You could have entered these values directly into the `factor()` functions below. I did it this way for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes it easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
 
 ```{r}
-alq_i <- alq_i %>% 
+alq_j <- alq_j %>% 
   mutate(
     alq101_f  = factor(alq101, yn_levs, yn_labs),
     alq110_f  = factor(alq110, yn_levs, yn_labs),
@@ -294,19 +300,19 @@ alq_i <- alq_i %>%
 
 # Task 12
 
-View the structure of `alq_i` using the `str()` function.
+View the structure of `alq_j` using the `str()` function.
 
 ```{r}
-str(alq_i)
+str(alq_j)
 ```
 
 ## Questions:
 
-9. The `alq_i` data frame contains ____ rows and ____ columns.
+9. The `alq_j` data frame contains ____ rows and ____ columns.
 
-* The `alq_i` data frame contains 5,735 rows and 15 columns.
+* The `alq_j` data frame contains 5,735 rows and 15 columns.
 
-10. When you view the structure of `alq_i` using the `str()` function, what is the vector type shown for `alq101_f`? According to R, what kind of variable is `alq101_f`? 
+10. When you view the structure of `alq_j` using the `str()` function, what is the vector type shown for `alq101_f`? According to R, what kind of variable is `alq101_f`? 
 
-* When you view the structure of `alq_i` using the `str()` function, the vector type shown is `Factor`.
+* When you view the structure of `alq_j` using the `str()` function, the vector type shown is `Factor`.
 
