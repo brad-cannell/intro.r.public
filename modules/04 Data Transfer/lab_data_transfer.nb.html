@@ -2029,20 +2029,21 @@ choco_3 &lt;- read_fwf(
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBGb3IgRHIuIENhbm5lbGwncyBjb21wdXRlci5cbmNob2NvXzMgPC0gcmVhZF9md2YoXG4gIFwiL1VzZXJzL2JyYWRjYW5uZWxsL0Ryb3Bib3gvRGF0YXNldHMvQ2hvY29sYXRlL0Nob2NvbGF0ZSBTdHVkeSAzLnR4dFwiLFxuICBjb2xfcG9zaXRpb25zID0gZndmX3dpZHRocyhcbiAgICB3aWR0aHMgICAgPSBjKDUsIDksIDgsIDQsIDYsIDEzLCA5LCA5LCA2LCA2LCA2LCA2LCA2LCA2LCA4LCA3LCA3LCA3LCA3LCA5LCA2KSxcbiAgICBjb2xfbmFtZXMgPSBjKFxuICAgICAgXCJ1aW5cIiwgXCJsYXN0XCIsIFwiZmlyc3RcIiwgXCJhZ2VcIiwgXCJncmFkZVwiLCBcInNjaG9vbFwiLCBcInBhcmVudFwiLCBcIm1hcnJ5XCIsIFxuICAgICAgXCJtYXRoMVwiLCBcIm1hdGgyXCIsIFwibWF0aDNcIiwgXCJyZWFkMVwiLCBcInJlYWQyXCIsIFwicmVhZDNcIiwgXCJvdmVyYWxsXCIsIFwiY2hvY28xXCIsIFxuICAgICAgXCJjaG9jbzJcIiwgXCJjaG9jbzNcIiwgXCJleHRyYTFcIiwgXCJleHRyYTJcIiwgXCJ2ZWdnaWVcIlxuICAgIClcbiAgKSxcbiAgc2tpcCA9IDEsXG4gIG5hID0gXCIuXCJcbilcbmBgYCJ9 -->
-<pre class="r"><code># For Dr. Cannell&#39;s computer.
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuIyBGb3IgRHIuIENhbm5lbGwncyBjb21wdXRlci5cbmNob2NvXzMgPC0gcmVhZF9md2YoXG4gIFxcL1VzZXJzL2JyYWRjYW5uZWxsL0Ryb3Bib3gvRGF0YXNldHMvQ2hvY29sYXRlL0Nob2NvbGF0ZSBTdHVkeSAzLnR4dFxcLFxuICBjb2xfcG9zaXRpb25zID0gZndmX3dpZHRocyhcbiAgICB3aWR0aHMgICAgPSBjKDUsIDksIDgsIDQsIDYsIDEzLCA5LCA5LCA2LCA2LCA2LCA2LCA2LCA2LCA4LCA3LCA3LCA3LCA3LCA5LCA2KSxcbiAgICBjb2xfbmFtZXMgPSBjKFxuICAgICAgXFx1aW5cXCwgXFxsYXN0XFwsIFxcZmlyc3RcXCwgXFxhZ2VcXCwgXFxncmFkZVxcLCBcXHNjaG9vbFxcLCBcXHBhcmVudFxcLCBcXG1hcnJ5XFwsIFxuICAgICAgXFxtYXRoMVxcLCBcXG1hdGgyXFwsIFxcbWF0aDNcXCwgXFxyZWFkMVxcLCBcXHJlYWQyXFwsIFxccmVhZDNcXCwgXFxvdmVyYWxsXFwsIFxcY2hvY28xXFwsIFxuICAgICAgXFxjaG9jbzJcXCwgXFxjaG9jbzNcXCwgXFxleHRyYTFcXCwgXFxleHRyYTJcXCwgXFx2ZWdnaWVcXFxuICAgIClcbiAgKSxcbiAgc2tpcCA9IDEsXG4gIG5hID0gXFwuXFxcbilcbmBgYFxuYGBgIn0= -->
+<pre class="r"><code>```r
+# For Dr. Cannell&#39;s computer.
 choco_3 &lt;- read_fwf(
-  &quot;/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 3.txt&quot;,
+  \/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 3.txt\,
   col_positions = fwf_widths(
     widths    = c(5, 9, 8, 4, 6, 13, 9, 9, 6, 6, 6, 6, 6, 6, 8, 7, 7, 7, 7, 9, 6),
     col_names = c(
-      &quot;uin&quot;, &quot;last&quot;, &quot;first&quot;, &quot;age&quot;, &quot;grade&quot;, &quot;school&quot;, &quot;parent&quot;, &quot;marry&quot;, 
-      &quot;math1&quot;, &quot;math2&quot;, &quot;math3&quot;, &quot;read1&quot;, &quot;read2&quot;, &quot;read3&quot;, &quot;overall&quot;, &quot;choco1&quot;, 
-      &quot;choco2&quot;, &quot;choco3&quot;, &quot;extra1&quot;, &quot;extra2&quot;, &quot;veggie&quot;
+      \uin\, \last\, \first\, \age\, \grade\, \school\, \parent\, \marry\, 
+      \math1\, \math2\, \math3\, \read1\, \read2\, \read3\, \overall\, \choco1\, 
+      \choco2\, \choco3\, \extra1\, \extra2\, \veggie\
     )
   ),
   skip = 1,
-  na = &quot;.&quot;
+  na = \.\
 )</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
@@ -2060,16 +2061,6 @@ choco_3 &lt;- read_fwf(
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div id="question-5" class="section level2">
-<h2>Question:</h2>
-<ol start="6" style="list-style-type: decimal">
-<li>The <code>choco_3</code> data frame contains ____ rows and ____
-columns.</li>
-</ol>
-<ul>
-<li>The <code>choco_3</code> data frame contains 10 rows and 21
-columns.</li>
-</ul>
 </div>
 </div>
 <div id="task-8." class="section level1">
@@ -2117,7 +2108,7 @@ the NHANES data in Task 9.</li>
 <h1>Task 10.</h1>
 <p>Coerce all of the variable names in <code>alq_j</code> to
 lowercase.</p>
-<div id="question-7" class="section level2">
+<div id="question-2" class="section level2">
 <h2>Question:</h2>
 <ol start="8" style="list-style-type: decimal">
 <li>Which of the following code chunks will correctly coerce all of the
@@ -2181,7 +2172,7 @@ of each variable the same name as the original version, but add a
 <pre class="r"><code># Create a numeric vector you can reuse for all yes/no factor levels
 yn_levs &lt;- c(1, 2, 7, 9)
 # Create a character vector you can reuse for all yes/no factor labels
-yn_labs &lt;- c(&quot;Yes&quot;, &quot;No&quot;, &quot;Refused&quot;, &quot;Don&#39;t know&quot;)
+yn_labs &lt;- c(\Yes\, \No\, \Refused\, \Don&#39;t know\)
 # Create a numeric vector you can reuse for all unit of time factor levels
 time_levs &lt;- c(1, 2, 3, 7, 9)
 # Create a character vector you can reuse for all unit of time factor labels
@@ -2212,7 +2203,48 @@ change them once in the code chunk above, as opposed to changing every
     alq141u_f = factor(alq141u, time_levs, time_labs),
     alq151_f  = factor(alq151, yn_levs, yn_labs)
   )</code></pre>
-<!-- rnb-source-end -->
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+# Task 12
+
+View the structure of `alq_i` using the `str()` function.
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc3RyKGFscV9pKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+str(alq_i)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-output-begin eyJkYXRhIjoidGliYmxlIFs1LDczNSDDlyAxNV0gKFMzOiB0YmxfZGYvdGJsL2RhdGEuZnJhbWUpXG4gJCBzZXFuICAgICA6IG51bSBbMTo1NzM1XSA4MzczMiA4MzczMyA4MzczNCA4MzczNSA4MzczNiAuLi5cbiAgLi4tIGF0dHIoKiwgXFxsYWJlbFxcKT0gY2hyIFxcUmVzcG9uZGVudCBzZXF1ZW5jZSBudW1iZXJcXFxuICQgYWxxMTAxICAgOiBudW0gWzE6NTczNV0gMSAxIDEgMiAyIDIgMSAxIE5BIDEgLi4uXG4gIC4uLSBhdHRyKCosIFxcbGFiZWxcXCk9IGNociBcXEhhZCBhdCBsZWFzdCAxMiBhbGNvaG9sIGRyaW5rcy8xIHlyP1xcXG4gJCBhbHExMTAgICA6IG51bSBbMTo1NzM1XSBOQSBOQSBOQSAxIDEgMiBOQSBOQSBOQSBOQSAuLi5cbiAgLi4tIGF0dHIoKiwgXFxsYWJlbFxcKT0gY2hyIFxcSGFkIGF0IGxlYXN0IDEyIGFsY29ob2wgZHJpbmtzL2xpZmV0aW1lP1xcXG4gJCBhbHExMjBxICA6IG51bSBbMTo1NzM1XSAxIDcgMCAzIDEgTkEgMyAxIE5BIDAgLi4uXG4gIC4uLSBhdHRyKCosIFxcbGFiZWxcXCk9IGNociBcXEhvdyBvZnRlbiBkcmluayBhbGNvaG9sIG92ZXIgcGFzdCAxMiBtb3NcXFxuICQgYWxxMTIwdSAgOiBudW0gWzE6NTczNV0gMiAxIE5BIDMgMyBOQSAyIDIgTkEgTkEgLi4uXG4gIC4uLSBhdHRyKCosIFxcbGFiZWxcXCk9IGNociBcXCMgZGF5cyBkcmluayBhbGNvaG9sIHBlciB3a1xuIn0= --&gt;
+</code></pre>
+<p>tibble [5,735 × 15] (S3: tbl_df/tbl/data.frame) $ seqn : num [1:5735]
+83732 83733 83734 83735 83736 … ..- attr(<em>, )= chr sequence
+number<br />
+$ alq101 : num [1:5735] 1 1 1 2 2 2 1 1 NA 1 … ..- attr(</em>, )= chr at
+least 12 alcohol drinks/1 yr?<br />
+$ alq110 : num [1:5735] NA NA NA 1 1 2 NA NA NA NA … ..- attr(<em>, )=
+chr at least 12 alcohol drinks/lifetime?<br />
+$ alq120q : num [1:5735] 1 7 0 3 1 NA 3 1 NA 0 … ..- attr(</em>, )= chr
+often drink alcohol over past 12 mos<br />
+$ alq120u : num [1:5735] 2 1 NA 3 3 NA 2 2 NA NA … ..- attr(*, )= chr #
+days drink alcohol per wk ```</p>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
