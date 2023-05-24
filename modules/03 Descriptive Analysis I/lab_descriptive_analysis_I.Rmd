@@ -350,7 +350,7 @@ nutritional_status <- c(73.3, 54.6, 82.4, 76.5, 72.2, 73.6, 74.0, 80.5, 71.0, 56
 
 1. Typing all of these commas in manually can be really tedious. Here's a little tip to make it easier. Use RStudio's find a replace tool.    
   - Place your cursor right in front of the first number in the vector (73.3).  
-  - Click the icon for RStudio's find and replace tool. It's at the tope of the source pane and looks like a little magnifying glass.   
+  - Click the icon for RStudio's find and replace tool. It's at the top of the source pane and looks like a little magnifying glass.   
   - Type a single empty space in the "Find" box using the space bar.   
   - Type a comma followed by a single empty space in the Replace box.    
   - Click the Replace button repeatedly until you've added a comma between all the values in the vector.   
@@ -362,7 +362,7 @@ nutritional_status <- c(73.3, 54.6, 82.4, 76.5, 72.2, 73.6, 74.0, 80.5, 71.0, 56
   - This time, click the little "In selection" box directly below the "Find" box.   
   - As before, type a single empty space in the "Find" box using the space bar, and type a comma followed by a single empty space in the Replace box.   
   - Now, click the "All" button to the right of the replace button. RStudio will then tell you how many replacements were made.    
-  - BE CAREFUL!!! If you forget to check the "In selection" box, then every single space in your file will replaced with a comma and space. If you accidently do this, you can quickly undo it by typing Command + z (on Mac) or Control + z (on Windows).
+  - BE CAREFUL!!! If you forget to check the "In selection" box, then every single space in your file will replaced with a comma and space. If you accidentally do this, you can quickly undo it by typing Command + z (on Mac) or Control + z (on Windows).
   
 ## Task 10. 
 
