@@ -1,0 +1,91 @@
+---
+title: "Repeated Operations II"
+output: html_notebook
+---
+
+# Overview
+
+This week, we will practice using for loops and performing repeated operations with functions from the purrr package.
+
+* [Click here to download Clients list.csv](**link update**). As you may already know, we provide short-term mental health counseling services here at the NTRHD. Once enrolled in these services, our clients are invited to come in for a maximum of six sessions. At each session, our clients complete a brief health survey. The June, July and August data was just sent to me, and I could use your help preparing it for analysis.
+
+```{r message=FALSE}
+library(readr)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(purrr)
+library(readxl)
+```
+
+# Task 1
+
+Please download ntrhd_clients_June_July_August.xlsx, import each sheet in the excel file using a for loop.
+
+```{r}
+# Save the file path to an object so we don't have to type it repeatedly 
+path <- "C:/Users/jelly/OneDrive - The University of Texas Health Science Center at Houston/TA/ntrhd_clients_June_July_August.xlsx"
+
+# Use readxl::excel_sheets to get the name of each sheet in the workbook.
+# this makes our code more robust.
+
+for(i in seq_along(sheets)) {
+  # Convert sheet name to lowercase before using it to name the data frame
+  new_nm <- tolower(sheets[[i]])
+  assign(new_nm, read_excel(path, sheet = sheets[[i]]))
+}
+```
+
+# Task 2
+
+Now import the same file using the purrr package instead (hint: try using purrr::walk() function). 
+
+```{r}
+
+walk(
+  .x = excel_sheets(path),
+  .f = function(x) {
+    new_nm <- tolower(x)
+    assign(new_nm, read_excel(path, sheet = x), envir = .GlobalEnv)
+  }
+)
+```
+
+## Notes to students
+Alternatively, you can also use the map() function to return a list of data frames and then extract each sheet into a separate data frame further (with a bit of repetition, of course!) 
+## Question
+
+1. Calculate the mean weight for each month.
+
+```{r}
+#We can implement the continuous variable calculation function from the textbook.
+continuous_stats <- function(data, var) {
+  data %>%  
+    summarise(
+      variable = quo_name(var),
+      n_miss   = sum(is.na({{ var}} )),
+      mean     = mean({{ var }}, na.rm = TRUE),
+      median   = median({{ var }}, na.rm = TRUE),
+      min      = min({{ var }}, na.rm = TRUE),
+      max      = max({{ var }}, na.rm = TRUE)
+    ) 
+}
+
+months<-list(june, july, august)
+
+for (i in months){
+results<-map_dfr(
+  .x = quos(Height, Weight),
+  .f = continuous_stats, data = i
+)
+print(results)}
+```
+
+* June: 66.7inches, 157lbs
+July: 66.3inches, 157lbs 
+August: 67.2inches, 162lbs
+
+
+# Task 3. 
+
+#Need ideas for additional tasks
