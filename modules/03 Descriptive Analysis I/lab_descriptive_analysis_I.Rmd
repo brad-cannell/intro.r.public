@@ -72,7 +72,7 @@ The following data comes from the [United States Census Bureau website](https://
 "WI", "NCntrl", 5686986, 777314, 38.5,   
 "WY", "West", 563626, 70090, 36.8   
 
-## Task 1. 
+## Task 1
 
 Please create a data frame in R from this data.
 
@@ -144,7 +144,7 @@ census <- tibble::tribble(
 
 1. Notice that I used the `tribble()` function, which is loaded with the `dplyr` package (it's also in the `tibble` package). I did not have to use the `tribble()` function, but doing so saved me some time. I would have had to manually type in the values as columns (vectors) if I used the `data.frame()` function. Using the `tribble()` function allowed me to simply cut and past the data as it was given to me. 
 
-## Task 2. 
+## Task 2
 
 Please create a new factor variable for each of the categorical variables in the census data frame (i.e., state and region). Please use the _f naming convention when you create these new columns.
 
@@ -156,7 +156,7 @@ census <- census %>%
   )
 ```
 
-## Task 3. 
+## Task 3
 
 Please view the structure of the data frame you created above using the `str()` or `dplyr::glimpse()` functions.
 
@@ -164,7 +164,7 @@ Please view the structure of the data frame you created above using the `str()` 
 glimpse(census)
 ```
 
-## Task 4. 
+## Task 4
 
 Use R to calculate the frequencies for the region_f variable.
 
@@ -190,7 +190,7 @@ census %>%
   freq_table(region_f)
 ```
 
-## Task 5. 
+## Task 5
 
 Create a bar graph depicting the number of states in each region.
 
@@ -203,7 +203,7 @@ ggplot(census) +
 
 1. This one is deceptively simple. All we need to do is tell R to map `region_f` to the `x` aesthetic in the `geom_bar` layer. By default, `geom_bar()` will plot a count of the number of times each category of the variable mapped to `x` appears in the data frame (i.e., how many rows contain each value). For example, "NCntrl" appears in the data frame 12 times. Said another way, there are 12 rows with a value of "NCntrl" in the `region_f` column. Additionally, each row in this data frame corresponds to one, and only one, state, and each state can only have one value for `region_f`. Therefore, plotting the count of each value of `region_f` amounts to plotting the number of states in each region.
 
-## Task 6. 
+## Task 6
 
 Reorder the region_f factor vector from the region that contains the fewest number of states to the region that contains the greatest number of states. Then, create another bar graph depicting the number of states in each region. The region that contains the fewest number of states should be the farthest left bar on the graph and the region containing the greatest number of states should be the farthest right bar on the graph.
 
@@ -222,17 +222,21 @@ census %>%
 
 3. Notice that we passed the `census` data frame with the reordered `region_f` column to the `ggplot()` function using a pipe operator. Alternatively, we could have overwritten the `census` data with the reordered `region_f` column, and then passed the new `census` data directly to the `data` argument of the `ggplot()` function as we did when we created the first bar plot.
 
-## Questions   
+## Question 1
 
-1. When you viewed the structure of the `census` data frame above, how many columns were there?
+When you viewed the structure of the `census` data frame above, how many columns were there?
 
 * There are 7 columns in the `census` data frame. They are `state`, `region`, `pop`, `pop65`, `medage`, `state_f1`, and `region_f`.
 
-2. Which region contains the largest number of states?
+## Question 2
+
+Which region contains the largest number of states?
 
 * The South region has the largest number of states (n = 16). We can see this in our calculated frequencies and in our bar graph. 
 
-3. How many states are in the NCntrl AND NE region?  
+## Question 3
+
+How many states are in the NCntrl AND NE region?  
 
 * This is sort of a trick question. There are 12 states in the NCntrl region and there are 9 states in the NE region. However, there aren't any states that appear in both the NCntrl _AND_ NE region. There is a reason for creating a tricky question like this. In most programming languages (including R), the words AND and OR have special meaning and are interpreted very literally. It's best if you start adjusting to it now. This concept typically causes some students problems in later learning modules.
 
@@ -242,7 +246,7 @@ Porcellini et al. studied 13 HIV-positive patients who were treated with highly 
 
 230 205 313 207 227 245 173 58 103 181 105 301 169
 
-## Task 7. 
+## Task 7
 
 Use this data to create a numerical vector in R.
 
@@ -250,7 +254,7 @@ Use this data to create a numerical vector in R.
 cd4_counts <- c(230, 205, 313, 207, 227, 245, 173, 58, 103, 181, 105, 301, 169)
 ```
 
-## Task 8. 
+## Task 8
 
 Use R to calculate the mean, median, mode, standard deviation, minimum value, and maximum value of this vector.
 
@@ -305,21 +309,27 @@ data.frame(
 
 2. Notice that I nested all the individual statistical calculations above inside of the `data.frame()` function. You do not _have_ to do this. I just think it makes the output easier to read when they are labeled and presented side-by-side like this. Additionally, adding all of our descriptive statistics to a data frame like this would allow us to save them as a group. This can sometimes be useful when we want to use these statistics again later -- either in our final presentation of results or as inputs to additional calculations. 
 
-## Questions
+## Question 4
 
-4. What is the mean CD4 T cell count for these 13 participants (rounded to the nearest tenth)?
+What is the mean CD4 T cell count for these 13 participants (rounded to the nearest tenth)?
 
 * 193.6
 
-5. What is the median CD4 T cell count for these 13 participants?
+## Question 5
+
+What is the median CD4 T cell count for these 13 participants?
 
 * 205
 
-6. What is the mode CD4 T cell count for these 13 participants (rounded to the nearest tenth)?
+## Question 6
+
+What is the mode CD4 T cell count for these 13 participants (rounded to the nearest tenth)?
 
 * There is no mode CD4 T cell count for these 13 participants. This makes sense because if you look at the data, you can see there are no repeating numbers.
 
-7. Which measure of central tendency is best to report based on your results?
+## Question 7
+
+Which measure of central tendency is best to report based on your results?
 
 * The median value is probably the best choice. There is no mode value, and because the difference between the mean and the median is clinically relevant, and because the difference is like due to outlying values, the median is probably the best choice.
 
@@ -338,7 +348,7 @@ for actual height). The nutritional status values of the 107 cases studied are l
 84.0 71.4 84.6 123.7 93.7 76.9 79.6 45.6 92.5 65.6 61.3 64.5 72.7 77.5 76.9 80.2 76.9 88.7 78.1
 60.6 59.0 84.7 78.2 72.4 68.3 67.5 76.9 82.6 85.4 65.7 65.9
 
-## Task 9. 
+## Task 9
 
 Use the data above to create a numerical vector in R.
 
@@ -364,7 +374,7 @@ nutritional_status <- c(73.3, 54.6, 82.4, 76.5, 72.2, 73.6, 74.0, 80.5, 71.0, 56
   - Now, click the "All" button to the right of the replace button. RStudio will then tell you how many replacements were made.    
   - BE CAREFUL!!! If you forget to check the "In selection" box, then every single space in your file will replaced with a comma and space. If you accidentally do this, you can quickly undo it by typing Command + z (on Mac) or Control + z (on Windows).
   
-## Task 10. 
+## Task 10
 
 Use R to calculate the mean, median, mode, standard deviation, minimum value, and maximum value of this vector.
 
@@ -383,7 +393,7 @@ data.frame(
 
 1. I hope you didn't type the code above again. Copy and paste is your friend here!!
 
-## Task 11. 
+## Task 11
 
 Create a histogram of these values (hint: you _must_ pass a data frame to `ggplot2`. It will not plot a standalone vector).
 
@@ -404,17 +414,20 @@ ggplot(thilothammal_data) +
 
 2. I think the rest of the code is relatively straightforward. As always, we passed the `thilothammal_data` data frame to the `ggplot()` function. Then, we mapped the `nutritional_status` column to x aesthetic inside the `geom_histogram` layer.   
 
-## Questions
+## Question 8
 
-8. What is the standard deviation of these participants’ nutritional status (rounded to the nearest tenth)?
+What is the standard deviation of these participants’ nutritional status (rounded to the nearest tenth)?
 
 * The result of `sd(nutritional_status)` was 13.64424, which is 13.6 after rounding to the nearest tenth.
 
-9. What argument in the geom_histogram() function can you use to adjust the number of bins in your histogram?
+## Question 9
+
+What argument in the geom_histogram() function can you use to adjust the number of bins in your histogram?
 
 * The `bins` argument. When you create a histogram with `ggplot2`, it will pick a default bin width value for you. You can, and sometimes should, adjust the value passed the `bins` argument to improve the appearance of your histogram. 
 
 For example:
+
 ```{r}
 ggplot(thilothammal_data) +
   geom_histogram(aes(x = nutritional_status), bins = 10)
@@ -447,7 +460,7 @@ The data below was collected from students in a class. It contains eight variabl
 19 153 137 0 1 0 0 3.4
 20 165 129 0 1 0 0 3.6
 
-## Task 12. 
+## Task 12
 
 Please create a data frame in R from this data.
 
@@ -485,7 +498,7 @@ class <- tibble::tribble(
 
 3. A period was used to represent missing values in the raw data you were given. R, of course, uses the special NA value to represent missing data. So, you had to change all the periods to NA in order to create an R data frame. It's fine if you did this manually, but I'm hoping some of you once again used the find and replace tool. Not only does this make things easier for you, but it is also less error prone. We are pretty likely to overlook a period that needs to be changed. R is not. Here's a second little related tip. If you just entered a period in the find box, then all the periods in the gpa column were highlighted and had to be skipped over. If you entered a period followed by a comma (.,) in the find and replace tool, then only the "missing value" periods should have been highlighted (this assumes that you added the commas first). 
 
-## Task 13. 
+## Task 13
 
 Use R to calculate the number of missing values, mean, median, minimum value, and maximum value of all of the numeric vectors in this data frame (i.e., height, weight, and gpa).
 
@@ -549,7 +562,7 @@ sum(is.na(na_example))
 
 * This little trick (i.e., performing calculations on logical vectors) comes in handy a lot.
 
-## Task 14. 
+## Task 14
 
 Create a boxplot for each of the numeric vectors in this data frame (i.e., height, weight, and gpa).
 
@@ -587,21 +600,27 @@ class %>%
     geom_boxplot(aes(y = gpa))
 ```
 
-## Questions
+## Question 10
 
-10. Which numeric vectors in this data frame (i.e., height, weight, and gpa) have a missing value in at least one observation?
+Which numeric vectors in this data frame (i.e., height, weight, and gpa) have a missing value in at least one observation?
 
 * height and gpa
 
-11. How many non-missing values are there for the variable gpa?
+## Question 11
+
+How many non-missing values are there for the variable gpa?
 
 * The variable gpa has 2 missing values. One at id = 5 and one at id = 13. Therefore, there are 18 non-missing values.
 
-12. How many outlying values are there for the variable weight? 
+## Question 12
+
+How many outlying values are there for the variable weight? 
 
 * The variable weight contains zero outlying values. You can see this in the boxplot you created in Task 13. 
 
-13. Which variable has the greatest number of outlying values?
+## Question 13
+
+Which variable has the greatest number of outlying values?
 
 * The variable height contains the greatest number of outlying values (2)
 

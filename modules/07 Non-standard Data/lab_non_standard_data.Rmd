@@ -38,9 +38,9 @@ View the structure of hospital using the `str()` function.
 str(hospital)
 ```
 
-## Question:
+## Question 1
 
-1. The `hospital` data frame contains ____ rows and ____ columns.
+The `hospital` data frame contains ____ rows and ____ columns.
 
 * The `hospital` data frame contains 100 rows and 16 columns.
 
@@ -61,9 +61,9 @@ hospital <- hospital %>%
 
 1. Notice the three lines of code inside the mutate function above are all identical aside from the column name. It's generally a good idea to try to remove this kind of repetition from your code. We will discuss this more in module on repeated operations.  
 
-## Question
+## Question 2
 
-2. What is patient 37’s date of admission?
+What is patient 37’s date of admission?
 
 ```{r}
 hospital %>% 
@@ -109,9 +109,9 @@ View the structure of hospital using the `str()` function.
 str(hospital)
 ```
 
-## Question
+## Question 3
 
-3. The hospital data frame contains ____ rows and ____ columns.
+The hospital data frame contains ____ rows and ____ columns.
 
 * The hospital data frame contains 100 rows and 25 columns.
 
@@ -125,13 +125,13 @@ hospital %>%
   mutate(percent = n / sum(n) * 100)
 ```
 
-## Notes to students
+## Notes for students
 
 1. Because there are 100 people and no missing data, the count and the percentage are the same.
 
-## Question
+## Question 4
 
-4. What percentage of patients used Medicare insurance (with or without other forms of insurance)?
+What percentage of patients used Medicare insurance (with or without other forms of insurance)?
 
 * 12 percent of patients used Medicare insurance (with or without other forms of insurance).
 
@@ -144,7 +144,7 @@ hospital <- hospital %>%
   mutate(addmit_day = wday(addate, label = TRUE, abbr = FALSE))
 ```
 
-# Task 10. 
+# Task 10
 
 Calculate the count and percentage of patients who reported that they would recommend this hospital to their friends and family by day of admission. 
 
@@ -158,7 +158,7 @@ hospital %>%
   arrange(desc(percent))
 ```
 
-## Notes to students
+## Notes for students
 
 1. You didn't have to coerce `reco` to a factor. I just think it looks better and I feel like I'm less likely to make a mistake when interpreting my results. 
 
@@ -166,13 +166,13 @@ hospital %>%
 
 3. You didn't have to arrange your results. I just feel like doing so makes me less likely to make a mistake when interpreting my results.
 
-## Question
+## Question 5
 
-5. Patients admitted on which day most frequently reported (as a percentage) that they would recommend this hospital to their friends and family?
+Patients admitted on which day most frequently reported (as a percentage) that they would recommend this hospital to their friends and family?
 
 * Patients admitted on Thursdays most frequently reported (64%) that they would recommend this hospital to their friends and family.
 
-# Task 11. 
+# Task 11
 
 For each physician, please calculate the mean response value to the survey question, “How would you rate the professionalism of your physicians during your stay?”
 
@@ -183,7 +183,7 @@ hospital %>%
   arrange(desc(mean_sat))
 ```
 
-## Notes to students
+## Notes for students
 
 1. I didn't create a task specifically instructing you to clean the physician names. However, I'm hoping the first time you ran the analysis above, you thought the results looked weird. If you go check the data dictionary, you should see that there are only four possible valid physician names. 
 
@@ -198,12 +198,12 @@ hospital %>%
   arrange(desc(mean_sat))
 ```
 
-## Question
+## Question 5
 
-5. Patients treated by which physician reported the highest mean response to the “How would you rate the professionalism of your physicians during your stay?” survey question?
+Patients treated by which physician reported the highest mean response to the “How would you rate the professionalism of your physicians during your stay?” survey question?
 
 * Patients treated by Dr. Steele reported the highest mean response to the “How would you rate the professionalism of your physicians during your stay?” survey question (3.6).
 
-## Notes to students
+## Notes for students
 
 1. Even though `pro2` is sequentially numbered (i.e., values = 1 through 5), it isn't really a numeric variable. These are categories that have been assigned to numbers. Can we really say that a "No Opinion" is 2 better than a "Poor"? No, we can't. In cases like this, it can be a bad idea to analyze your data as though it were continuous. I just asked you to do it above because it is a convenient way for me to check to see if you did the data management correctly. Please do as I say, not as I do! 😂

@@ -63,7 +63,7 @@ cities_ses <- houston %>%
   )
 ```
 
-## Notes to students
+## Notes for students
 
 1. There are many different ways to complete the task above. For example, you may have broken adding the city column and binding the rows into separate code chunks. If so, that's totally fine. Additionally, you may have renamed the columns outside of the `bind_rows()` function. Again, totally fine. Maybe you did something entirely different. As long as you got the same result, then it's totally fine.
 
@@ -75,9 +75,9 @@ View the structure of `cities_ses` using the `str()` function.
 str(cities_ses)
 ```
 
-## Question:
+## Question 1
 
-1. The `cities_ses` data frame contains ____ rows and ____ columns.
+The `cities_ses` data frame contains ____ rows and ____ columns.
 
 * The `cities_ses` data frame contains 15 rows and 5 columns.
 
@@ -90,9 +90,9 @@ cities_ses <- cities_ses %>%
   arrange(pid)
 ```
 
-## Question:
+## Question 2
 
-2. What value is in the third row of the `city` column in the sorted `cities_ses` data frame?
+What value is in the third row of the `city` column in the sorted `cities_ses` data frame?
 
 ```{r}
 cities_ses %>% 
@@ -117,9 +117,9 @@ ggplot(cities_ses) +
   theme_classic()
 ```
 
-## Question:
+## Question 3
 
-3.  Looking at the boxplots you created in Task 5, which city appears to have the lowest SES scores?
+Looking at the boxplots you created in Task 5, which city appears to have the lowest SES scores?
 
 * Atlanta appears to have the lowest SES scores.
 
@@ -149,13 +149,15 @@ mcq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/MCQ_J.XPT")
 smq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/SMQ_J.XPT")
 ```
 
-## Questions:
+## Question 4
 
-4. The `mcq_j` data frame contains ____ rows and ____ columns.
+The `mcq_j` data frame contains ____ rows and ____ columns.
 
 * The `mcq_j` data frame contains 8897 rows and 76 columns.
 
-5. Which data frame contains 6,724 rows?
+## Question 5
+
+Which data frame contains 6,724 rows?
 
 * The `smq_j` data frame contains 6,724 rows.
 
@@ -163,20 +165,25 @@ smq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/SMQ_J.XPT")
 
 Familiarize yourself with the codebook for the data set `smq_j`, which is available on the [NHANES website](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Questionnaire&CycleBeginYear=2017).
 
-## Questions:
-6. What variable in the `smq_j` data set contains information regarding whether or not a participant has smoked 100 cigarettes in their life?
+## Question 6
+
+What variable in the `smq_j` data set contains information regarding whether or not a participant has smoked 100 cigarettes in their life?
 
 * The variable named `smq_020` contains responses to the question, "These next questions are about cigarette smoking and other tobacco use. {Have you/Has SP} smoked at least 100 cigarettes in {your/his/her} entire life?"
 
-7. According to the codebook, how many participants have smoked 100 cigarettes in their life?
+## Question 7
+
+According to the codebook, how many participants have smoked 100 cigarettes in their life?
 
 * According to the codebook, 2,359 participants have smoked 100 cigarettes in their life?
 
-8. If the participant tells the interviewer that they have not smoked 100 cigarettes in their life, what is the next question they are asked?
+## Question 8
+
+If the participant tells the interviewer that they have not smoked 100 cigarettes in their life, what is the next question they are asked?
 
 * If the participant tells the interviewer that they have not smoked 100 cigarettes in their life, the next question they are asked is `smq890`, "{Have you/Has SP} ever smoked a regular cigar, cigarillo or little filtered cigar even one time? This hand card shows examples of some cigars; however there are others not included here."? You can find this answer by looking at the value associated with a "No" response in the "Skip to Item" column.
 
-# Task 8. 
+# Task 8
 
 Please merge the 3 separate NHANES data frames into a single combined data frame. Please name the combined data frame `nhanes`.
 
@@ -186,12 +193,12 @@ nhanes <- demo_j %>%
   left_join(smq_j, by = "SEQN")
 ```
 
-## Notes to students
+## Notes for students
 
 1. You didn't necessarily need to use the same join functions and data frame ordering that I used above. However, you do need to make sure that your combined data frame has the correct number of rows and columns. Using different join functions than I used or passing the data frames in a different order than I did definitely could have resulted in a combined data frame with a different number of rows and columns.
 
-## Questions:
+## Question 9
 
-9. The `nhanes` data frame contains ____ rows and ____ columns.
+The `nhanes` data frame contains ____ rows and ____ columns.
 
 * The `nhanes` data frame contains 9,254 rows and 157 columns.

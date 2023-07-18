@@ -28,9 +28,9 @@ Click the links below to download the raw data files to your computer:
 
 Import `Chocolate Study 1.xls` into your R global environment as `choco_1`.
 
-## Question:
+## Question 1
 
-1. Which of the following code chunks will correctly import the `Chocolate Study 1.xls` data into your R global environment as `choco_1`?
+Which of the following code chunks will correctly import the `Chocolate Study 1.xls` data into your R global environment as `choco_1`?
 
 ```{r eval=FALSE}
 # Incorrect: chocolate_study_1.xls is not a csv file.
@@ -65,9 +65,9 @@ View the structure of `choco_1` using the `str()` function.
 str(choco_1)
 ```
 
-## Question:
+## Question 2
 
-2. The `choco_1` data frame contains ____ rows and ____ columns.
+The `choco_1` data frame contains ____ rows and ____ columns.
 
 * The `choco_1` data frame contains 50 rows and 21 columns.
 
@@ -75,9 +75,9 @@ str(choco_1)
 
 Import `Chocolate Study 2.csv` into your R global environment as `choco_2`.
 
-## Question:
+## Question 3
 
-3. Which of the following code chunks will correctly import the `Chocolate Study 2.csv` data into your R global environment?
+Which of the following code chunks will correctly import the `Chocolate Study 2.csv` data into your R global environment?
 
 ```{r eval=FALSE}
 # Incorrect: Although you can open chocolate_study_1.csv in Excel, it doesn't have a .xls or .xlsx file extension, which is what read_excel expects.
@@ -112,9 +112,9 @@ View the structure of `choco_2` using the `str()` function.
 str(choco_2)
 ```
 
-## Question:
+## Question 4
 
-4. The `choco_2` data frame contains ____ rows and ____ columns.
+The `choco_2` data frame contains ____ rows and ____ columns.
 
 * The `choco_2` data frame contains 20 rows and 21 columns.
 
@@ -122,9 +122,9 @@ str(choco_2)
 
 Import `Chocolate Study 3.txt` into your R global environment as `choco_3`. Make sure to tell R how to correctly identify missing values in the raw data.
 
-## Question:
+## Question 5
 
-5. Which of the following code chunks will correctly import the `Chocolate Study 3.txt` data into your R global environment?
+Which of the following code chunks will correctly import the `Chocolate Study 3.txt` data into your R global environment?
 
 ```{r eval=FALSE}
 # Incorrect: read_table will not correctly handle values that include spaces 
@@ -211,17 +211,17 @@ View the structure of `choco_3` using the `str()` function.
 str(choco_3)
 ```
 
-## Question:
+## Question 6
 
-6. The `choco_3` data frame contains ____ rows and ____ columns.
+The `choco_3` data frame contains ____ rows and ____ columns.
 
 * The `choco_3` data frame contains 10 rows and 21 columns.
 
-# Task 8. 
+# Task 8
 
 Please view the National Health and Nutrition Examination Survey (NHANES) questionnaires, datasets, and related documentation website here: https://wwwn.cdc.gov/nchs/nhanes/Default.aspx. Then, locate and select the `NHANES 2017-2018 data`.
 
-# Task 9. 
+# Task 9
 
 After locating the data from the correct years, import the `Alcohol Use` data into R. 
 
@@ -235,9 +235,9 @@ After locating the data from the correct years, import the `Alcohol Use` data in
 alq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/ALQ_J.XPT")
 ```
 
-## Question:
+## Question 7
 
-7. What R package contains the `read_xpt()` function we need to use to import the NHANES data in Task 9?
+What R package contains the `read_xpt()` function we need to use to import the NHANES data in Task 9?
 
 * The [haven](https://haven.tidyverse.org/) package contains the `read_xpt()` function we need to use to import the NHANES data in Task 9.
 
@@ -245,9 +245,9 @@ alq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/ALQ_J.XPT")
 
 Coerce all of the variable names in `alq_j` to lowercase.
 
-## Question:
+## Question 8
 
-8. Which of the following code chunks will correctly coerce all of the variable names in `alq_j` to lowercase?
+Which of the following code chunks will correctly coerce all of the variable names in `alq_j` to lowercase?
 
 ```{r eval=FALSE}
 # Incorrect: This code passes the entire alq_j data frame, not just the column names from alq_j, to the tolower() function.
@@ -269,11 +269,11 @@ alq_j <- names(alq_j) %>% tolower()
 names(alq_j) <- names(alq_j) %>% tolower()
 ```
 
-## Notes to students
+## Notes for students
 
 1. We can easily convert any character string to all lowercase letters using the `tolower()` function. The code above tells R to get the column names from alq_j (`names(alq_j)`), convert them all to lowercase (`%>% tolower()`), and finally assign the new lowercase versions back to the column names (`names(alq_j) <-`).
 
-# Task 11. 
+# Task 11
 
 Coerce all of the categorical variables in `alq_j` to factor variables. Use the value descriptions from the NHANES Alcohol Use data codebook to make factor levels and labels. Name the factor version of each variable with the same name as the original version, but add a `_f` to the end.
 
@@ -299,7 +299,7 @@ time_labs <- c(
 )
 ```
 
-## Notes to students
+## Notes for students
 
 1. You don't have to create vectors of level values and labels values as I did in the code chunk above. Instead, you could have entered these values directly into the `factor()` functions below -- as I did for `alq130` and `alq170`. I created these vectors of values and labels for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes the code chunk below easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
 
@@ -340,13 +340,15 @@ View the structure of `alq_j` using the `str()` function.
 str(alq_j)
 ```
 
-## Questions:
+## Questions 9
 
-9. The `alq_j` data frame contains ____ rows and ____ columns.
+The `alq_j` data frame contains ____ rows and ____ columns.
 
 * The `alq_j` data frame contains 5,533 rows and 19 columns.
 
-10. When you view the structure of `alq_j` using the `str()` function, what is the vector type shown for `alq111_f`? According to R, what kind of variable is `alq111_f`? 
+## Questions 10
+
+When you view the structure of `alq_j` using the `str()` function, what is the vector type shown for `alq111_f`? According to R, what kind of variable is `alq111_f`? 
 
 * When you view the structure of `alq_j` using the `str()` function, the vector type shown is `Factor`.
 

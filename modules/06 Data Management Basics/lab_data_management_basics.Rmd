@@ -34,9 +34,9 @@ View the structure of clients_may using the `str()` function.
 str(clients_may)
 ```
 
-## Question:
+## Question 1
 
-1. The `clients_may` data frame contains ____ rows and ____ columns.
+The `clients_may` data frame contains ____ rows and ____ columns.
 
 * The `clients_may` data frame contains 84 rows and 14 columns.
 
@@ -73,7 +73,7 @@ clients_may <- clients_may %>%
   select(-`depression 1`, -`depression 2`, -`depression 3`, -`depression 4`)
 ```
 
-## Notes to students
+## Notes for students
 
 1. Remember that when column names contain spaces, we have to wrap them with backticks in order to use them in our R code. In general, I don't think it's a good idea to use column names that contain spaces.
 
@@ -112,7 +112,7 @@ clients_may <- clients_may %>%
   ungroup()
 ```
 
-# Task 7. 
+# Task 7
 
 Create a new data frame named `clients_may_dedup` from `clients_may` by dropping all duplicate (by first and last name) rows from the data.
 
@@ -121,9 +121,9 @@ clients_may_dedup <- clients_may %>%
   filter(!dup)
 ```
 
-## Question
+## Question 2
 
-2. How many unique people does `clients_may_dedup` contain?
+How many unique people does `clients_may_dedup` contain?
 
 ```{r}
 nrow(clients_may_dedup)
@@ -131,7 +131,7 @@ nrow(clients_may_dedup)
 
 * There are 60 unique people in `clients_may`.
 
-# Task 8. 
+# Task 8
 
 Create a new column in `clients_may_dedup` named `bmi` that contains the Body Mass Index for each client calculated using [the formula found on the CDC website here](https://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/index.html).
 
@@ -140,7 +140,7 @@ clients_may_dedup <- clients_may_dedup %>%
   mutate(bmi = weight / height^2 * 703)
 ```
 
-# Task 9. 
+# Task 9
 
 Arrange the columns in `clients_may_dedup` such that the new `bmi` column immediately follows the `weight` column.
 
@@ -149,7 +149,7 @@ clients_may_dedup <- clients_may_dedup %>%
   select(name_first:weight, bmi, everything())
 ```
 
-# Task 10. 
+# Task 10
 
 For all remaining calculations, we want to perform complete case analyses. Drop all rows from `clients_may_dedup` that have a missing value for `bmi`.
 
@@ -158,7 +158,7 @@ clients_may_dedup <- clients_may_dedup %>%
   filter(!is.na(bmi))
 ```
 
-# Task 11. 
+# Task 11
 
 Calculate the mean value of BMI for the remaining May clients (round to one decimal place).
 
@@ -167,17 +167,17 @@ clients_may_dedup %>%
   summarise(mean_bmi = mean(bmi) %>% round(1))
 ```
 
-## Notes to students
+## Notes for students
 
 1. If you get an unexpected result here, make sure you go back and ungroup your data in Task 6.
 
-## Question:
+## Question 3
 
-3. After listwise deletion, what is the mean BMI for May clients at their first session (round to one decimal place)?
+After listwise deletion, what is the mean BMI for May clients at their first session (round to one decimal place)?
 
 * After listwise deletion, the mean BMI for May clients at their first session was 21.8.
 
-# Task 12. 
+# Task 12
 
 Create a new column in `clients_may_dedup` named `any_drink` that is `TRUE` if the client responded “yes” (i.e., had a value of 1) for any of the alcohol drinking questions and `FALSE` if the client responded “no” to all of the alcohol drinking questions.
 
@@ -188,7 +188,7 @@ clients_may_dedup <- clients_may_dedup %>%
   ungroup()
 ```
 
-# Task 13. 
+# Task 13
 
 Calculate the number and percentage of May clients who had a “yes” response to any of the alcohol drinking questions.
 
@@ -198,20 +198,24 @@ clients_may_dedup %>%
   mutate(percent = (n / sum(n) * 100) %>% round())
 ```
 
-## Notes to students
+## Notes for students
 
 1. If you get an unexpected result here, make sure you ungrouped your data after creating `any_drink` in Task 12.
 
-## Questions:
+## Question 4
 
-4. What percentage of May clients had a “yes” response to any of the alcohol drinking questions (round to the nearest whole percent — no decimals)?
+What percentage of May clients had a “yes” response to any of the alcohol drinking questions (round to the nearest whole percent — no decimals)?
 
 * 18%
 
-5. After completing all tasks above, the `clients_may_dedup` data frame contains ____ rows and ____ columns. 
+## Question 5
+
+After completing all tasks above, the `clients_may_dedup` data frame contains ____ rows and ____ columns. 
 
 * After completing all tasks above, the `clients_may_dedup` data frame contains 34 rows and 14 columns.
 
-6. After completing all tasks above, the ninth column in the `clients_may_dedup` data frame is ____.
+## Question 6
+
+After completing all tasks above, the ninth column in the `clients_may_dedup` data frame is ____.
 
 * After completing all tasks above, the ninth column in the `clients_may_dedup` data frame is `drink_blackout`.

@@ -35,7 +35,7 @@ class_survey <- class_survey %>%
   rename_with(str_to_lower)
 ```
 
-## Notes to students
+## Notes for students
 
 1. There are many different ways you could have dealt with the first two rows in this data. For example, you could have added `skip = 1` to your `read_csv()` call above. I choose to import the file as-is and clean it in subsequent steps.
 
@@ -68,9 +68,9 @@ View the structure of `class_survey` using the `str()` function.
 str(class_survey)
 ```
 
-## Question:
+## Question 1
 
-1. The `class_survey` data frame contains ____ rows and ____ columns.
+The `class_survey` data frame contains ____ rows and ____ columns.
 
 * The `class_survey` data frame contains 52 rows and 9 columns.
 
@@ -119,13 +119,13 @@ class_survey %>%
   )
 ```
 
-## Notes to students
+## Notes for students
 
 1. Notice again, that we are repeating ourselves a lot in the code chunk above. We will learn how to remove this repetition in the repeated operations modules.
 
-## Question
+## Question 2
 
-2. How many participants responded `Not Sure` to the question, “Do you have one or more people you think of as your personal doctor or health care provider?”
+How many participants responded `Not Sure` to the question, “Do you have one or more people you think of as your personal doctor or health care provider?”
 
 * Three participants responded `Not Sure` to the question, “Do you have one or more people you think of as your personal doctor or health care provider?”
 
@@ -150,7 +150,7 @@ yn_levs <- c("0", "1")
 yn_labs <- c("No", "Yes")
 ```
 
-## Notes to students
+## Notes for students
 
 1. You don't have to do what I did above. You could have entered these values directly into the `factor()` functions below. I did it this way for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes it easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
 
@@ -175,11 +175,11 @@ class_survey <- class_survey %>%
   )
 ```
 
-## Notes to students
+## Notes for students
 
 1. Notice that we were able to use R's built-in `month.name` character vector to make this task just a little be easier to complete.
 
-# Task 8. 
+# Task 8
 
 Recode the values in the birth_year column to the actual year of birth, as opposed to the coded value for the birth_year. 
 
@@ -190,7 +190,7 @@ class_survey <- class_survey %>%
   mutate(birth_year = as.numeric(birth_year) + 1949)
 ```
 
-## Notes to students
+## Notes for students
 
 1. As you can see in the codebook, students would select their year of birth (choices ranged from 1950 to 2013), but the value that was recorded in the data was a category code -- similar to the other categorical variables in the data. Now, we could use a bunch of conditional operations to recode these categories. For example, `if_else(birth_year == 1, 1950, birth_year)` and so on. But, I really hope you didn't do that. Instead, all we have to do is coerce the character category values to numeric, and then add 1949 to each of them. And because the addition operator is vectorized, we just have to tell R to add 1949 to the birth_year vector and R will add 1949 separately to each element of that vector. Why 1949? Well, category 1 is 1950. What is 1 + 1949? It's 1950. Category 2 is 1951. What is 2 + 1949? It's 1951. And so on. 
 
@@ -204,9 +204,9 @@ class_survey %>%
   arrange(desc(n))
 ```
 
-## Question
+## Question 3
 
-3. In what year was the greatest number of participants born?
+In what year was the greatest number of participants born?
 
 * The greatest number of participants were born in 1990 (n = 14).
 
@@ -222,15 +222,15 @@ class_survey <- class_survey %>%
   )
 ```
 
-## Notes to students
+## Notes for students
 
 1. Notice that we had to `paste()` the three separate elements of the date of birth together before passing it to a function that coerces it to date type. We could have used the `as.Date()` function that we've used before, but I chose to use `lubridate`'s `mdy()` function. You can get more info here if you are curious: https://lubridate.tidyverse.org/.
 
 2. We created the `age` column above in the same way we've already learned. I just wanted to point out that the `ymd()` function is from the `lubridate` package. You can get more info here if you are curious: https://lubridate.tidyverse.org/.
 
-## Question
+## Question 4
 
-4. How many missing observations are there for the variable `age`? 
+How many missing observations are there for the variable `age`? 
 
 ```{r}
 is.na(class_survey$age) %>% sum()
@@ -246,13 +246,13 @@ Determine the average age of students on the first day of class.
 mean(class_survey$age, na.rm = TRUE) %>% round()
 ```
 
-## Question:
+## Question 5
 
-5. What was the average age of students on the first day of class (rounded to the nearest integer)?
+What was the average age of students on the first day of class (rounded to the nearest integer)?
 
 * The average age of students on the first day of class was 26 (rounded to the nearest integer).
 
-# Task 12. 
+# Task 12
 
 Use the `quantile()` function to determine quartiles of annual salary.
 
@@ -265,7 +265,7 @@ class_survey$salary <- as.numeric(class_survey$salary)
 quantile(class_survey$salary, na.rm = TRUE)
 ```
 
-# Task 13. 
+# Task 13
 
 Use conditional operations to create a new column that categorizes students into groups defined by quartiles of salary. Please name the new column salary_4cat. Please also create a factor version of the salary_4cat column that uses the _f naming convention.
 
@@ -283,9 +283,9 @@ class_survey <- class_survey %>%
   )
 ```
 
-## Question
+## Question 6
 
-6. After completing all tasks above, the `class_survey` data frame contains ____ rows and ____ columns.
+After completing all tasks above, the `class_survey` data frame contains ____ rows and ____ columns.
 
 ```{r}
 dim(class_survey)
@@ -293,7 +293,7 @@ dim(class_survey)
 
 * After completing all tasks above, the `class_survey` data frame contains 52 rows and 20 columns.
 
-# Task 14. 
+# Task 14
 
 Determine the percentage of students in each of the salary categories by gender.
 
@@ -305,14 +305,14 @@ class_survey %>%
   mutate(group_percent = n / sum(n) * 100)
 ```
 
-## Notes to students
+## Notes for students
 
 1. Notice that I filtered out all missing values for salary_4cat_f and gender_f before performing the descriptive analysis. This is called a complete case analysis.
 
 2. Notice that I passed `FALSE` to the `.drop` argument of the `count()` function. That tells R to create a row in the results data frame for Males with in the first quartile of salary even though there are males in the first quartile of salary observed in the data (i.e., n = 0). This also only works for factor variables. 
 
-## Question
+## Question 7
 
-7. Females most commonly reported an annual salary that was in the  ____ quartile of annual salaries overall. Males most commonly reported an annual salary that was in the  ____ quartile of annual salaries overall.
+Females most commonly reported an annual salary that was in the  ____ quartile of annual salaries overall. Males most commonly reported an annual salary that was in the  ____ quartile of annual salaries overall.
 
 * Females most commonly reported an annual salary that was in the 1st quartile of annual salaries overall (36%). Males most commonly reported an annual salary that was in the 2nd quartile of annual salaries overall (43%).

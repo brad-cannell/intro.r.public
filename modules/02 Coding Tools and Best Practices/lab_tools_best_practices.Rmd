@@ -34,9 +34,9 @@ After you have skimmed through the study forms, please create an R data frame na
 
 Please make sure you give each variable a meaningfully descriptive name. For example, use something like `name_first` rather than `var1` or `x1`.
 
-## Question:
+## Question 1
 
-1. Which of the following code chunks would correctly create the `form_20` data frame and adheres to the coding best practices described in R4Epi?
+Which of the following code chunks would correctly create the `form_20` data frame and adheres to the coding best practices described in R4Epi?
 
 ```{r eval=FALSE}
 # Incorrect: The data frame is named form.20 instead of form_20.
@@ -159,9 +159,9 @@ typeof(NA_real_)
 
 After you create the `form_20` data frame, please view it in the Notebook to make sure your program worked as expected. 
 
-## Question:
+## Question 2
 
-2. Which of the following code chunks could you use to view the `form_20` data frame?
+Which of the following code chunks could you use to view the `form_20` data frame?
 
 ```{r}
 # Correct
@@ -200,9 +200,9 @@ str(form_20)
 dplyr::glimpse(form_20)
 ```
 
-## Question:
+## Question 3
 
-3. The `form_20` data frame contains ____ rows and ____ columns.
+The `form_20` data frame contains ____ rows and ____ columns.
 
 * The `form_20` data frame contains 3 rows and 5 columns.
 

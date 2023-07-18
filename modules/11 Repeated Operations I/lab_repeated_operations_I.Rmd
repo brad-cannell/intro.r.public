@@ -35,13 +35,13 @@ class_survey <- class_survey %>%
   rename_with(str_to_lower)
 ```
 
-## Notes to students
+## Notes for students
 
 1. There are many different ways you could have dealt with the first two rows in this data. For example, you could have added `skip = 1` to your `read_csv()` call above. I choose to import the file as-is and clean it in subsequent steps.
 
 # Task 2
 
-Task 2. Please look at the codebook for the class_survey data. Several questions on the survey included Not Sure as a response option. They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. Please rename each of the columns contains these questions as required, still_enroll, package, genhealth, asthma, seatbelt, insurance, persdoc, hispanic, race, veteran, marital, employment, sex, and color.
+Please look at the codebook for the class_survey data. Several questions on the survey included Not Sure as a response option. They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. Please rename each of the columns contains these questions as required, still_enroll, package, genhealth, asthma, seatbelt, insurance, persdoc, hispanic, race, veteran, marital, employment, sex, and color.
 
 ```{r}
 class_survey %>% 
@@ -64,7 +64,7 @@ class_survey %>%
   )
 ```
 
-## Notes to students
+## Notes for students
 
 1. In the code above, I decided to give a more informative name to each of the columns that we will analyze in the next few tasks. I would have probably had to keep looking at the codebook throughout the analysis if I didn't rename them. I find doing that frustrating, and the time spent renaming the columns well worth it.
 
@@ -77,7 +77,7 @@ cols_9 <- c("required", "still_enroll", "package", "genhealth", "asthma",
             "marital", "employment", "sex", "color")
 ```
 
-## Notes to students
+## Notes for students
 
 1. In the code above, I created a character vector containing the names of all the columns that have a “Not Sure” response option. In the code chunk below, I will use this character vector to help rename our columns. The order of the column names in this vector is important.
 
@@ -91,17 +91,17 @@ class_survey <- class_survey %>%
   )
 ```
 
-## Notes to students
+## Notes for students
 
 1. We’ve used rename_with before to apply the str_to_lower function to all of our column names. However, we can pass any function to the .fn argument of rename_with. Passing the character vector, we created earlier as an anonymous function (I wrote the anonymous function above using a purrr-style lambda) to the .fn argument has the effect of assigning the names in the character vector to the columns of class_survey. It’s very important that (1) the number column names in the character vector matches the number of columns you pass to the .cols argument, and (2) the order of the column names in the character vector matches the order of the columns you pass to the .cols argument.
 
-## Question
+## Question 1
 
-1. Which function can we use to apply other functions (e.g., str_to_lower) to some, or all, of our column names simultaneously in order to change them in some way?
+Which function can we use to apply other functions (e.g., str_to_lower) to some, or all, of our column names simultaneously in order to change them in some way?
 
 * We can use the rename_with() function to apply other functions (e.g., str_to_lower) to some, or all, of our column names simultaneously in order to change them in some way. We can apply functions to individual column names inside of rename() and select(), but we can apply those functions to some, or all, of our column names simultaneously inside of rename() and select(). 
 
-# Task 3. 
+# Task 3
 
 Please coerce all of the columns with a Not Sure option from character type to numeric type. Please use the across() function to help you remove some of the repetition from your code.
 
@@ -153,7 +153,7 @@ class_survey <- class_survey %>%
   )
 ```
 
-## Notes to students
+## Notes for students
 
 1. Using across() removes all of the repetition from our code, which is great. Passing the character vector of column names we previously created to the .cols argument (using the all_of() tidy-select function) make our code even easier to read and maintain.
 
@@ -260,9 +260,9 @@ class_survey %>%
   )
 ```
 
-## Question
+## Question 2
 
-2. Tasks 4 through 7 above essentially required you to do the same thing in four different slightly different ways. For this particular task, which method did you prefer, and why?
+Tasks 4 through 7 above essentially required you to do the same thing in four different slightly different ways. For this particular task, which method did you prefer, and why?
 
 # Task 8
 
@@ -297,9 +297,9 @@ not_sure_count %>%
   arrange(desc(n_not_sure))
 ```
 
-## Question
+## Question 3
 
-3. Which column in the class_survey data frame contains the greatest number of Not Sure responses?
+Which column in the class_survey data frame contains the greatest number of Not Sure responses?
 
 * The package column contains the greatest number of Not Sure responses (n = 14).
 
@@ -317,9 +317,9 @@ class_survey <- class_survey %>%
   )
 ```
 
-## Question
+## Question 4
 
-4. Which column in the class_survey data frame contains the greatest number of missing values?
+Which column in the class_survey data frame contains the greatest number of missing values?
 
 ```{r}
 class_survey %>% 
@@ -358,9 +358,9 @@ class_survey <- class_survey %>%
   )
 ```
 
-## Question
+## Question 5
 
-5. How many people reported that they have ever been told by a doctor, nurse, or other health professional that they have asthma?
+How many people reported that they have ever been told by a doctor, nurse, or other health professional that they have asthma?
 
 ```{r}
 class_survey %>% 
@@ -369,7 +369,7 @@ class_survey %>%
 
 * Nine people reported that they have ever been told by a doctor, nurse, or other health professional that they have asthma.
 
-## Notes to students
+## Notes for students
 
 1. Some of you may be wondering if we can use across() to apply count() to all the yes/no factor variables in one code chunk. Unfortunately, that isn't currently possible. As of this writing, we will need to use a for loop or the purrr package to repeatedly apply the count function across more than one column in our data frame.
 
