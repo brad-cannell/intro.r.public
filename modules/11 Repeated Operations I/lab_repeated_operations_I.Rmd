@@ -5,43 +5,30 @@ output: html_notebook
 
 # Overview
 
-This week, we will practice writing functions and performing column-wise repeated operations with dplyr verbs. We will do so using a couple of different data sets:
+This week, we will practice [writing functions](https://www.r4epi.com/writing-functions.html) and performing [column-wise repeated operations with dplyr](https://www.r4epi.com/column-wise-operations-in-dplyr.html) verbs. In some cases, we will be completing tasks that we already completed in previous modules, but we will do so in a more efficient way. We will use the following data sets for all the tasks in this lab:
 
 * [Click here to download Class Survey 5141.csv](https://www.dropbox.com/s/70q553h37cacjka/Class%20Survey%205141.csv?dl=1). This is the class survey data we used in the conditional operations lab. Feel free to reuse your code from that lab for the tasks below that are repeated from that lab.
 
 * [Click here to view the codebook for the class survey data](https://www.dropbox.com/s/kjyfq8cfur0hzdp/5313%20-%205314%20Day%20One%20Survey%20Codebook.pdf?dl=0).
 
-```{r message=FALSE}
+```{r}
+library(dplyr, warn.conflicts = FALSE)
 library(readr)
-library(dplyr)
 library(stringr)
 library(tidyr)
 ```
 
 # Task 1
 
-Please download Class Survey 5141.csv, import it into your R global environment as class_survey.
+Please download `Class Survey 5141.csv` and import it into your R global environment as `class_survey`.
 
 ```{r}
-class_survey <- read_csv("/Users/bradcannell/Dropbox/Datasets/Day one survey/Class Survey 5141.csv")
+class_survey <- read_rds("/Users/bradcannell/Dropbox/Datasets/Class Survey/class_survey.Rds")
 ```
-
-```{r}
-# Remove the second row -- data labels
-# Also remove the last column of all NA's
-# Coerce all names to lowercase
-class_survey <- class_survey %>%
-  slice(-1) %>% 
-  rename_with(str_to_lower)
-```
-
-## Notes for students
-
-1. There are many different ways you could have dealt with the first two rows in this data. For example, you could have added `skip = 1` to your `read_csv()` call above. I choose to import the file as-is and clean it in subsequent steps.
 
 # Task 2
 
-Please look at the codebook for the class_survey data. Several questions on the survey included Not Sure as a response option. They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. Please rename each of the columns contains these questions as required, still_enroll, package, genhealth, asthma, seatbelt, insurance, persdoc, hispanic, race, veteran, marital, employment, sex, and color.
+Please look at the codebook for the `class_survey` data. Several questions on the survey included "Not Sure" as a response option. They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. Please rename each of the columns contains these questions to `required`, `still_enroll`, `package`, `genhealth`, `asthma`, `seatbelt`, `insurance`, `persdoc`, `hispanic`, `race`, `veteran`, `marital`, `employment`, `sex`, and `color`.
 
 ```{r}
 class_survey %>% 
@@ -70,11 +57,12 @@ class_survey %>%
 
 2. There isn’t really “repetition” in the code above, per se, but there is still a way that we can make the code easier to update in the future. Start by creating a character vector containing the names of the columns we want to operate on.
 
-
 ```{r}
-cols_9 <- c("required", "still_enroll", "package", "genhealth", "asthma", 
-            "seatbelt", "insurance", "persdoc", "hispanic", "race", "veteran",
-            "marital", "employment", "sex", "color")
+cols_9 <- c(
+  "required", "still_enroll", "package", "genhealth", "asthma", "seatbelt", 
+  "insurance", "persdoc", "hispanic", "race", "veteran", "marital", "employment", 
+  "sex", "color"
+)
 ```
 
 ## Notes for students
@@ -86,24 +74,24 @@ cols_9 <- c("required", "still_enroll", "package", "genhealth", "asthma",
 ```{r}
 class_survey <- class_survey %>% 
   rename_with(
-    .fn = ~ cols_9,
+    .fn   = ~ cols_9,
     .cols = c(q2, q4, q6, q7, q9, q10, q13:q18, q20, q26:q27)
   )
 ```
 
 ## Notes for students
 
-1. We’ve used rename_with before to apply the str_to_lower function to all of our column names. However, we can pass any function to the .fn argument of rename_with. Passing the character vector, we created earlier as an anonymous function (I wrote the anonymous function above using a purrr-style lambda) to the .fn argument has the effect of assigning the names in the character vector to the columns of class_survey. It’s very important that (1) the number column names in the character vector matches the number of columns you pass to the .cols argument, and (2) the order of the column names in the character vector matches the order of the columns you pass to the .cols argument.
+1. We’ve used `rename_with()` before to apply the `str_to_lower()` function to all of our column names. However, we can pass any function to the `.fn` argument of `rename_with()`. Passing the character vector, we created earlier as an anonymous function (I wrote the anonymous function above using a purrr-style lambda) to the `.fn` argument has the effect of assigning the names in the character vector to the columns of `class_survey`. It’s very important that (1) the number column names in the character vector matches the number of columns you pass to the `.cols` argument, and (2) the order of the column names in the character vector matches the order of the columns you pass to the `.cols` argument.
 
 ## Question 1
 
-Which function can we use to apply other functions (e.g., str_to_lower) to some, or all, of our column names simultaneously in order to change them in some way?
+Which function can we use to apply other functions (e.g., `str_to_lower()`) to some, or all, of our column names simultaneously in order to change them in some way?
 
-* We can use the rename_with() function to apply other functions (e.g., str_to_lower) to some, or all, of our column names simultaneously in order to change them in some way. We can apply functions to individual column names inside of rename() and select(), but we can apply those functions to some, or all, of our column names simultaneously inside of rename() and select(). 
+* We can use the `rename_with()` function to apply other functions (e.g., `str_to_lower()`) to some, or all, of our column names _simultaneously_ in order to change them in some way. We can apply functions to individual column names inside of `rename()` and `select()`, but we can't apply those functions to _multiple_ column names simultaneously inside of `rename()` and `select()`. 
 
 # Task 3
 
-Please coerce all of the columns with a Not Sure option from character type to numeric type. Please use the across() function to help you remove some of the repetition from your code.
+Please coerce all of the columns with a Not Sure option from character type to numeric type. Please use the `across()` function to help you remove some of the repetition from your code.
 
 ```{r}
 # Old way
@@ -155,7 +143,7 @@ class_survey <- class_survey %>%
 
 ## Notes for students
 
-1. Using across() removes all of the repetition from our code, which is great. Passing the character vector of column names we previously created to the .cols argument (using the all_of() tidy-select function) make our code even easier to read and maintain.
+1. Using `across()` removes all of the repetition from our code, which is great. Passing the character vector of column names we previously created to the `.cols` argument (using the `all_of()` tidy-select function) make our code even easier to read and maintain.
 
 # Task 4
 
