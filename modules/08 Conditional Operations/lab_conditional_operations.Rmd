@@ -23,7 +23,7 @@ library(stringr)
 Import `Class Survey 5141.csv` into your R global environment as `class_survey`.
 
 ```{r}
-class_survey <- read_csv("/Users/bradcannell/Dropbox/Datasets/Day one survey/Class Survey 5141.csv")
+class_survey <- read_csv("/Users/bradcannell/Dropbox/Datasets/Class Survey/Class Survey 5141.csv")
 ```
 
 ```{r}
