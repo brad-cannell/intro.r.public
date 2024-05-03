@@ -1,0 +1,69 @@
+---
+title: "Lab: Getting Started"
+format:
+  html:
+    embed-resources: true
+---
+
+# Overview
+
+The North Texas Regional Health Department (NTRHD), and that the NTRHD is conducting a women's health study in Tarrant County. Data for this study is collected remotely at study sites around Tarrant County, scanned, and sent back to the data center to be processed. In the code below, we use data collected from 3 study participants to create an R data frame.
+
+# Load packages
+
+```{r}
+#| label: load-packages
+library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
+```
+
+# Create data frame
+
+In the code chunk below, we create a data frame containing data collected from 3 women's health study participants.
+
+```{r}
+form_20 <- tibble(
+  date_received = rep("2013-08-22", 3),
+  name_last     = c("Cooper", "Rodriguez", "Smith"),
+  name_first    = c("Samantha", "Leslie", "Jane"),
+  usual_care    = c(0, 1, 1),
+  usual_care_f  = factor(usual_care, 0:1, c("No", "Yes"))
+)
+```
+
+## Review the data frame
+
+In the code chunk below, we print the form_20 data frame to the screen so that we can review it for accuracy.
+
+```{r}
+form_20
+```
+
+## Notes for students
+
+1. We used the `tibble()` function to create our data frame. We could have also used the `data.frame()` function, but the Let's Get Programming chapter of R4epi discusses some reasons why we should consider using the `tibble()` function instead. We named our data frame `form_20` and added it to our global environment using the assignment operator (`<-`). 
+  
+  - Please note that adding objects to our global environment is **not** the same as saving them to an external file that we can share. In fact, depending on our settings, those objects may not even exist if we close RStudio and open it again. Right now, we don't need to know how to save our data frame in a more perminant way, but please feel free to read the chapter in R4Epi about exporting data if you are curious.
+  
+  - Many people find it odd that we use the assignment operator instead of an equal sign to create objects in the R programming language. For example, we typed `form_20 <- tibble(` above instead of `form_20 = tibble(`. If you are one of those people, I empathize with you. I used to feel the same way. However, my advice is to try not to overthink it, let it go, and just follow the R programming convention. It will make your life easier in the end.
+  
+  - Notice that we use the equal sign to pass values to named arguments inside of R functions. For example, we typed `date_received = rep("2013-08-22", 3)` above instead of `date_received <- rep("2013-08-22", 3)`. This is also confusing to some people. As a general rule of thumb, we will only use the assignment operator to add objects to the global environment and will will type them _outside_ of functions. Meaning, we will not type them anywhere in between the opening and close parentheses of a function.
+
+2. We added four variables (columns) to our data frame. They are `date_received`,  `name_last`, `name_first`, and `education`. Each of these columns is also a _vector_.
+
+3. Notice that we used the `rep()` function to enter the values for `date_received`. We did this because the value was the same for all three participants -- "2013-08-22". The value returned by the `rep()` function -- the thing that "comes out of it" is always a vector. 
+  
+  - The first argument to the `rep()` function determines the value that the returned vector contains. In the example above, we passed the value "2013-08-22" as the first argument to the the `rep()` function. 
+  
+  - The second argument to the `rep()` function (i.e., the value after the comma) determines the number of times that value will be repeated. In the example above, we passed the value "3" as the second argument to the the `rep()` function.
+  
+  - So, `c("2013-08-22", "2013-08-22", "2013-08-22")` and `rep("2013-08-22", 3)` mean the same thing to R.
+
+3. Notice that the dates above are currently just character strings to R. They don't have any true date value. In other words, "2013-08-22" isn't 1 day before "2013-08-23" to R. They are both just character strings like "Jane" and "Samantha". Later, we will learn how to tell R that these are actually dates.
+
+4. Notice that we manually added space between the variable names and the equals sign. We did this so that they all line-up. We don't have to do this, but it makes the code easier for humans to read. Writing code that is easy for humans to read is important!!!
+
+5. Notice that we wrote "name_last" and "name_first" instead of "last_name" and "first_name". This was intentional. When we have multiple related variables, it's good practice to start their variable names with the same word. Addresses are another set of variables where this practice usually makes sense. For example, use the names "address_street", "address_city", and "address_state" instead of "street", "city, and "state". Naming variables this way makes them easier to find and work with in the future if we need to do something with all of them at once.
+
+6. Notice that `usual_care` is a categorical variable. Here, we assigned each participant a number representing the category they selected as their answer to the question, "Do you have a clinic, doctor, nurse, or physician assistant who gives you your usual medical care?" Having this numeric representation of the data can sometimes be convenient for future data management and analysis tasks. The downside is that now we won't know for sure what those numbers mean without looking back at the surveys. In response, we created a new column, `usual_care_f`, which is a factor version of `usual_care`. Please review the Let's Get Programming chapter of R4epi for more information about factor vectors.
+
+7. Finally, we printed the `form_20` data frame to our computer screen by simply typing `form_20` in a code chunk and running it. We could have also typed `print(form_20)` if we wanted to be more explicit; however, the result would have been identical. Feel free to try it out if you would like.
