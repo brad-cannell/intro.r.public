@@ -172,7 +172,7 @@ glimpse(census)
 
 ## Task 4
 
-Use R to calculate the frequencies for the **region_f** variable.
+Use R to create a frequency table for the **region_f** variable.
 
 ```{r}
 # Using base R
@@ -263,7 +263,7 @@ cd4_counts <- c(230, 205, 313, 207, 227, 245, 173, 58, 103, 181, 105, 301, 169)
 
 ## Task 8
 
-Use R to calculate the mean, median, mode, standard deviation, minimum value, and maximum value of this vector.
+Use R to calculate the mean, median, mode, standard deviation, minimum value, and maximum value of this vector (hint: you will probably need to get the code to calculate the mode from R4Epi).
 
 ```{r}
 mode_val <- function(x) {
@@ -338,7 +338,7 @@ What is the mode CD4 T cell count for these 13 participants (rounded to the near
 
 Which measure of central tendency is the best one to report based on your results?
 
-* The median value is probably the best choice. There is no mode value, so we don't need to consider it. Because the difference between the mean and the median is clinically relevant, and because the difference is likely due to outlying values, the median is probably the best choice.
+* The median value is probably the best choice. No mode value exists, so we don't need to consider it. Because the difference between the mean and the median is clinically relevant, and because the difference is likely due to outlying values, the median is probably the best choice.
 
 
 # Example 3. Numerical and graphical descriptions of numerical variables
