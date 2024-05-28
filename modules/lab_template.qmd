@@ -1,0 +1,77 @@
+---
+title: "Lab: Module Name"
+format:
+  html:
+    embed-resources: true
+---
+
+# 🛑 Formatting (delete this section before posting to Canvas) 🛑
+
+* Please name this file `lab_module_name.qmd`.
+* The Overview section, each task number, and each question number should be written as a level-one headers (e.g., `# Task 1`).
+* All R code being run, should be put into R code chunks.
+* All R code being discussed in the text should be placed inside backticks (e.g., `install.packages("dplyr")`).
+* R package names being discussed in the text should be formatted as code (e.g., "...the `dplyr` package...). 
+* When functions are discussed in the text, they should be formatted as code and empty parentheses added to the end of the function name (e.g., "The `tibble()` function can be used to create data frames…").
+* Data set/frame names, variable names, and other key words should be written with **bold** text (e.g., "Please download **chocolate study 1.xls**".
+* There should be 2 line breaks (returns) immediately above level-one headers. There should be 1 line break (return) immediately above all other headers.
+* There should be one line break (return) immediately above each code chunk. There should be at least 1 line break immediately below each code chunk. If the the code chunk is immediately followed by a level-one header, then there will be two line breaks.
+
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that your file will use up at the top of the file. If you have not yet installed a package, you will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, you would run `install.packages("dplyr")`. However, you typically **do not** want to type the code to install the package here in your Quarto file because you only need to install the package once on a given computer. Not every time you run your R code.
+
+```{r}
+#| label: load-packages
+library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
+```
+
+
+# Overview
+
+Here is an overview of what we will cover in this lab. You will be talking about the purpose of the code below during the live lab warm-up session; however, some written material here will probably be helpful to students who are reviewing the code later, outside of the lab session.  
+
+
+# Task 1
+
+Copy and paste the task text from the Word document. Often, task 1 asks students to download an external data set.
+
+* [data set 1](link)   
+* [data set 1](link)
+
+
+# Task 2
+
+Task 2 often asks students to import some data.
+
+```{r}
+df <- read_function("path")
+```
+
+## Notes for students
+
+1. We may choose to add notes immediately below R code chunks that expound upon the code above.
+2. The notes should be written as a numbered list and should follow the formatting rules written at the top of this Rmd document. 
+
+
+## Question 1
+
+Question 1 often asks students to list the number of rows and columns in the data. It's easy and helps make sure they are starting with the correct data. Typically, the question text will be bulleted and written twice. The first bullet will contain the question text as it is written in the Word document. The second bullet will contain the correct answer. 
+
+* The **study_data** data frame contains ____ rows and ____ columns.
+
+* The **study_data** data frame contains 189 rows and 15 columns.
+
+## Question 2
+
+See Canvas. There are no R calculations for this question.
+
+
+# Text for question feedback blocks
+
+Please make sure you understand why this is the correct answer. You may use the "Previous" button below to update your answer if your original answer was incorrect. 
+
+Click the "Next" button below to move on to the next question. 
+
+
