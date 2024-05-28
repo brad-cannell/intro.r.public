@@ -1,5 +1,5 @@
 ---
-title: "Lab: Getting Started"
+title: "Lab: Coding Tools and Best Practices"
 format:
   html:
     embed-resources: true
