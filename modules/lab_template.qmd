@@ -14,7 +14,7 @@ format:
 * R package names being discussed in the text should be formatted as code (e.g., "...the `dplyr` package...). 
 * When functions are discussed in the text, they should be formatted as code and empty parentheses added to the end of the function name (e.g., "The `tibble()` function can be used to create data frames…").
 * Data set/frame names, variable names, and other key words should be written with **bold** text (e.g., "Please download **chocolate study 1.xls**".
-* There should be 2 line breaks (returns) immediately above level-one headers. There should be 1 line break (return) immediately above all other headers.
+* There should be 1 line break (returns) immediately above all headers.
 * There should be one line break (return) immediately above each code chunk. There should be at least 1 line break immediately below each code chunk. If the the code chunk is immediately followed by a level-one header, then there will be two line breaks.
 
 

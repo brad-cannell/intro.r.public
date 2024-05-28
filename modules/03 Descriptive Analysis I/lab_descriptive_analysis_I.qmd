@@ -5,7 +5,6 @@ format:
     embed-resources: true
 ---
 
-
 # Load packages
 
 Remember, it's considered a best practice to load all the packages that your file will use up at the top of the file. If you have not yet installed a package, you will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, you would run `install.packages("dplyr")`. However, you typically **do not** want to type the code to install the package here in your Quarto file because you only need to install the package once on a given computer. Not every time you run your R code.
@@ -17,11 +16,9 @@ library(freqtables)
 library(ggplot2)
 ```
 
-
 # Overview
 
 In today’s lab we will practice performing an interpreting descriptive analysis on categorical and numerical variables using R. Examples 2 and 3 are taken from the [Daniels Biostatistics textbook](https://bcs.wiley.com/he-bcs/Books?action=index&bcsId=2191&itemId=0471456543). Sometimes calculating statistics by hand, and then checking them with statistical software, can help you develop a better intuition for interpreting output.
-
 
 # Example 1. Descriptive analysis of 2010 Census data
 
@@ -246,7 +243,6 @@ How many states are in the NCntrl AND NE region?
 
 * This is sort of a trick question. There are 12 states in the NCntrl region and there are 9 states in the NE region. However, there aren't any states that appear in both the NCntrl _AND_ NE region. There is a reason for creating a tricky question like this. In most programming languages (including R), the words AND and OR have special meaning and are interpreted very literally. It's best if you start adjusting to it now. This concept typically causes some students problems in later learning modules.
 
-
 # Example 2. Numerical descriptions of numerical variables
 
 Porcellini et al. studied 13 HIV-positive patients who were treated with highly active antiretroviral therapy (HAART) for at least 6 months. The CD4 T cell counts at baseline for the 13 participants are listed below (Daniel, 2005).
@@ -339,7 +335,6 @@ What is the mode CD4 T cell count for these 13 participants (rounded to the near
 Which measure of central tendency is the best one to report based on your results?
 
 * The median value is probably the best choice. No mode value exists, so we don't need to consider it. Because the difference between the mean and the median is clinically relevant, and because the difference is likely due to outlying values, the median is probably the best choice.
-
 
 # Example 3. Numerical and graphical descriptions of numerical variables
 
@@ -442,7 +437,6 @@ ggplot(thilothammal_data) +
 ```
 
 Students often ask what bin width they select. While there are some rules of thumb that exist for selecting bin widths, none of them are perfect in all situations. Typically, we just play around with bin widths until we feel like we've landed on a histogram that is both _informative_ (i.e., send a clear message) and _honest_ (i.e., does not represent the data as having a shape that it does not actually have). 
-
 
 # Example 4. Analyze some class survey data
 
