@@ -32,7 +32,7 @@ form_20 <- tibble(
 
 ## Review the data frame
 
-In the code chunk below, we print the form_20 data frame to the screen so that we can review it for accuracy.
+In the code chunk below, we print the `form_20` data frame to the screen so that we can review it for accuracy.
 
 ```{r}
 form_20
@@ -67,3 +67,5 @@ form_20
 6. Notice that `usual_care` is a categorical variable. Here, we assigned each participant a number representing the category they selected as their answer to the question, "Do you have a clinic, doctor, nurse, or physician assistant who gives you your usual medical care?" Having this numeric representation of the data can sometimes be convenient for future data management and analysis tasks. The downside is that now we won't know for sure what those numbers mean without looking back at the surveys. In response, we created a new column, `usual_care_f`, which is a factor version of `usual_care`. Please review the Let's Get Programming chapter of R4epi for more information about factor vectors.
 
 7. Finally, we printed the `form_20` data frame to our computer screen by simply typing `form_20` in a code chunk and running it. We could have also typed `print(form_20)` if we wanted to be more explicit; however, the result would have been identical. Feel free to try it out if you would like.
+
+Important note: In addition to adding the correct options to our YAML header, we will also need to ensure we've loaded the packages that R needs to turn our Quarto file into an HTML file. The first time we use a Quarto file in RStudio, it may ask us to install these packages (e.g., `knitr` and `rmarkdown`). We need to install them if it asks us to do so. RStudio will typically even give us a little link we can click to install them. If it doesn't give us a link, or if we overlook the link, we will need to install these packages by running install.packages("package name") in the R console. We want to type the install code in the R console -- not the Quarto file -- because we only need to install the package once on a given computer -- not every time we run the code in our Quarto file.
