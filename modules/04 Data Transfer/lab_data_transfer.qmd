@@ -1,21 +1,9 @@
 ---
-title: "Chocolate Study"
+title: "Lab: Data Transfer"
 format:
   html:
     embed-resources: true
 ---
-
-# 🛑 Formatting (delete this section before posting to Canvas) 🛑
-
-* Please name this file `lab_module_name.qmd`.
-* The Overview section, each task number, and each question number should be written as a level-one headers (e.g., `# Task 1`).
-* All R code being run, should be put into R code chunks.
-* All R code being discussed in the text should be placed inside backticks (e.g., `install.packages("dplyr")`).
-* R package names being discussed in the text should be formatted as code (e.g., "...the `dplyr` package...). 
-* When functions are discussed in the text, they should be formatted as code and empty parentheses added to the end of the function name (e.g., "The `tibble()` function can be used to create data frames…").
-* Data set/frame names, variable names, and other key words should be written with **bold** text (e.g., "Please download **chocolate study 1.xls**".
-* There should be 1 line break (returns) immediately above all headers.
-* There should be one line break (return) immediately above each code chunk. There should be at least 1 line break immediately below each code chunk. If the the code chunk is immediately followed by a level-one header, then there will be two line breaks.
 
 # Load packages
 
@@ -45,28 +33,36 @@ Click the links below to download the raw data files to your computer:
 
 # Task 2
 
-Import `Chocolate Study 1.xls` into your R global environment as `choco_1`.
+Import **Chocolate Study 1.xls** into your R global environment as **choco_1**.
 
 ## Question 1
 
-Which of the following code chunks will correctly import the `Chocolate Study 1.xls` data into your R global environment as `choco_1`?
+Which of the following code chunks will correctly import the **Chocolate Study 1.xls** data into your R global environment as **choco_1**?
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: chocolate_study_1.xls is not a csv file.
 choco_1 <- read_csv("Chocolate Study 1.xls")
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: readxl is the name of an R package, not a function.
 choco_1 <- readxl("Chocolate Study 1.xls")
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: readr is the name of an R package, not a function.
 choco_1 <- readr("Chocolate Study 1.xls")
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Correct.
 choco_1 <- read_excel("Chocolate Study 1.xls")
 ```
@@ -78,7 +74,7 @@ choco_1 <- read_excel("/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate S
 
 # Task 3 
 
-View the structure of `choco_1` using the `str()` function.
+View the structure of **choco_1** using the `str()` function.
 
 ```{r}
 str(choco_1)
@@ -86,34 +82,42 @@ str(choco_1)
 
 ## Question 2
 
-The `choco_1` data frame contains ____ rows and ____ columns.
+The **choco_1** data frame contains ____ rows and ____ columns.
 
-* The `choco_1` data frame contains 50 rows and 21 columns.
+* The **choco_1** data frame contains 50 rows and 21 columns.
 
 # Task 4
 
-Import `Chocolate Study 2.csv` into your R global environment as `choco_2`.
+Import **Chocolate Study 2.csv** into your R global environment as **choco_2**.
 
 ## Question 3
 
-Which of the following code chunks will correctly import the `Chocolate Study 2.csv` data into your R global environment?
+Which of the following code chunks will correctly import the **Chocolate Study 2.csv** data into your R global environment?
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: Although you can open chocolate_study_1.csv in Excel, it doesn't have a .xls or .xlsx file extension, which is what read_excel expects.
 choco_2 <- read_excel("Chocolate Study 2.csv")
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: There is a read.csv() function that will import this data. However, it isn't in the readr package. The double colon syntax used in the code readr::read.csv() tells R to look for the read.csv() function in the readr package, which doesn't exist. The read_csv() function is a base R function. 
 choco_2 <- readr::read.csv("Chocolate Study 2.csv")
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Correct. However, I prefer read_csv() over read.csv().
 choco_2 <- read.csv("Chocolate Study 2.csv")
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Correct.
 choco_2 <- read_csv("Chocolate Study 2.csv")
 ```
@@ -125,7 +129,7 @@ choco_2 <- read_csv("/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Stu
 
 # Task 5 
 
-View the structure of `choco_2` using the `str()` function.
+View the structure of **choco_2** using the `str()` function.
 
 ```{r}
 str(choco_2)
@@ -133,25 +137,29 @@ str(choco_2)
 
 ## Question 4
 
-The `choco_2` data frame contains ____ rows and ____ columns.
+The **choco_2** data frame contains ____ rows and ____ columns.
 
-* The `choco_2` data frame contains 20 rows and 21 columns.
+* The **choco_2** data frame contains 20 rows and 21 columns.
 
 # Task 6 
 
-Import `Chocolate Study 3.txt` into your R global environment as `choco_3`. Make sure to tell R how to correctly identify missing values in the raw data.
+Import **Chocolate Study 3.txt** into your R global environment as **choco_3**. Make sure to tell R how to correctly identify missing values in the raw data.
 
 ## Question 5
 
-Which of the following code chunks will correctly import the `Chocolate Study 3.txt` data into your R global environment?
+Which of the following code chunks will correctly import the **Chocolate Study 3.txt** data into your R global environment?
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: read_table will not correctly handle values that include spaces 
 # such as "Flower Grove" in the school column.
 choco_3 <- read_table("Chocolate Study 3.txt")
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: This code does not tell R how to correctly identify missing values in the raw data.
 choco_3 <- read_fwf(
   "Chocolate Study 3.txt",
@@ -168,7 +176,9 @@ choco_3 <- read_fwf(
 )
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: This code gives column start values instead of column widths
 choco_3 <- read_fwf(
   "Chocolate Study 3.txt",
@@ -188,7 +198,9 @@ choco_3 <- read_fwf(
 )
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Correct
 choco_3 <- read_fwf(
   "Chocolate Study 3.txt",
@@ -224,7 +236,7 @@ choco_3 <- read_fwf(
 
 # Task 7 
 
-View the structure of `choco_3` using the `str()` function.
+View the structure of **choco_3** using the `str()` function.
 
 ```{r}
 str(choco_3)
@@ -232,21 +244,21 @@ str(choco_3)
 
 ## Question 6
 
-The `choco_3` data frame contains ____ rows and ____ columns.
+The **choco_3** data frame contains ____ rows and ____ columns.
 
-* The `choco_3` data frame contains 10 rows and 21 columns.
+* The **choco_3** data frame contains 10 rows and 21 columns.
 
 # Task 8
 
-Please view the National Health and Nutrition Examination Survey (NHANES) questionnaires, datasets, and related documentation website here: https://wwwn.cdc.gov/nchs/nhanes/Default.aspx. Then, locate and select the `NHANES 2017-2018 data`.
+Please view the National Health and Nutrition Examination Survey (NHANES) questionnaires, datasets, and related documentation website here: https://wwwn.cdc.gov/nchs/nhanes/Default.aspx. Then, locate and select the **NHANES 2017-2018 data**.
 
 # Task 9
 
-After locating the data from the correct years, import the `Alcohol Use` data into R. 
+After locating the data from the correct years, import the **Alcohol Use** data into R. 
 
-* `Alcohol Use` was part of the `NHANES questionnaire data`. The link to the data file should be labeled as, "ALQ_J Data [XPT - 434.4 KB]". The `XPT` file extension tells us that this is a SAS Transport file.
+* **Alcohol Use** was part of the **NHANES questionnaire data**. The link to the data file should be labeled as, "ALQ_J Data [XPT - 434.4 KB]". The **XPT** file extension tells us that this is a SAS Transport file.
 
-* Name the data frame you create `alq_j`.
+* Name the data frame you create **alq_j**.
 
 * Instead of downloading the data from the NHANES website to your computer, try passing a link to the XPT file directly to the `read_xpt()` function. [R4Epi](https://www.r4epi.com/importing-binary-files.html#importing-sas-data-sets) has an example that you can reference. 
 
@@ -268,17 +280,23 @@ Coerce all of the variable names in `alq_j` to lowercase.
 
 Which of the following code chunks will correctly coerce all of the variable names in `alq_j` to lowercase?
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: This code passes the entire alq_j data frame, not just the column names from alq_j, to the tolower() function.
 names(alq_j) <- alq_j %>% tolower()
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: This code doesn't assign the lowercase variable names back to the alq_j data frame (or anywhere else).
 tolower(names(alq_j))
 ```
 
-```{r eval=FALSE}
+```{r}
+#| eval: false
+
 # Incorrect: This code overwrites the alq_j data frame with a vector of lowercase variable names from the alq_j data frame.
 alq_j <- names(alq_j) %>% tolower()
 ```
@@ -294,9 +312,9 @@ names(alq_j) <- names(alq_j) %>% tolower()
 
 # Task 11
 
-Coerce all of the categorical variables in `alq_j` to factor variables. Use the value descriptions from the NHANES Alcohol Use data codebook to make factor levels and labels. Name the factor version of each variable with the same name as the original version, but add a `_f` to the end.
+Coerce all of the categorical variables in **alq_j** to factor variables. Use the value descriptions from the NHANES Alcohol Use data codebook to make factor levels and labels. Name the factor version of each variable with the same name as the original version, but add a **_f** to the end.
 
-* The codebook for the `Alcohol Use` data is available from the same web page you found the data on. Immediately to the left of was part of "ALQ_J Data [XPT - 434.4 KB]", you should see a linked file called "ALQ_J.Doc". Clicking on that link should open the codebook.
+* The codebook for the **Alcohol Use** data is available from the same web page you found the data on. Immediately to the left of was part of "ALQ_J Data [XPT - 434.4 KB]", you should see a linked file called "ALQ_J.Doc". Clicking on that link should open the codebook.
 
 ```{r}
 # Create a numeric vector you can reuse for all yes/no factor levels
@@ -320,13 +338,13 @@ time_labs <- c(
 
 ## Notes for students
 
-1. You don't have to create vectors of level values and labels values as I did in the code chunk above. Instead, you could have entered these values directly into the `factor()` functions below -- as I did for `alq130` and `alq170`. I created these vectors of values and labels for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes the code chunk below easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
+1. You don't have to create vectors of level values and labels values as I did in the code chunk above. Instead, you could have entered these values directly into the `factor()` functions below -- as I did for **alq130** and **alq170**. I created these vectors of values and labels for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes the code chunk below easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
 
-2. Why didn't I create a vector of level values and label values for `alq130` and `alq170`? I didn't create a vector of level values and label values for `alq130` and `alq170` because the values used are unique -- they aren't used by any other variable in the data frame. Therefore, the advantages listed above don't apply (aside from possibly making the code easier to read).
+2. Why didn't I create a vector of level values and label values for **alq130** and **alq170**? I didn't create a vector of level values and label values for **alq130** and **alq170** because the values used are unique -- they aren't used by any other variable in the data frame. Therefore, the advantages listed above don't apply (aside from possibly making the code easier to read).
 
-3. Why am I coercing `alq130` and `alq170` to factors? The instructions say to coerce all categorical variables, but `alq130` and `alq170` contain counts of drinks and drinking occasions respectively. If you had this question, it's a good one. And you are partially correct. For `alq130`, values between `1` and `14` (I explain why not 13 in the next bullet) _do_ represent a numeric count value. However, the value `15` is not a count value. When a `15` appears in the data for this variable, it doesn't necessarily mean that a person had 15 drinks. It means that they had 15 OR MORE drinks. So, they could have had 15, 17, or 100. Therefore, this is a _category_ -- not a count -- and in order to analyze this variable in a way that is valid for _all_ responses (i.e., not just the values less than 15), we have to treat this variable as a categorical variable. In the new factor version of `alq130` -- called `alq130_f` -- the values `1` through `14` will still _look_ like numbers, but they will represent categories. The same logic applies to `alq170`. The value `30` means "more than 20 times per month," not "30 times per month."
+3. Why am I coercing **alq130** and **alq170** to factors? The instructions say to coerce all categorical variables, but **alq130** and **alq170** contain counts of drinks and drinking occasions respectively. If you had this question, it's a good one. And you are partially correct. For **alq130**, values between **1** and **14** (I explain why not 13 in the next bullet) _do_ represent a numeric count value. However, the value **15** is not a count value. When a **15** appears in the data for this variable, it doesn't necessarily mean that a person had 15 drinks. It means that they had 15 OR MORE drinks. So, they could have had 15, 17, or 100. Therefore, this is a _category_ -- not a count -- and in order to analyze this variable in a way that is valid for _all_ responses (i.e., not just the values less than 15), we have to treat this variable as a categorical variable. In the new factor version of **alq130** -- called **alq130_f** -- the values **1** through **14** will still _look_ like numbers, but they will represent categories. The same logic applies to **alq170**. The value **30** means "more than 20 times per month," not "30 times per month."
 
-4. Why did I pass the values `1:14` to the `factor()` function used to create `alq130_f` in the code chunk below instead of `1:13`? If you had this question, you probably paid close attention to the [codebook](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/ALQ_J.htm#ALQ130) -- good job! The codebook states that the values `1` to `13` represent a "range of values" (i.e., counts of drinks) and the value `15` represents "15 or more drinks." If you were paying attention, you may have noticed that 14 isn't mentioned anywhere. Why not?? Well, I don't know for sure, but what I do know is that none of the participants have a value of `14` for `alq130`. Because none of the participants have a value of `14` for `alq130` we could simply ignore it, but that makes my skin crawl. Why? There are at least two reasons. First, what if we collected more data and one of the new participants reported having 14 drinks on average? This code would ignore those participants in our analysis. Additionally, even if there is never a participant who reports 14 drinks, we want our analysis results to reflect that 14 drinks was a _possible_ response -- it's just that zero people gave it. If we don't add an explicit level and label for the value `14` in our code, then R will treat it as though it doesn't exist. If you don't believe me, try it out for yourself.
+4. Why did I pass the values `1:14` to the `factor()` function used to create **alq130_f** in the code chunk below instead of `1:13`? If you had this question, you probably paid close attention to the [codebook](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/ALQ_J.htm#ALQ130) -- good job! The codebook states that the values **1** to **13** represent a "range of values" (i.e., counts of drinks) and the value **15** represents "15 or more drinks." If you were paying attention, you may have noticed that 14 isn't mentioned anywhere. Why not?? Well, I don't know for sure, but what I do know is that none of the participants have a value of **14** for **alq130**. Because none of the participants have a value of **14** for **alq130** we could simply ignore it, but that makes my skin crawl. Why? There are at least two reasons. First, what if we collected more data and one of the new participants reported having 14 drinks on average? This code would ignore those participants in our analysis. Additionally, even if there is never a participant who reports 14 drinks, we want our analysis results to reflect that 14 drinks was a _possible_ response -- it's just that zero people gave it. If we don't add an explicit level and label for the value **14** in our code, then R will treat it as though it doesn't exist. If you don't believe me, try it out for yourself.
 
 ```{r}
 alq_j <- alq_j %>% 
@@ -353,7 +371,7 @@ alq_j <- alq_j %>%
 
 # Task 12
 
-View the structure of `alq_j` using the `str()` function.
+View the structure of **alq_j** using the `str()` function.
 
 ```{r}
 str(alq_j)
@@ -361,13 +379,13 @@ str(alq_j)
 
 ## Questions 9
 
-The `alq_j` data frame contains ____ rows and ____ columns.
+The **alq_j** data frame contains ____ rows and ____ columns.
 
-* The `alq_j` data frame contains 5,533 rows and 19 columns.
+* The **alq_j** data frame contains 5,533 rows and 19 columns.
 
 ## Questions 10
 
-When you view the structure of `alq_j` using the `str()` function, what is the vector type shown for `alq111_f`? According to R, what kind of variable is `alq111_f`? 
+When you view the structure of **alq_j** using the `str()` function, what is the vector type shown for **alq111_f**? According to R, what kind of variable is **alq111_f**? 
 
-* When you view the structure of `alq_j` using the `str()` function, the vector type shown is `Factor`.
+* When you view the structure of **alq_j** using the `str()` function, the vector type shown is **Factor**.
 
