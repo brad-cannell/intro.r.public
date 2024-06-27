@@ -127,6 +127,15 @@ Rename questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26 to **requ
 Which of the following code chunks will correctly rename questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26 to **required**, **still_enroll**, **package**, **genhealth**, **asthma**, **seatbelt**, **insurance**, **persdoc**, **hispanic**, **race**, **veteran**, **marital**, **employment**, **sex**, and **color** using the `rename_with()` function?
 
 ```{r}
+# Correct.
+class_survey <- class_survey |> 
+  rename_with(
+    .fn   = ~ cols_9,
+    .cols = c(q2, q4, q6, q7, q9, q10, q13:q18, q20, q26:q27)
+  )
+```
+
+```{r}
 #| eval: false
 
 # Incorrect: This code is missing the purrr-style lambda in the .fn argument.
@@ -157,15 +166,6 @@ class_survey <- class_survey |>
   rename_with(
     .fn   = ~ cols_9,
     .cols = c(q2:q27)
-  )
-```
-
-```{r}
-# Correct.
-class_survey <- class_survey |> 
-  rename_with(
-    .fn   = ~ cols_9,
-    .cols = c(q2, q4, q6, q7, q9, q10, q13:q18, q20, q26:q27)
   )
 ```
 
