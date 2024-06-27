@@ -1,0 +1,447 @@
+---
+title: "Lab: Repeated Oprerations I"
+format:
+  html:
+    embed-resources: true
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that your file will use up at the top of the file. If you have not yet installed a package, you will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, you would run `install.packages("dplyr")`. However, you typically **do not** want to type the code to install the package here in your Quarto file because you only need to install the package once on a given computer. Not every time you run your R code.
+
+```{r}
+#| label: load-packages
+library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
+library(readr)
+library(stringr)
+library(tidyr)
+```
+
+# Overview
+
+This week, we will practice [writing functions](https://www.r4epi.com/writing-functions.html) and performing [column-wise repeated operations with dplyr](https://www.r4epi.com/column-wise-operations-in-dplyr.html) verbs. In some cases, we will be completing tasks that we already completed in previous modules, but we will do so using methods from this module. We will use the following data sets for all the tasks in this lab:
+
+* [Click here to download Class Survey 5141.csv](https://www.dropbox.com/s/70q553h37cacjka/Class%20Survey%205141.csv?dl=1). This is the class survey data we used in the conditional operations lab. Feel free to reuse your code from that lab for the tasks below that are repeated from that lab.
+
+* [Click here to view the codebook for the class survey data](https://www.dropbox.com/s/kjyfq8cfur0hzdp/5313%20-%205314%20Day%20One%20Survey%20Codebook.pdf?dl=0).
+
+# Task 1
+
+Please download **Class Survey 5141.csv** and import it into your R global environment as **class_survey**.
+
+```{r}
+class_survey <- read_rds("/Users/bradcannell/Dropbox/Datasets/Class Survey/class_survey.Rds")
+```
+
+# Task 2
+
+Please look at the codebook for the **class_survey** data. Several questions on the survey included a "Not Sure" response option coded as a "9". They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. Before analyzing this data, we will convert all of the "9" values to "NA" values. However, the very first thing we want to do is give each of those columns more informative names. Specifically, we want to rename those columns **required**, **still_enroll**, **package**, **genhealth**, **asthma**, **seatbelt**, **insurance**, **persdoc**, **hispanic**, **race**, **veteran**, **marital**, **employment**, **sex**, and **color**. We have already learned how to rename columns using the `rename()` function. 
+
+```{r}
+#| eval: false
+
+# We could rename the columns like this, but there are some advantages to using 
+# rename_with() instead.
+class_survey |> 
+  rename(
+    required     = q2,
+    still_enroll = q4,
+    package      = q6,
+    genhealth    = q7,
+    asthma       = q9,
+    seatbelt     = q10,
+    insurance    = q13,
+    persdoc      = q14, 
+    hispanic     = q15,
+    race         = q16,
+    veteran      = q17, 
+    marital      = q18, 
+    employment   = q20, 
+    sex          = q26,
+    color        = q27
+  )
+```
+
+However, we can also rename multiple columns at once by creating a character vector of column names and applying them using the `rename_with()` function instead. And using this method has some advantages. 
+
+Please create a character vector containing the new column names we want to use. Please name the character vector **cols_9**. The order of the column names in this vector is important, so please use the exact order given above.
+
+# Question 1
+
+Which of the following code chunks will correctly create a character vector named **cols_9** that contains the new column names we want to use?
+
+```{r}
+#| eval: false
+
+# Incorrect: This code doesn't name the vector cols_9.
+new_col_names <- c(
+  "required", "still_enroll", "package", "genhealth", "asthma", "seatbelt", 
+  "insurance", "persdoc", "hispanic", "race", "veteran", "marital", "employment", 
+  "sex", "color"
+)
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: This code is missing quotation marks around the column names.
+cols_9 <- c(
+  required, still_enroll, package, genhealth, asthma, seatbelt, 
+  insurance, persdoc, hispanic, race, veteran, marital, employment, 
+  sex, color
+)
+```
+
+```{r}
+# Correct.
+cols_9 <- c(
+  "required", "still_enroll", "package", "genhealth", "asthma", "seatbelt", 
+  "insurance", "persdoc", "hispanic", "race", "veteran", "marital", "employment", 
+  "sex", "color"
+)
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: This code creates a list instead of a vector.
+cols_9 <- list(
+  "required", "still_enroll", "package", "genhealth", "asthma", "seatbelt", 
+  "insurance", "persdoc", "hispanic", "race", "veteran", "marital", "employment", 
+  "sex", "color"
+)
+```
+
+## Notes for students
+
+1. In the correct code above, we created a character vector containing the names of all the columns that have a “Not Sure” response option. In the code chunk below, we will use this character vector to help rename our columns. The order of the column names in this vector is important.
+
+2. We will also use this character vector of column names to perform the other tasks that follow. There are a couple of nice things about using this strategy. First, it reduces typing and the likelihood of making errors. Second, if we all of the sudden realized that we needed to add another column to each of the tasks we are going to perform below, we will only need to update this character vector once instead of each code chunk below separately.
+
+# Task 3
+
+Rename questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26 to **required**, **still_enroll**, **package**, **genhealth**, **asthma**, **seatbelt**, **insurance**, **persdoc**, **hispanic**, **race**, **veteran**, **marital**, **employment**, **sex**, and **color** using the `rename_with()` function. 
+
+## Question 2
+
+Which of the following code chunks will correctly rename questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26 to **required**, **still_enroll**, **package**, **genhealth**, **asthma**, **seatbelt**, **insurance**, **persdoc**, **hispanic**, **race**, **veteran**, **marital**, **employment**, **sex**, and **color** using the `rename_with()` function?
+
+```{r}
+#| eval: false
+
+# Incorrect: This code is missing the purrr-style lambda in the .fn argument.
+class_survey <- class_survey |> 
+  rename_with(
+    .fn   = cols_9,
+    .cols = c(q2, q4, q6, q7, q9, q10, q13:q18, q20, q26:q27)
+  )
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: This code incorrectly passes the column names to the .fn argument 
+# and cols_9 to the .cols argument.
+class_survey <- class_survey |> 
+  rename_with(
+    .fn   = c(q2, q4, q6, q7, q9, q10, q13:q18, q20, q26:q27),
+    .cols = ~ cols_9
+  )
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: This code passes too many columns to the .cols argument.
+class_survey <- class_survey |> 
+  rename_with(
+    .fn   = ~ cols_9,
+    .cols = c(q2:q27)
+  )
+```
+
+```{r}
+# Correct.
+class_survey <- class_survey |> 
+  rename_with(
+    .fn   = ~ cols_9,
+    .cols = c(q2, q4, q6, q7, q9, q10, q13:q18, q20, q26:q27)
+  )
+```
+
+## Notes for students
+
+1. We’ve used `rename_with()` before to apply the `str_to_lower()` function to all of our column names. However, we can pass any function to the `.fn` argument of `rename_with()`. Passing the character vector, we created earlier as an anonymous function (we wrote the anonymous function above using a purrr-style lambda) to the `.fn` argument has the effect of assigning the names in the character vector to the columns of **class_survey**. It’s very important that (1) the number column names in the character vector matches the number of columns you pass to the `.cols` argument, and (2) the order of the column names in the character vector matches the order of the columns you pass to the `.cols` argument.
+
+# Task 4
+
+Please coerce all of the columns with a Not Sure option from character type to numeric type. Please use the `across()` function to help you remove some of the repetition from your code.
+
+```{r}
+# Old way
+class_survey |> 
+  mutate(
+    required     = as.numeric(required), 
+    still_enroll = as.numeric(still_enroll), 
+    package      = as.numeric(package),
+    genhealth    = as.numeric(genhealth),
+    asthma       = as.numeric(asthma),
+    seatbelt     = as.numeric(seatbelt),
+    insurance    = as.numeric(insurance),
+    persdoc      = as.numeric(persdoc), 
+    hispanic     = as.numeric(hispanic),
+    race         = as.numeric(race),
+    veteran      = as.numeric(veteran), 
+    marital      = as.numeric(marital), 
+    employment   = as.numeric(employment), 
+    sex          = as.numeric(sex),
+    color        = as.numeric(color)
+  )
+```
+
+```{r}
+# With across()
+class_survey |> 
+  mutate(
+    across(
+      .cols = c(
+        required, still_enroll, package, genhealth, asthma, seatbelt, 
+        insurance, persdoc, hispanic, race, veteran, marital, employment, 
+        sex, color
+      ),
+      .fns  = as.numeric
+    )
+  )
+```
+
+```{r}
+# With across() and our character vector
+class_survey <- class_survey |> 
+  mutate(
+    across(
+      .cols = all_of(cols_9),
+      .fns  = as.numeric 
+    )
+  )
+```
+
+## Notes for students
+
+1. Using `across()` removes all of the repetition from our code, which is great. Passing the character vector of column names we previously created to the `.cols` argument (using the `all_of()` tidy-select function) make our code even easier to read and maintain.
+
+# Task 5
+
+Please calculate the number of participants who selected Not Sure as their response for each variable in the class_survey data that included Not Sure as an option. As you complete this task, please write a function that will help remove some of the repetition from your code.
+
+```{r}
+# Here's how we might have completed this task prior to this module.
+# So much repetition!
+class_survey |> 
+  summarise(
+    required_9     = sum(required == 9, na.rm = TRUE),
+    still_enroll_9 = sum(still_enroll == 9, na.rm = TRUE),
+    package_9      = sum(package == 9, na.rm = TRUE),
+    genhealth_9    = sum(genhealth == 9, na.rm = TRUE),
+    asthma_9       = sum(asthma == 9, na.rm = TRUE),
+    seatbelt_9     = sum(seatbelt == 9, na.rm = TRUE),
+    insurance_9    = sum(insurance == 9, na.rm = TRUE),
+    persdoc_9      = sum(persdoc == 9, na.rm = TRUE), 
+    hispanic_9     = sum(hispanic == 9, na.rm = TRUE),
+    race_9         = sum(race == 9, na.rm = TRUE),
+    veteran_9      = sum(veteran == 9, na.rm = TRUE), 
+    marital_9      = sum(marital == 9, na.rm = TRUE), 
+    employment_9   = sum(employment == 9, na.rm = TRUE), 
+    sex_9          = sum(sex == 9, na.rm = TRUE),
+    color_9        = sum(color == 99, na.rm = TRUE) # Notice that color uses 99
+  )
+```
+
+```{r}
+# Now, let's write a function.
+n_nines <- function(x) {
+  sum(x == 9 | x == 99, na.rm = TRUE)
+}
+```
+
+```{r}
+# Use the n_nines function to reduce the amount of repetitive code.
+class_survey |> 
+  summarise(
+    required_9     = n_nines(required),
+    still_enroll_9 = n_nines(still_enroll),
+    package_9      = n_nines(package),
+    genhealth_9    = n_nines(genhealth),
+    asthma_9       = n_nines(asthma),
+    seatbelt_9     = n_nines(seatbelt),
+    insurance_9    = n_nines(insurance),
+    persdoc_9      = n_nines(persdoc), 
+    hispanic_9     = n_nines(hispanic),
+    race_9         = n_nines(race),
+    veteran_9      = n_nines(veteran), 
+    marital_9      = n_nines(marital), 
+    employment_9   = n_nines(employment), 
+    sex_9          = n_nines(sex),
+    color_9        = n_nines(color) 
+  )
+```
+
+# Task 6
+
+Please use the across() function to apply the function you created in Task 4 to calculate the number of participants who selected Not Sure as their response for each variable in the class_survey data that included Not Sure as an option. 
+
+```{r}
+# Use summarise across to remove even more repetitive code.
+class_survey |> 
+  summarise(
+    across(
+      .cols = all_of(cols_9),
+      .fns  = n_nines
+    )
+  )
+```
+
+# Task 7 
+
+Please repeat Task 5. This time, however, please pass the code you wrote in your function to the .fns argument as an anonymous function.
+
+```{r}
+# Use an anonymous function.
+class_survey |> 
+  summarise(
+    across(
+      .cols = all_of(cols_9),
+      .fns  = function(x) { 
+        sum(x == 9 | x == 99, na.rm = TRUE)
+      }
+    )
+  )
+```
+
+# Task 8
+
+Please repeat Task 6. This time, however, please pass your anonymous function to the .fns argument using the purrr-style lambda syntax.
+
+```{r}
+# Use the dplyr purr_style lambda syntax.
+class_survey |> 
+  summarise(
+    across(
+      .cols = all_of(cols_9),
+      .fns  = ~ sum(.x == 9 | .x == 99, na.rm = TRUE)
+    )
+  )
+```
+
+## Question 3
+
+Tasks 4 through 7 above essentially required you to do the same thing in four different slightly different ways. For this particular task, which method did you prefer, and why?
+
+# Task 9
+
+Please repeat Task 7. This time, however, please change the .names argument so that the column names in our results data frame all end with “n_not_sure”. Please assign the results data from the name not_sure_count.
+
+```{r}
+# Make the column names more informative.
+not_sure_count <- class_survey |> 
+  summarise(
+    across(
+      .cols  = all_of(cols_9),
+      .fns   = ~ sum(.x == 9 | .x == 99, na.rm = TRUE),
+      .names = "{col}-n_not_sure" # Using a hyphen here makes the next task easier
+    )
+  )
+```
+
+# Task 10
+
+Please restructure not_sure_count so that it has two columns. The first column should contain each of the column names from class_survey that we analyzed in tasks 4 through 8. The second column of not_sure_count should contain the number of Not Sure responses for each of the column names from class_survey that we analyzed in tasks 4 through 8.
+
+```{r rows.print = 15}
+# When there are lots of columns to look through, pivot longer makes it easier to
+# view the results.
+not_sure_count |> 
+  pivot_longer(
+    cols          = everything(),
+    names_to      = "column",
+    names_pattern = "(\\w+)-",
+    values_to     = "n_not_sure"
+  ) |> 
+  arrange(desc(n_not_sure))
+```
+
+## Question 4
+
+Which column in the class_survey data frame contains the greatest number of Not Sure responses?
+
+* The package column contains the greatest number of Not Sure responses (n = 14).
+
+# Task 11
+
+Please recode all Not Sure responses in the class_survey data frame to missing. 
+
+```{r}
+class_survey <- class_survey |> 
+  mutate(
+    across(
+      .cols = all_of(cols_9),
+      .fns  = ~ if_else(.x == 9 | .x == 99, NA_real_, .x) 
+    )
+  )
+```
+
+## Question 5
+
+Which column in the class_survey data frame contains the greatest number of missing values?
+
+```{r}
+class_survey |> 
+  summarise(
+    across(
+      .cols = all_of(cols_9),
+      .fns  = ~ sum(is.na(.x))
+    )
+  ) |> 
+  pivot_longer(
+    cols      = everything(),
+    names_to  = "column",
+    values_to = "n_missing"
+  ) |> 
+  arrange(desc(n_missing))
+```
+
+* The still_enroll column contains the greatest number of missing values (n = 21).
+
+# Task 12
+
+There are six variables in the class_survey data frame that have Yes and No as response options. They are required, still_enroll, asthma, insurance, hispanic, and veteran. Please create new factor versions of each of these variables. Please use the across() function to help you remove some of the repetition from your code. Please also use the “_f” variable naming convention.
+
+```{r}
+yn_cols <- c("required", "still_enroll", "asthma", "insurance", "hispanic", "veteran")
+```
+
+```{r}
+class_survey <- class_survey |> 
+  mutate(
+    across(
+      .cols  = all_of(yn_cols),
+      .fns   = ~ factor(.x, 0:1, c("No", "Yes")),
+      .names = "{col}_f"
+    )
+  )
+```
+
+## Question 6
+
+How many people reported that they have ever been told by a doctor, nurse, or other health professional that they have asthma?
+
+```{r}
+class_survey |> 
+  count(asthma_f)
+```
+
+* Nine people reported that they have ever been told by a doctor, nurse, or other health professional that they have asthma.
+
+## Notes for students
+
+1. Some of you may be wondering if we can use across() to apply count() to all the yes/no factor variables in one code chunk. Unfortunately, that isn't currently possible. As of this writing, we will need to use a for loop or the purrr package to repeatedly apply the count function across more than one column in our data frame.
+

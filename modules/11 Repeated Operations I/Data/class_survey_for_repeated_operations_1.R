@@ -20,5 +20,5 @@ class_survey <- class_survey %>%
   slice(-1) %>%
   rename_with(str_to_lower)
 
-# Add the data to the datasets directory.
+# Add the data to the data sets directory.
 write_rds(class_survey, "/Users/bradcannell/Library/CloudStorage/Dropbox/Datasets/Class Survey/class_survey.Rds")
