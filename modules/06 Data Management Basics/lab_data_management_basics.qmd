@@ -59,8 +59,8 @@ As part of the data management process, please make sure that all column names a
 * **Alcohol 4** to **drink_concern**
 
 ```{r}
-clients_may <- clients_may %>% 
-  rename_with(tolower) %>% 
+clients_may <- clients_may |> 
+  rename_with(tolower) |> 
   rename(
     "name_first"             = "first name",
     "name_last"              = "last name",
@@ -76,7 +76,7 @@ clients_may <- clients_may %>%
 Please drop all of the depression columns from the data frame. We will not analyze them this month.
 
 ```{r}
-clients_may <- clients_may %>% 
+clients_may <- clients_may |> 
   select(-`depression 1`, -`depression 2`, -`depression 3`, -`depression 4`)
 ```
 
@@ -88,19 +88,19 @@ clients_may <- clients_may %>%
 
 ```{r}
 #| eval: false
-clients_may %>% 
+clients_may |> 
   select(name_first:drink_concern)
 ```
 
 ```{r}
 #| eval: false
-clients_may %>% 
+clients_may |> 
   select(-c(11:14))
 ```
 
 ```{r}
 #| eval: false
-clients_may %>% 
+clients_may |> 
   select(-starts_with("depression"))
 ```
 
@@ -113,12 +113,12 @@ We need to identify unique people in the data frame.
 * Add a column that identifies duplicate (by first and last name) rows in the data frame. The value of this column should be FALSE the first time the client appears in the data and TRUE at each additional time (when applicable).   
 
 ```{r}
-clients_may <- clients_may %>% 
-  group_by(name_first, name_last) %>% 
+clients_may <- clients_may |> 
+  group_by(name_first, name_last) |> 
   mutate(
     count = row_number(),
     dup   = count > 1
-  ) %>% 
+  ) |> 
   ungroup()
 ```
 
@@ -127,7 +127,7 @@ clients_may <- clients_may %>%
 Create a new data frame named **clients_may_dedup** from **clients_may** by dropping all duplicate (by first and last name) rows from the data.
 
 ```{r}
-clients_may_dedup <- clients_may %>% 
+clients_may_dedup <- clients_may |> 
   filter(!dup)
 ```
 
@@ -146,7 +146,7 @@ nrow(clients_may_dedup)
 Create a new column in **clients_may_dedup** named **bmi** that contains the Body Mass Index for each client calculated using [the formula found on the CDC website here](https://www.cdc.gov/healthyweight/assessing/bmi/adult_bmi/index.html).
 
 ```{r}
-clients_may_dedup <- clients_may_dedup %>% 
+clients_may_dedup <- clients_may_dedup |> 
   mutate(bmi = weight / height^2 * 703)
 ```
 
@@ -155,7 +155,7 @@ clients_may_dedup <- clients_may_dedup %>%
 Arrange the columns in **clients_may_dedup** such that the new **bmi** column immediately follows the **weight** column.
 
 ```{r}
-clients_may_dedup <- clients_may_dedup %>% 
+clients_may_dedup <- clients_may_dedup |> 
   select(name_first:weight, bmi, everything())
 ```
 
@@ -164,7 +164,7 @@ clients_may_dedup <- clients_may_dedup %>%
 For all remaining calculations, we want to perform complete case analyses. Drop all rows from **clients_may_dedup** that have a missing value for **bmi**.
 
 ```{r}
-clients_may_dedup <- clients_may_dedup %>% 
+clients_may_dedup <- clients_may_dedup |> 
   filter(!is.na(bmi))
 ```
 
@@ -173,8 +173,8 @@ clients_may_dedup <- clients_may_dedup %>%
 Calculate the mean value of BMI for the remaining May clients (round to one decimal place).
 
 ```{r}
-clients_may_dedup %>% 
-  summarise(mean_bmi = mean(bmi) %>% round(1))
+clients_may_dedup |> 
+  summarise(mean_bmi = mean(bmi) |> round(1))
 ```
 
 ## Notes for students
@@ -192,9 +192,9 @@ After listwise deletion, what is the mean BMI for May clients at their first ses
 Create a new column in **clients_may_dedup** named **any_drink** that is TRUE if the client responded “yes” (i.e., had a value of 1) for any of the alcohol drinking questions and FALSE if the client responded “no” to all of the alcohol drinking questions.
 
 ```{r}
-clients_may_dedup <- clients_may_dedup %>% 
-  rowwise() %>% 
-  mutate(any_drink = sum(drink_eight, drink_blackout, drink_fail_expectation, drink_concern) > 0) %>% 
+clients_may_dedup <- clients_may_dedup |> 
+  rowwise() |> 
+  mutate(any_drink = sum(drink_eight, drink_blackout, drink_fail_expectation, drink_concern) > 0) |> 
   ungroup()
 ```
 
@@ -203,9 +203,9 @@ clients_may_dedup <- clients_may_dedup %>%
 Calculate the number and percentage of May clients who had a “yes” response to any of the alcohol drinking questions.
 
 ```{r}
-clients_may_dedup %>% 
-  count(any_drink) %>% 
-  mutate(percent = (n / sum(n) * 100) %>% round())
+clients_may_dedup |> 
+  count(any_drink) |> 
+  mutate(percent = (n / sum(n) * 100) |> round())
 ```
 
 ## Notes for students

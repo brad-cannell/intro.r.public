@@ -46,19 +46,19 @@ charlotte <- read_excel(
 Vertically combine the data frames you created in Task 1. Name the resulting data frame `cities_ses.` Please make sure that the column names in `cities_ses` match the column names in `houston`.
 
 ```{r}
-cities_ses <- houston %>%
+cities_ses <- houston |>
   # Add city column to houston before adding rows from atlanta and charlotte
-  mutate(city = "Houston") %>% 
+  mutate(city = "Houston") |> 
   bind_rows(
     # Add rows from atlanta - rename columns to match houston
     # Add city column
-    atlanta %>% 
-      rename(pid = id, sex = gender) %>% 
+    atlanta |> 
+      rename(pid = id, sex = gender) |> 
       mutate(city = "Atlanta"),
     # Add rows from charlotte - rename columns to match houston
     # Add city column
-    charlotte %>% 
-      rename(ses_score = ses) %>% 
+    charlotte |> 
+      rename(ses_score = ses) |> 
       mutate(city = "Charlotte")
   )
 ```
@@ -86,7 +86,7 @@ The `cities_ses` data frame contains ____ rows and ____ columns.
 Please sort the `cities_ses` data frame by `PID` in ascending order.
 
 ```{r}
-cities_ses <- cities_ses %>% 
+cities_ses <- cities_ses |> 
   arrange(pid)
 ```
 
@@ -95,8 +95,8 @@ cities_ses <- cities_ses %>%
 What value is in the third row of the `city` column in the sorted `cities_ses` data frame?
 
 ```{r}
-cities_ses %>% 
-  slice(3) %>% 
+cities_ses |> 
+  slice(3) |> 
   pull(city)
 ```
 
@@ -188,8 +188,8 @@ If the participant tells the interviewer that they have not smoked 100 cigarette
 Please merge the 3 separate NHANES data frames into a single combined data frame. Please name the combined data frame `nhanes`.
 
 ```{r}
-nhanes <- demo_j %>% 
-  left_join(mcq_j, by = "SEQN") %>% 
+nhanes <- demo_j |> 
+  left_join(mcq_j, by = "SEQN") |> 
   left_join(smq_j, by = "SEQN")
 ```
 

@@ -31,7 +31,7 @@ class_survey <- read_rds("/Users/bradcannell/Dropbox/Datasets/Class Survey/class
 Please look at the codebook for the `class_survey` data. Several questions on the survey included "Not Sure" as a response option. They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. Please rename each of the columns contains these questions to `required`, `still_enroll`, `package`, `genhealth`, `asthma`, `seatbelt`, `insurance`, `persdoc`, `hispanic`, `race`, `veteran`, `marital`, `employment`, `sex`, and `color`.
 
 ```{r}
-class_survey %>% 
+class_survey |> 
   rename(
     required     = q2,
     still_enroll = q4,
@@ -72,7 +72,7 @@ cols_9 <- c(
 2. I will also use this character vector of column names to perform the other tasks that follow. There are a couple of nice things about using this strategy. First, it reduces typing and likelihood of making errors. Second, if we all of the sudden realized that we needed to add another column to each of the tasks we are going to perform below, we will only need to update this character vector once instead of each code chunk below separately.
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   rename_with(
     .fn   = ~ cols_9,
     .cols = c(q2, q4, q6, q7, q9, q10, q13:q18, q20, q26:q27)
@@ -95,7 +95,7 @@ Please coerce all of the columns with a Not Sure option from character type to n
 
 ```{r}
 # Old way
-class_survey %>% 
+class_survey |> 
   mutate(
     required     = as.numeric(required), 
     still_enroll = as.numeric(still_enroll), 
@@ -117,7 +117,7 @@ class_survey %>%
 
 ```{r}
 # With across()
-class_survey %>% 
+class_survey |> 
   mutate(
     across(
       .cols = c(
@@ -132,7 +132,7 @@ class_survey %>%
 
 ```{r}
 # With across() and our character vector
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   mutate(
     across(
       .cols = all_of(cols_9),
@@ -152,7 +152,7 @@ Please calculate the number of participants who selected Not Sure as their respo
 ```{r}
 # Here's how we might have completed this task prior to this module.
 # So much repetition!
-class_survey %>% 
+class_survey |> 
   summarise(
     required_9     = sum(required == 9, na.rm = TRUE),
     still_enroll_9 = sum(still_enroll == 9, na.rm = TRUE),
@@ -181,7 +181,7 @@ n_nines <- function(x) {
 
 ```{r}
 # Use the n_nines function to reduce the amount of repetitive code.
-class_survey %>% 
+class_survey |> 
   summarise(
     required_9     = n_nines(required),
     still_enroll_9 = n_nines(still_enroll),
@@ -207,7 +207,7 @@ Please use the across() function to apply the function you created in Task 4 to 
 
 ```{r}
 # Use summarise across to remove even more repetitive code.
-class_survey %>% 
+class_survey |> 
   summarise(
     across(
       .cols = all_of(cols_9),
@@ -222,7 +222,7 @@ Please repeat Task 5. This time, however, please pass the code you wrote in your
 
 ```{r}
 # Use an anonymous function.
-class_survey %>% 
+class_survey |> 
   summarise(
     across(
       .cols = all_of(cols_9),
@@ -239,7 +239,7 @@ Please repeat Task 6. This time, however, please pass your anonymous function to
 
 ```{r}
 # Use the dplyr purr_style lambda syntax.
-class_survey %>% 
+class_survey |> 
   summarise(
     across(
       .cols = all_of(cols_9),
@@ -258,7 +258,7 @@ Please repeat Task 7. This time, however, please change the .names argument so t
 
 ```{r}
 # Make the column names more informative.
-not_sure_count <- class_survey %>% 
+not_sure_count <- class_survey |> 
   summarise(
     across(
       .cols  = all_of(cols_9),
@@ -275,13 +275,13 @@ Please restructure not_sure_count so that it has two columns. The first column s
 ```{r rows.print = 15}
 # When there are lots of columns to look through, pivot longer makes it easier to
 # view the results.
-not_sure_count %>% 
+not_sure_count |> 
   pivot_longer(
     cols          = everything(),
     names_to      = "column",
     names_pattern = "(\\w+)-",
     values_to     = "n_not_sure"
-  ) %>% 
+  ) |> 
   arrange(desc(n_not_sure))
 ```
 
@@ -296,7 +296,7 @@ Which column in the class_survey data frame contains the greatest number of Not 
 Please recode all Not Sure responses in the class_survey data frame to missing. 
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   mutate(
     across(
       .cols = all_of(cols_9),
@@ -310,18 +310,18 @@ class_survey <- class_survey %>%
 Which column in the class_survey data frame contains the greatest number of missing values?
 
 ```{r}
-class_survey %>% 
+class_survey |> 
   summarise(
     across(
       .cols = all_of(cols_9),
       .fns  = ~ sum(is.na(.x))
     )
-  ) %>% 
+  ) |> 
   pivot_longer(
     cols      = everything(),
     names_to  = "column",
     values_to = "n_missing"
-  ) %>% 
+  ) |> 
   arrange(desc(n_missing))
 ```
 
@@ -336,7 +336,7 @@ yn_cols <- c("required", "still_enroll", "asthma", "insurance", "hispanic", "vet
 ```
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   mutate(
     across(
       .cols  = all_of(yn_cols),
@@ -351,7 +351,7 @@ class_survey <- class_survey %>%
 How many people reported that they have ever been told by a doctor, nurse, or other health professional that they have asthma?
 
 ```{r}
-class_survey %>% 
+class_survey |> 
   count(asthma_f)
 ```
 

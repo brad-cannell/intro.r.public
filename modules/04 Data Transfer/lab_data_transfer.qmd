@@ -284,7 +284,7 @@ Which of the following code chunks will correctly coerce all of the variable nam
 #| eval: false
 
 # Incorrect: This code passes the entire alq_j data frame, not just the column names from alq_j, to the tolower() function.
-names(alq_j) <- alq_j %>% tolower()
+names(alq_j) <- alq_j |> tolower()
 ```
 
 ```{r}
@@ -298,17 +298,17 @@ tolower(names(alq_j))
 #| eval: false
 
 # Incorrect: This code overwrites the alq_j data frame with a vector of lowercase variable names from the alq_j data frame.
-alq_j <- names(alq_j) %>% tolower()
+alq_j <- names(alq_j) |> tolower()
 ```
 
 ```{r}
 # Correct.
-names(alq_j) <- names(alq_j) %>% tolower()
+names(alq_j) <- names(alq_j) |> tolower()
 ```
 
 ## Notes for students
 
-1. We can easily convert any character string to all lowercase letters using the `tolower()` function. The code above tells R to get the column names from alq_j (`names(alq_j)`), convert them all to lowercase (`%>% tolower()`), and finally assign the new lowercase versions back to the column names (`names(alq_j) <-`).
+1. We can easily convert any character string to all lowercase letters using the `tolower()` function. The code above tells R to get the column names from alq_j (`names(alq_j)`), convert them all to lowercase (`|> tolower()`), and finally assign the new lowercase versions back to the column names (`names(alq_j) <-`).
 
 # Task 11
 
@@ -347,7 +347,7 @@ time_labs <- c(
 4. Why did I pass the values `1:14` to the `factor()` function used to create **alq130_f** in the code chunk below instead of `1:13`? If you had this question, you probably paid close attention to the [codebook](https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/ALQ_J.htm#ALQ130) -- good job! The codebook states that the values **1** to **13** represent a "range of values" (i.e., counts of drinks) and the value **15** represents "15 or more drinks." If you were paying attention, you may have noticed that 14 isn't mentioned anywhere. Why not?? Well, I don't know for sure, but what I do know is that none of the participants have a value of **14** for **alq130**. Because none of the participants have a value of **14** for **alq130** we could simply ignore it, but that makes my skin crawl. Why? There are at least two reasons. First, what if we collected more data and one of the new participants reported having 14 drinks on average? This code would ignore those participants in our analysis. Additionally, even if there is never a participant who reports 14 drinks, we want our analysis results to reflect that 14 drinks was a _possible_ response -- it's just that zero people gave it. If we don't add an explicit level and label for the value **14** in our code, then R will treat it as though it doesn't exist. If you don't believe me, try it out for yourself.
 
 ```{r}
-alq_j <- alq_j %>% 
+alq_j <- alq_j |> 
   mutate(
     alq111_f  = factor(alq111, yn_levs, yn_labs),
     alq121_f  = factor(alq121, time_levs, time_labs),

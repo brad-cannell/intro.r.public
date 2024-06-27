@@ -30,8 +30,8 @@ class_survey <- read_csv("/Users/bradcannell/Dropbox/Datasets/Class Survey/Class
 # Remove the second row -- data labels
 # Also remove the last column of all NA's
 # Coerce all names to lowercase
-class_survey <- class_survey %>%
-  slice(-1) %>% 
+class_survey <- class_survey |>
+  slice(-1) |> 
   rename_with(str_to_lower)
 ```
 
@@ -56,7 +56,7 @@ h. What month were you born?
 i. What is your gender?    
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   select(q13, q14, q17, q18, q20, q21_1, q24, q25, q26)
 ```
 
@@ -89,7 +89,7 @@ Please rename the remaining column names as follows:
 * What is your gender? to `gender`    
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   rename(
     insurance   = q13,
     persdoc     = q14, 
@@ -108,7 +108,7 @@ class_survey <- class_survey %>%
 Please calculate the number of participants who selected `Not Sure` as their response for each of the following variables: `insurance`, `persdoc`, `veteran`, `marital`, `employment`, and `gender`.
 
 ```{r}
-class_survey %>% 
+class_survey |> 
   summarise(
     insurance    = sum(insurance == "9", na.rm = TRUE),
     persdoc      = sum(persdoc == "9", na.rm = TRUE),
@@ -134,7 +134,7 @@ How many participants responded `Not Sure` to the question, “Do you have one o
 Please use the `if_else()` function to recode all `"9"`'s in the columns we inspected in Task 5 to `NA`'s.
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   mutate(persdoc = if_else(persdoc == "9", NA_character_, persdoc))
 ```
 
@@ -155,7 +155,7 @@ yn_labs <- c("No", "Yes")
 1. You don't have to do what I did above. You could have entered these values directly into the `factor()` functions below. I did it this way for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes it easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   mutate(
     insurance_f   = factor(insurance, yn_levs, yn_labs),
     persdoc_f     = factor(persdoc, "0":"2", c("No", "Yes, only one", "Yes, more than one")),
@@ -186,7 +186,7 @@ Recode the values in the birth_year column to the actual year of birth, as oppos
 HINT: This should only require one line of code.
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   mutate(birth_year = as.numeric(birth_year) + 1949)
 ```
 
@@ -199,8 +199,8 @@ class_survey <- class_survey %>%
 Calculate the number of participants born in each year.
 
 ```{r}
-class_survey %>% 
-  count(birth_year) %>% 
+class_survey |> 
+  count(birth_year) |> 
   arrange(desc(n))
 ```
 
@@ -215,9 +215,9 @@ In what year was the greatest number of participants born?
 Please create a new column that contains each student’s date of birth. Name the column `dob` and assume each student was born on the 15th day of the month. Additionally, create another calculated variable that contains each student’s age (as of their last birthday) at the time of the survey. Everyone took the survey on January 10, 2014. Name this column `age`. 
 
 ```{r}
-class_survey <- class_survey %>%
+class_survey <- class_survey |>
   mutate(
-    dob = paste(birth_month, 15, birth_year) %>% mdy(),
+    dob = paste(birth_month, 15, birth_year) |> mdy(),
     age = dob %--% ymd("2014-01-10") %/% years(1)
   )
 ```
@@ -233,7 +233,7 @@ class_survey <- class_survey %>%
 How many missing observations are there for the variable `age`? 
 
 ```{r}
-is.na(class_survey$age) %>% sum()
+is.na(class_survey$age) |> sum()
 ```
 
 * There are 3 missing observations for the variable `age`.
@@ -243,7 +243,7 @@ is.na(class_survey$age) %>% sum()
 Determine the average age of students on the first day of class.
 
 ```{r}
-mean(class_survey$age, na.rm = TRUE) %>% round()
+mean(class_survey$age, na.rm = TRUE) |> round()
 ```
 
 ## Question 5
@@ -270,7 +270,7 @@ quantile(class_survey$salary, na.rm = TRUE)
 Use conditional operations to create a new column that categorizes students into groups defined by quartiles of salary. Please name the new column salary_4cat. Please also create a factor version of the salary_4cat column that uses the _f naming convention.
 
 ```{r}
-class_survey <- class_survey %>% 
+class_survey <- class_survey |> 
   mutate(
     salary_4cat = case_when(
       is.na(salary)  ~ NA_real_,
@@ -298,10 +298,10 @@ dim(class_survey)
 Determine the percentage of students in each of the salary categories by gender.
 
 ```{r}
-class_survey %>% 
-  filter(!is.na(salary_4cat_f) & !is.na(gender_f)) %>% 
-  group_by(gender_f) %>% 
-  count(salary_4cat_f, .drop = FALSE) %>% 
+class_survey |> 
+  filter(!is.na(salary_4cat_f) & !is.na(gender_f)) |> 
+  group_by(gender_f) |> 
+  count(salary_4cat_f, .drop = FALSE) |> 
   mutate(group_percent = n / sum(n) * 100)
 ```
 

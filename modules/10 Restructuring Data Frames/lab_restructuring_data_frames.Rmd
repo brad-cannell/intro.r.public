@@ -60,14 +60,14 @@ All 3 tasks above (and probably many others) would be difficult to do with the `
 Restructure the `temps_2012` data from wide to long. Name the restructured data frame `temps_2012_long`. Please make sure the restructured data frame includes a column that contains the day of the month and a single column that contains the temperature in degrees Fahrenheit. Please name these columns `day` and `temp_fahrenheit` respectively.
 
 ```{r}
-temps_2012_long <- temps_2012 %>% 
+temps_2012_long <- temps_2012 |> 
   pivot_longer(
     cols            = -month, 
     names_to        = "day", 
     names_prefix    = "temp_f",
     names_transform = list(day = as.integer),
     values_to       = "temp_fahrenheit"
-  ) %>% 
+  ) |> 
   print()
 ```
 
@@ -82,7 +82,7 @@ The `temps_2012_long` data frame contains ____ rows and ____ columns.
 Please calculate the number of missing values and the mean, median, minimum, and maximum value of the `temp_fahrenheit` column.
 
 ```{r}
-temps_2012_long %>% 
+temps_2012_long |> 
   summarise(
     n_miss = sum(is.na(temp_fahrenheit)),
     mean   = mean(temp_fahrenheit, na.rm = TRUE),
@@ -103,7 +103,7 @@ What is the mean value of the `temp_fahrenheit` column (rounded to the nearest i
 In the previous task, you should have found temperature values that were equal to -999. The temperature in Dallas was obviously never -999 degrees Fahrenheit. It turns out that these values were just codes used to represent missing data. Please recode all instances of -999 for `temp_fahrenheit` to missing.
 
 ```{r}
-temps_2012_long <- temps_2012_long %>% 
+temps_2012_long <- temps_2012_long |> 
   mutate(temp_fahrenheit = if_else(temp_fahrenheit == -999, NA_real_, temp_fahrenheit))
 ```
 
@@ -112,7 +112,7 @@ temps_2012_long <- temps_2012_long %>%
 Please once again calculate the number of missing values and the mean, median, minimum, and maximum value of the `temp_fahrenheit` column.
 
 ```{r}
-temps_2012_long %>% 
+temps_2012_long |> 
   summarise(
     n_miss = sum(is.na(temp_fahrenheit)),
     mean   = mean(temp_fahrenheit, na.rm = TRUE),
@@ -148,9 +148,9 @@ ggplot(temps_2012_long) +
 4. Finally, we will get rid of the gray background and make the axis labels look a little bit better.
 
 ```{r}
-temps_2012_long <- temps_2012_long %>% 
+temps_2012_long <- temps_2012_long |> 
   # Drop the 21 rows with missing data to get rid of the warning above
-  filter(!is.na(temp_fahrenheit)) %>% 
+  filter(!is.na(temp_fahrenheit)) |> 
   # Coerce month to a factor and order chronologically
   mutate(
     # First, have to change the case
@@ -159,7 +159,7 @@ temps_2012_long <- temps_2012_long %>%
     month   = str_to_title(month),
     # Use built-in month.abb vector to conveniently order month_f chronologically
     month_f = factor(month, month.abb)
-  ) %>% 
+  ) |> 
   print()
 ```
 
@@ -195,8 +195,8 @@ $$T_{C} = (T_{F} - 32) * 5 / 9$$
 Please create a new column in the `temps_2012_long` data frame that contains the daily average temperature in degrees Celsius. Please name the new column temp_celsius.
 
 ```{r}
-temps_2012_long <- temps_2012_long %>% 
-  mutate(temp_celsius = (temp_fahrenheit - 32) * 5 / 9) %>% 
+temps_2012_long <- temps_2012_long |> 
+  mutate(temp_celsius = (temp_fahrenheit - 32) * 5 / 9) |> 
   print()
 ```
 
@@ -205,7 +205,7 @@ temps_2012_long <- temps_2012_long %>%
 Please calculate the number of missing values and the mean, median, minimum, and maximum value of the `temp_celsius` column.
 
 ```{r}
-temps_2012_long %>% 
+temps_2012_long |> 
   summarise(
     n_miss = sum(is.na(temp_celsius)),
     mean   = mean(temp_celsius, na.rm = TRUE),
@@ -238,9 +238,9 @@ epcr_multi_treat
 Please create a new column in `epcr_multi_treat` that sequentially counts the number of rows each person in the data frame has.
 
 ```{r}
-epcr_multi_treat <- epcr_multi_treat %>% 
-  group_by(name) %>% 
-  mutate(incident_number = row_number()) %>% 
+epcr_multi_treat <- epcr_multi_treat |> 
+  group_by(name) |> 
+  mutate(incident_number = row_number()) |> 
   ungroup()
 ```
 
@@ -249,7 +249,7 @@ epcr_multi_treat <- epcr_multi_treat %>%
 Restructure the `epcr_multi_treat` data from long to wide. Name the restructured data frame `epcr_multi_treat_wide`. Please make sure the restructured data frame includes at least the following columns: the arrival time at each person’s first 911 response, the arrival time at each person’s second 911 response, the incident complaint(s) at each person’s first 911 response, and the incident complaint(s) at each person’s second 911 response.
 
 ```{r}
-epcr_multi_treat_wide <- epcr_multi_treat %>% 
+epcr_multi_treat_wide <- epcr_multi_treat |> 
   pivot_wider(
     id_cols     = "name",
     names_from  = "incident_number",
@@ -266,7 +266,7 @@ epcr_multi_treat_wide <- epcr_multi_treat %>%
 Please create a new column in `epcr_multi_treat_wide` that contains the number of days that elapsed between each person’s first and second 911 response.
 
 ```{r}
-epcr_multi_treat_wide <- epcr_multi_treat_wide %>% 
+epcr_multi_treat_wide <- epcr_multi_treat_wide |> 
   mutate(repeat_time = arrival_time_1 %--% arrival_time_2 %/% days(1))
 ```
 
@@ -275,7 +275,7 @@ epcr_multi_treat_wide <- epcr_multi_treat_wide %>%
 Please calculate the number of missing values and the mean, median, minimum, and maximum value of the `repeat_time` column.
 
 ```{r}
-epcr_multi_treat_wide %>% 
+epcr_multi_treat_wide |> 
   summarise(
     n_miss = sum(is.na(repeat_time)),
     mean   = mean(repeat_time, na.rm = TRUE),

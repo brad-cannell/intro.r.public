@@ -56,7 +56,7 @@ The **hospital** data frame contains ____ rows and ____ columns.
 As part of the data management process, please coerce the following columns from character type to date type: date of birth, date of admission to the hospital, date of discharge from the hospital.
 
 ```{r}
-hospital <- hospital %>%
+hospital <- hospital |>
   mutate(
     dob     = as.Date(dob, "%B %d, %Y"),
     addate  = as.Date(addate, "%B %d, %Y"),
@@ -73,8 +73,8 @@ hospital <- hospital %>%
 What is patient 37’s date of admission?
 
 ```{r}
-hospital %>% 
-  filter(id == 37) %>% 
+hospital |> 
+  filter(id == 37) |> 
   pull(addate)
 ```
 
@@ -85,7 +85,7 @@ hospital %>%
 Please create a new column in the **hospital** data frame that contains each patient's age in years, as of their last birthday, on the day they were admitted to the hospital. Please name this column **age**.
 
 ```{r}
-hospital <- hospital %>% 
+hospital <- hospital |> 
   mutate(age = (dob %--% addate) %/% years(1))
 ```
 
@@ -94,7 +94,7 @@ hospital <- hospital %>%
 Please create 8 new dummy variables in the **hospital** data frame based on categories from the type of insurance used column.
 
 ```{r}
-hospital <- hospital %>% 
+hospital <- hospital |> 
   mutate(
     ins_none = str_detect(ins, "0"), # No insurance
     ins_empl = str_detect(ins, "1"), # Employer
@@ -126,8 +126,8 @@ The **hospital** data frame contains ____ rows and ____ columns.
 Calculate the count and percentage of patients who used Medicare insurance (with or without other forms of insurance).
 
 ```{r}
-hospital %>% 
-  count(ins_mdcr) %>% 
+hospital |> 
+  count(ins_mdcr) |> 
   mutate(percent = n / sum(n) * 100)
 ```
 
@@ -146,7 +146,7 @@ What percentage of patients used Medicare insurance (with or without other forms
 Please create a new column in the **hospital** data frame that contains the day of the week each patient was admitted. Please make sure the full name of the day is displayed. Please name this column **admit_day**.
 
 ```{r}
-hospital <- hospital %>% 
+hospital <- hospital |> 
   mutate(admit_day = wday(addate, label = TRUE, abbr = FALSE))
 ```
 
@@ -155,12 +155,12 @@ hospital <- hospital %>%
 Calculate the count and percentage of patients who reported that they would recommend this hospital to their friends and family by day of admission. 
 
 ```{r}
-hospital %>% 
-  mutate(reco_f = factor(reco, c(0, 1), c("No", "Yes"))) %>% 
-  group_by(admit_day) %>% 
-  count(reco_f) %>% 
-  mutate(percent = n / sum(n) * 100) %>% 
-  filter(reco_f == "Yes") %>% 
+hospital |> 
+  mutate(reco_f = factor(reco, c(0, 1), c("No", "Yes"))) |> 
+  group_by(admit_day) |> 
+  count(reco_f) |> 
+  mutate(percent = n / sum(n) * 100) |> 
+  filter(reco_f == "Yes") |> 
   arrange(desc(percent))
 ```
 
@@ -183,9 +183,9 @@ Patients admitted on which day most frequently reported (as a percentage) that t
 For each physician, please calculate the mean response value to the survey question, “How would you rate the professionalism of your physicians during your stay?”
 
 ```{r message=FALSE}
-hospital %>% 
-  group_by(physician) %>% 
-  summarise(mean_sat = mean(pro2)) %>% 
+hospital |> 
+  group_by(physician) |> 
+  summarise(mean_sat = mean(pro2)) |> 
   arrange(desc(mean_sat))
 ```
 
@@ -194,13 +194,13 @@ hospital %>%
 1. I didn't create a task specifically instructing you to clean the physician names. However, I'm hoping the first time you ran the analysis above, you thought the results looked weird. If you go check the data dictionary, you should see that there are only four possible valid physician names. 
 
 ```{r message=FALSE}
-hospital %>% 
+hospital |> 
   mutate(
     physician = str_to_lower(physician),
     physician = str_replace(physician, "recse", "reese")
-  ) %>% 
-  group_by(physician) %>% 
-  summarise(mean_sat = mean(pro2)) %>% 
+  ) |> 
+  group_by(physician) |> 
+  summarise(mean_sat = mean(pro2)) |> 
   arrange(desc(mean_sat))
 ```
 

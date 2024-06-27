@@ -153,8 +153,8 @@ Calculate mean **bmi** within levels of **gender**.
 #| message: false
 
 ## Using dplyr
-whas500 %>% 
-  group_by(gender) %>% 
+whas500 |> 
+  group_by(gender) |> 
   summarise(mean_bmi = mean(bmi))
 ```
 
@@ -162,8 +162,8 @@ whas500 %>%
 #| message: false
 
 ## Using meantables
-whas500 %>% 
-  group_by(gender) %>% 
+whas500 |> 
+  group_by(gender) |> 
   mean_table(bmi)
 ```
 
@@ -231,20 +231,20 @@ gmodels::CrossTable(whas500$year, whas500$cvd)
 
 ```{r}
 # Using freqtables
-whas500 %>% 
-  freq_table(year, cvd) %>% 
+whas500 |> 
+  freq_table(year, cvd) |> 
   # Make the results easier to read --- 
   # Use select() to keep only the columns I'm interested in
-  select(row_var:n_row, percent_row) %>% 
+  select(row_var:n_row, percent_row) |> 
   # Use filter() to see only the rows corresponding to people who had CVD.
   filter(col_cat == 1)
 ```
 
 ```{r}
 # Using freqtables
-whas500 %>% 
-  freq_table(cvd, year) %>% 
-  select(row_var:n_row, percent_row) %>% 
+whas500 |> 
+  freq_table(cvd, year) |> 
+  select(row_var:n_row, percent_row) |> 
   filter(row_cat == 1)
 ```
 

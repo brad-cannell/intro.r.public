@@ -11,7 +11,7 @@
 
 
 
-<title>Restructuring Data Frames</title>
+<title>Repeated Operations II</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Restructuring Data Frames</h1>
+<h1 class="title toc-ignore">Repeated Operations II</h1>
 
 </div>
 
@@ -1754,449 +1754,118 @@ display: none;
 <!-- rnb-text-begin -->
 <div id="overview" class="section level1">
 <h1>Overview</h1>
-<p>This week, we will practice restructuring data frames. We will do so
-using a couple of different data sets:</p>
+<p>This week, we will practice using for loops and performing repeated
+operations with functions from the purrr package.</p>
 <ul>
-<li><p><a href="https://www.dropbox.com/s/ok5athwxaecq3r8/dfwtemps2012.sas7bdat?dl=1">Click
-here to download dfwtemps2012.sas7bdat</a>. This data set contains the
-average daily temperature for Dallas, TX in the year 2012.</p></li>
-<li><p><a href="https://www.dropbox.com/s/ax6cq3qo56jdrcl/epcr_multi_treat.rds?dl=1">Click
-here to download epcr_multi_treat.rds</a>. This data is from a local
-Emergency Medical Services (EMS) provider’s Electronic Patient Care
-Reporting (EPCR) system. Each row in the EPCR data represents a unique
-911 emergency response, but not a unique person. Each person has exactly
-two rows.</p></li>
+<li><a href="**link%20update**">Click here to download Clients
+list.csv</a>. As you may already know, we provide short-term mental
+health counseling services here at the NTRHD. Once enrolled in these
+services, our clients are invited to come in for a maximum of six
+sessions. At each session, our clients complete a brief health survey.
+The June, July and August data was just sent to me, and I could use your
+help preparing it for analysis.</li>
 </ul>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShoYXZlbilcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHlyKVxubGlicmFyeShnZ3Bsb3QyKVxubGlicmFyeShzdHJpbmdyKVxubGlicmFyeShyZWFkcilcbmxpYnJhcnkobHVicmlkYXRlKVxuYGBgIn0= -->
-<pre class="r"><code>library(haven)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShyZWFkcilcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHN0cmluZ3IpXG5saWJyYXJ5KHRpZHlyKVxubGlicmFyeShwdXJycilcbmxpYnJhcnkocmVhZHhsKVxuYGBgIn0= -->
+<pre class="r"><code>library(readr)
 library(dplyr)
-library(tidyr)
-library(ggplot2)
 library(stringr)
-library(readr)
-library(lubridate)</code></pre>
+library(tidyr)
+library(purrr)
+library(readxl)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
 <div id="task-1" class="section level1">
 <h1>Task 1</h1>
-<p>Please download <code>dfwtemps2012.sas7bdat</code>, import it into
-your R global environment as <code>temps_2012</code> and view the
-data.</p>
+<p>Please download ntrhd_clients_June_July_August.xlsx, import each
+sheet in the excel file using a for loop.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMiA8LSByZWFkX3NhcyhcIi9Vc2Vycy9icmFkY2FubmVsbC9Ecm9wYm94L0RhdGFzZXRzL0F2ZXJhZ2UgVGVtcGVyYXR1cmVzL2Rmd3RlbXBzMjAxMi5zYXM3YmRhdFwiKVxuYGBgIn0= -->
-<pre class="r"><code>temps_2012 &lt;- read_sas(&quot;/Users/bradcannell/Dropbox/Datasets/Average Temperatures/dfwtemps2012.sas7bdat&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyBTYXZlIHRoZSBmaWxlIHBhdGggdG8gYW4gb2JqZWN0IHNvIHdlIGRvbid0IGhhdmUgdG8gdHlwZSBpdCByZXBlYXRlZGx5IFxucGF0aCA8LSBcIkM6L1VzZXJzL2plbGx5L09uZURyaXZlIC0gVGhlIFVuaXZlcnNpdHkgb2YgVGV4YXMgSGVhbHRoIFNjaWVuY2UgQ2VudGVyIGF0IEhvdXN0b24vVEEvbnRyaGRfY2xpZW50c19KdW5lX0p1bHlfQXVndXN0Lnhsc3hcIlxuXG4jIFVzZSByZWFkeGw6OmV4Y2VsX3NoZWV0cyB0byBnZXQgdGhlIG5hbWUgb2YgZWFjaCBzaGVldCBpbiB0aGUgd29ya2Jvb2suXG4jIHRoaXMgbWFrZXMgb3VyIGNvZGUgbW9yZSByb2J1c3QuXG5cbmZvcihpIGluIHNlcV9hbG9uZyhzaGVldHMpKSB7XG4gICMgQ29udmVydCBzaGVldCBuYW1lIHRvIGxvd2VyY2FzZSBiZWZvcmUgdXNpbmcgaXQgdG8gbmFtZSB0aGUgZGF0YSBmcmFtZVxuICBuZXdfbm0gPC0gdG9sb3dlcihzaGVldHNbW2ldXSlcbiAgYXNzaWduKG5ld19ubSwgcmVhZF9leGNlbChwYXRoLCBzaGVldCA9IHNoZWV0c1tbaV1dKSlcbn1cbmBgYCJ9 -->
+<pre class="r"><code># Save the file path to an object so we don&#39;t have to type it repeatedly 
+path &lt;- &quot;C:/Users/jelly/OneDrive - The University of Texas Health Science Center at Houston/TA/ntrhd_clients_June_July_August.xlsx&quot;
+
+# Use readxl::excel_sheets to get the name of each sheet in the workbook.
+# this makes our code more robust.
+
+for(i in seq_along(sheets)) {
+  # Convert sheet name to lowercase before using it to name the data frame
+  new_nm &lt;- tolower(sheets[[i]])
+  assign(new_nm, read_excel(path, sheet = sheets[[i]]))
+}</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMlxuYGBgIn0= -->
-<pre class="r"><code>temps_2012</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="question-1" class="section level2">
-<h2>Question 1</h2>
-<p>The <code>temps_2012</code> data frame contains ____ rows and ____
-columns.</p>
-<ul>
-<li>The <code>temps_2012</code> data frame contains 12 rows and 32
-columns.</li>
-</ul>
-</div>
-<div id="question-2" class="section level2">
-<h2>Question 2</h2>
-<p>Does the <code>temps_2012</code> data frame currently have a
-person-period (long) structure or a person-level (wide) structure?</p>
-<ul>
-<li>The <code>temps_2012</code> data frame currently has a person-level
-(wide) structure.</li>
-</ul>
-</div>
-<div id="question-3" class="section level2">
-<h2>Question 3</h2>
-<p>Which of the tidy data guidelines does <code>temps_2012</code>
-violate?</p>
-<ul>
-<li>In the <code>temps_2012</code> data frame, each variable does not
-have its own column. The day of the month variable does not have a
-column at all. Instead, it’s embedded in the other column names.
-Additionally, each observation does not have its own row. In the
-<code>temps_2012</code> data frame, each observation is a single day;
-however, each row is not a single day.</li>
-</ul>
-<p>Looking at the <code>temps_2012</code> data frame, please consider
-each of the following questions. How would you calculate the mean
-overall temperature for the year? How you plot average monthly
-temperatures? How would you convert all the temperatures from Fahrenheit
-to Celcius?</p>
-<p>All 3 tasks above (and probably many others) would be difficult to do
-with the <code>temps_2012</code> data frame. However, we will easily do
-all three of these things below after restructuring the
-<code>temps_2012</code> data frame from wide to long.</p>
-</div>
 </div>
 <div id="task-2" class="section level1">
 <h1>Task 2</h1>
-<p>Restructure the <code>temps_2012</code> data from wide to long. Name
-the restructured data frame <code>temps_2012_long</code>. Please make
-sure the restructured data frame includes a column that contains the day
-of the month and a single column that contains the temperature in
-degrees Fahrenheit. Please name these columns <code>day</code> and
-<code>temp_fahrenheit</code> respectively.</p>
+<p>Now import the same file using the purrr package instead (hint: try
+using purrr::walk() function).</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMl9sb25nIDwtIHRlbXBzXzIwMTIgfD4gXG4gIHBpdm90X2xvbmdlcihcbiAgICBjb2xzICAgICAgICAgICAgPSAtbW9udGgsIFxuICAgIG5hbWVzX3RvICAgICAgICA9IFwiZGF5XCIsIFxuICAgIG5hbWVzX3ByZWZpeCAgICA9IFwidGVtcF9mXCIsXG4gICAgbmFtZXNfdHJhbnNmb3JtID0gbGlzdChkYXkgPSBhcy5pbnRlZ2VyKSxcbiAgICB2YWx1ZXNfdG8gICAgICAgPSBcInRlbXBfZmFocmVuaGVpdFwiXG4gICkgfD4gXG4gIHByaW50KClcbmBgYCJ9 -->
-<pre class="r"><code>temps_2012_long &lt;- temps_2012 |&gt; 
-  pivot_longer(
-    cols            = -month, 
-    names_to        = &quot;day&quot;, 
-    names_prefix    = &quot;temp_f&quot;,
-    names_transform = list(day = as.integer),
-    values_to       = &quot;temp_fahrenheit&quot;
-  ) |&gt; 
-  print()</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG53YWxrKFxuICAueCA9IGV4Y2VsX3NoZWV0cyhwYXRoKSxcbiAgLmYgPSBmdW5jdGlvbih4KSB7XG4gICAgbmV3X25tIDwtIHRvbG93ZXIoeClcbiAgICBhc3NpZ24obmV3X25tLCByZWFkX2V4Y2VsKHBhdGgsIHNoZWV0ID0geCksIGVudmlyID0gLkdsb2JhbEVudilcbiAgfVxuKVxuYGBgIn0= -->
+<pre class="r"><code>
+walk(
+  .x = excel_sheets(path),
+  .f = function(x) {
+    new_nm &lt;- tolower(x)
+    assign(new_nm, read_excel(path, sheet = x), envir = .GlobalEnv)
+  }
+)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<div id="question-4" class="section level2">
-<h2>Question 4</h2>
-<p>The <code>temps_2012_long</code> data frame contains ____ rows and
-____ columns.</p>
-<ul>
-<li>The <code>temps_2012_long</code> data frame contains 372 rows and 3
-columns.</li>
-</ul>
-</div>
-</div>
-<div id="task-3" class="section level1">
-<h1>Task 3</h1>
-<p>Please calculate the number of missing values and the mean, median,
-minimum, and maximum value of the <code>temp_fahrenheit</code>
-column.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMl9sb25nIHw+IFxuICBzdW1tYXJpc2UoXG4gICAgbl9taXNzID0gc3VtKGlzLm5hKHRlbXBfZmFocmVuaGVpdCkpLFxuICAgIG1lYW4gICA9IG1lYW4odGVtcF9mYWhyZW5oZWl0LCBuYS5ybSA9IFRSVUUpLFxuICAgIG1lZGlhbiA9IG1lZGlhbih0ZW1wX2ZhaHJlbmhlaXQsIG5hLnJtID0gVFJVRSksXG4gICAgbWluICAgID0gbWluKHRlbXBfZmFocmVuaGVpdCwgbmEucm0gPSBUUlVFKSxcbiAgICBtYXggICAgPSBtYXgodGVtcF9mYWhyZW5oZWl0LCBuYS5ybSA9IFRSVUUpXG4gIClcbmBgYCJ9 -->
-<pre class="r"><code>temps_2012_long |&gt; 
-  summarise(
-    n_miss = sum(is.na(temp_fahrenheit)),
-    mean   = mean(temp_fahrenheit, na.rm = TRUE),
-    median = median(temp_fahrenheit, na.rm = TRUE),
-    min    = min(temp_fahrenheit, na.rm = TRUE),
-    max    = max(temp_fahrenheit, na.rm = TRUE)
-  )</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="question-5" class="section level2">
-<h2>Question 5</h2>
-<p>What is the mean value of the <code>temp_fahrenheit</code> column
-(rounded to the nearest integer)?</p>
-<ul>
-<li>The mean value of the <code>temp_fahrenheit</code> column is 9
-degrees Fahrenheit. Does this seem like a reasonable estimate for the
-average temperature in Dallas over the course of a year?</li>
-</ul>
-</div>
-</div>
-<div id="task-4" class="section level1">
-<h1>Task 4</h1>
-<p>In the previous task, you should have found temperature values that
-were equal to -999. The temperature in Dallas was obviously never -999
-degrees Fahrenheit. It turns out that these values were just codes used
-to represent missing data. Please recode all instances of -999 for
-<code>temp_fahrenheit</code> to missing.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMl9sb25nIDwtIHRlbXBzXzIwMTJfbG9uZyB8PiBcbiAgbXV0YXRlKHRlbXBfZmFocmVuaGVpdCA9IGlmX2Vsc2UodGVtcF9mYWhyZW5oZWl0ID09IC05OTksIE5BX3JlYWxfLCB0ZW1wX2ZhaHJlbmhlaXQpKVxuYGBgIn0= -->
-<pre class="r"><code>temps_2012_long &lt;- temps_2012_long |&gt; 
-  mutate(temp_fahrenheit = if_else(temp_fahrenheit == -999, NA_real_, temp_fahrenheit))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="task-5" class="section level1">
-<h1>Task 5</h1>
-<p>Please once again calculate the number of missing values and the
-mean, median, minimum, and maximum value of the
-<code>temp_fahrenheit</code> column.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMl9sb25nIHw+IFxuICBzdW1tYXJpc2UoXG4gICAgbl9taXNzID0gc3VtKGlzLm5hKHRlbXBfZmFocmVuaGVpdCkpLFxuICAgIG1lYW4gICA9IG1lYW4odGVtcF9mYWhyZW5oZWl0LCBuYS5ybSA9IFRSVUUpLFxuICAgIG1lZGlhbiA9IG1lZGlhbih0ZW1wX2ZhaHJlbmhlaXQsIG5hLnJtID0gVFJVRSksXG4gICAgbWluICAgID0gbWluKHRlbXBfZmFocmVuaGVpdCwgbmEucm0gPSBUUlVFKSxcbiAgICBtYXggICAgPSBtYXgodGVtcF9mYWhyZW5oZWl0LCBuYS5ybSA9IFRSVUUpXG4gIClcbmBgYCJ9 -->
-<pre class="r"><code>temps_2012_long |&gt; 
-  summarise(
-    n_miss = sum(is.na(temp_fahrenheit)),
-    mean   = mean(temp_fahrenheit, na.rm = TRUE),
-    median = median(temp_fahrenheit, na.rm = TRUE),
-    min    = min(temp_fahrenheit, na.rm = TRUE),
-    max    = max(temp_fahrenheit, na.rm = TRUE)
-  )</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="question-6" class="section level2">
-<h2>Question 6</h2>
-<p>How many missing values are there in the <code>temp_fahrenheit</code>
-column?</p>
-<ul>
-<li>There are 21 missing values in the <code>temp_fahrenheit</code>
-column.</li>
-</ul>
-</div>
-</div>
-<div id="task-6" class="section level1">
-<h1>Task 6</h1>
-<p>Please use <code>temps_2012_long</code> to create a boxplot of
-temperature by month. Please map months to the x-axis and temperatures
-to the y-axis.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2dwbG90KHRlbXBzXzIwMTJfbG9uZykgKyBcbiAgZ2VvbV9ib3hwbG90KGFlcyhtb250aCwgdGVtcF9mYWhyZW5oZWl0KSlcbmBgYCJ9 -->
-<pre class="r"><code>ggplot(temps_2012_long) + 
-  geom_boxplot(aes(month, temp_fahrenheit))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="notes-for-students" class="section level2">
-<h2>Notes for students</h2>
+<div id="notes-to-students" class="section level2">
+<h2>Notes to students</h2>
+<p>Alternatively, you can also use the map() function to return a list
+of data frames and then extract each sheet into a separate data frame
+further (with a bit of repetition, of course!) ## Question</p>
 <ol style="list-style-type: decimal">
-<li><p>The plot above may be what your first attempt looked like. It
-isn’t technically wrong, but it could certainly be improved on. Most
-importantly, a very clear trend that exists in average temperatures
-throughout the year is completely lost in the plot above.</p></li>
-<li><p>The warning above that says “Removed 21 rows containing
-non-Finite values (stat_boxplot)” is just telling us that the 21 rows
-with a missing value for temp_fahrenheit were dropped in order to make
-this plot. It’s not really a problem, but it is kind of ugly. We will
-fix it below by dropping the rows with missing values from the data
-frame ourselves.</p></li>
-<li><p>Currently, month is a character vector. Remember that character
-vectors are ordered alphabetically by default. I this case, the
-alphabetical, rather than chronological, ordering causes to the trend in
-temperature change throughout the year to be totally invisible. To fix
-this, we will coerce months to a factor vector below, and order the
-factor levels chronologically (i.e., Jan to Dec).</p></li>
-<li><p>Finally, we will get rid of the gray background and make the axis
-labels look a little bit better.</p></li>
+<li>Calculate the mean weight for each month.</li>
 </ol>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMl9sb25nIDwtIHRlbXBzXzIwMTJfbG9uZyB8PiBcbiAgIyBEcm9wIHRoZSAyMSByb3dzIHdpdGggbWlzc2luZyBkYXRhIHRvIGdldCByaWQgb2YgdGhlIHdhcm5pbmcgYWJvdmVcbiAgZmlsdGVyKCFpcy5uYSh0ZW1wX2ZhaHJlbmhlaXQpKSB8PiBcbiAgIyBDb2VyY2UgbW9udGggdG8gYSBmYWN0b3IgYW5kIG9yZGVyIGNocm9ub2xvZ2ljYWxseVxuICBtdXRhdGUoXG4gICAgIyBGaXJzdCwgaGF2ZSB0byBjaGFuZ2UgdGhlIGNhc2VcbiAgICAjIEN1cnJlbnRseSBzb21lIG1vbnRocyBhcmUgd3JpdHRlbiBpbiB1cHBlciBjYXNlXG4gICAgIyBPdGhlcnMgYXJlIHdyaXR0ZW4gaW4gdGl0bGUgY2FzZVxuICAgIG1vbnRoICAgPSBzdHJfdG9fdGl0bGUobW9udGgpLFxuICAgICMgVXNlIGJ1aWx0LWluIG1vbnRoLmFiYiB2ZWN0b3IgdG8gY29udmVuaWVudGx5IG9yZGVyIG1vbnRoX2YgY2hyb25vbG9naWNhbGx5XG4gICAgbW9udGhfZiA9IGZhY3Rvcihtb250aCwgbW9udGguYWJiKVxuICApIHw+IFxuICBwcmludCgpXG5gYGAifQ== -->
-<pre class="r"><code>temps_2012_long &lt;- temps_2012_long |&gt; 
-  # Drop the 21 rows with missing data to get rid of the warning above
-  filter(!is.na(temp_fahrenheit)) |&gt; 
-  # Coerce month to a factor and order chronologically
-  mutate(
-    # First, have to change the case
-    # Currently some months are written in upper case
-    # Others are written in title case
-    month   = str_to_title(month),
-    # Use built-in month.abb vector to conveniently order month_f chronologically
-    month_f = factor(month, month.abb)
-  ) |&gt; 
-  print()</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1dlIGNhbiBpbXBsZW1lbnQgdGhlIGNvbnRpbnVvdXMgdmFyaWFibGUgY2FsY3VsYXRpb24gZnVuY3Rpb24gZnJvbSB0aGUgdGV4dGJvb2suXG5jb250aW51b3VzX3N0YXRzIDwtIGZ1bmN0aW9uKGRhdGEsIHZhcikge1xuICBkYXRhIHw+ICBcbiAgICBzdW1tYXJpc2UoXG4gICAgICB2YXJpYWJsZSA9IHF1b19uYW1lKHZhciksXG4gICAgICBuX21pc3MgICA9IHN1bShpcy5uYSh7eyB2YXJ9fSApKSxcbiAgICAgIG1lYW4gICAgID0gbWVhbih7eyB2YXIgfX0sIG5hLnJtID0gVFJVRSksXG4gICAgICBtZWRpYW4gICA9IG1lZGlhbih7eyB2YXIgfX0sIG5hLnJtID0gVFJVRSksXG4gICAgICBtaW4gICAgICA9IG1pbih7eyB2YXIgfX0sIG5hLnJtID0gVFJVRSksXG4gICAgICBtYXggICAgICA9IG1heCh7eyB2YXIgfX0sIG5hLnJtID0gVFJVRSlcbiAgICApIFxufVxuXG5tb250aHM8LWxpc3QoanVuZSwganVseSwgYXVndXN0KVxuXG5mb3IgKGkgaW4gbW9udGhzKXtcbnJlc3VsdHM8LW1hcF9kZnIoXG4gIC54ID0gcXVvcyhIZWlnaHQsIFdlaWdodCksXG4gIC5mID0gY29udGludW91c19zdGF0cywgZGF0YSA9IGlcbilcbnByaW50KHJlc3VsdHMpfVxuYGBgIn0= -->
+<pre class="r"><code>#We can implement the continuous variable calculation function from the textbook.
+continuous_stats &lt;- function(data, var) {
+  data |&gt;  
+    summarise(
+      variable = quo_name(var),
+      n_miss   = sum(is.na({{ var}} )),
+      mean     = mean({{ var }}, na.rm = TRUE),
+      median   = median({{ var }}, na.rm = TRUE),
+      min      = min({{ var }}, na.rm = TRUE),
+      max      = max({{ var }}, na.rm = TRUE)
+    ) 
+}
+
+months&lt;-list(june, july, august)
+
+for (i in months){
+results&lt;-map_dfr(
+  .x = quos(Height, Weight),
+  .f = continuous_stats, data = i
+)
+print(results)}</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2dwbG90KHRlbXBzXzIwMTJfbG9uZykgKyBcbiAgZ2VvbV9ib3hwbG90KGFlcyhtb250aF9mLCB0ZW1wX2ZhaHJlbmhlaXQpKSArXG4gIGxhYnMoXG4gICAgeCA9IFwiTW9udGhcIixcbiAgICB5ID0gXCJUZW1wZXJhdHVyZVwiLFxuICAgIGNvbG9yID0gXCJTY2FsZVwiXG4gICkgK1xuICB0aGVtZV9jbGFzc2ljKClcbmBgYCJ9 -->
-<pre class="r"><code>ggplot(temps_2012_long) + 
-  geom_boxplot(aes(month_f, temp_fahrenheit)) +
-  labs(
-    x = &quot;Month&quot;,
-    y = &quot;Temperature&quot;,
-    color = &quot;Scale&quot;
-  ) +
-  theme_classic()</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="question-7" class="section level2">
-<h2>Question 7</h2>
-<p>Which month appears to have the highest average temperature?</p>
 <ul>
-<li>July appears to have the highest average temperature. It’s median
-(the black line in the middle of the boxplot) is highest of all the
-months.</li>
-</ul>
-</div>
-<div id="question-8" class="section level2">
-<h2>Question 8</h2>
-<p>Which month appears to have the largest range of temperatures?</p>
-<ul>
-<li>December appears to have the largest range of temperatures. The
-length between the top and bottom of its whiskers appears to be the
-longest of all the months.</li>
+<li>June: 66.7inches, 157lbs July: 66.3inches, 157lbs August:
+67.2inches, 162lbs</li>
 </ul>
 </div>
 </div>
-<div id="task-7" class="section level1">
-<h1>Task 7</h1>
-<p>The formula to convert Fahrenheit to Celsius is The temperature T in
-degrees Celsius (°C) is equal to the temperature T in degrees Fahrenheit
-(°F) minus 32, times 5/9.</p>
-<p><span class="math display">\[T_{C} = (T_{F} - 32) * 5 /
-9\]</span></p>
-<p>Please create a new column in the <code>temps_2012_long</code> data
-frame that contains the daily average temperature in degrees Celsius.
-Please name the new column temp_celsius.</p>
+<div id="task-3." class="section level1">
+<h1>Task 3.</h1>
+<p>#Need ideas for additional tasks</p>
 <!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMl9sb25nIDwtIHRlbXBzXzIwMTJfbG9uZyB8PiBcbiAgbXV0YXRlKHRlbXBfY2Vsc2l1cyA9ICh0ZW1wX2ZhaHJlbmhlaXQgLSAzMikgKiA1IC8gOSkgfD4gXG4gIHByaW50KClcbmBgYCJ9 -->
-<pre class="r"><code>temps_2012_long &lt;- temps_2012_long |&gt; 
-  mutate(temp_celsius = (temp_fahrenheit - 32) * 5 / 9) |&gt; 
-  print()</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="task-8" class="section level1">
-<h1>Task 8</h1>
-<p>Please calculate the number of missing values and the mean, median,
-minimum, and maximum value of the <code>temp_celsius</code> column.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudGVtcHNfMjAxMl9sb25nIHw+IFxuICBzdW1tYXJpc2UoXG4gICAgbl9taXNzID0gc3VtKGlzLm5hKHRlbXBfY2Vsc2l1cykpLFxuICAgIG1lYW4gICA9IG1lYW4odGVtcF9jZWxzaXVzLCBuYS5ybSA9IFRSVUUpLFxuICAgIG1lZGlhbiA9IG1lZGlhbih0ZW1wX2NlbHNpdXMsIG5hLnJtID0gVFJVRSksXG4gICAgbWluICAgID0gbWluKHRlbXBfY2Vsc2l1cywgbmEucm0gPSBUUlVFKSxcbiAgICBtYXggICAgPSBtYXgodGVtcF9jZWxzaXVzLCBuYS5ybSA9IFRSVUUpXG4gIClcbmBgYCJ9 -->
-<pre class="r"><code>temps_2012_long |&gt; 
-  summarise(
-    n_miss = sum(is.na(temp_celsius)),
-    mean   = mean(temp_celsius, na.rm = TRUE),
-    median = median(temp_celsius, na.rm = TRUE),
-    min    = min(temp_celsius, na.rm = TRUE),
-    max    = max(temp_celsius, na.rm = TRUE)
-  )</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="question-9" class="section level2">
-<h2>Question 9</h2>
-<p>What is the mean value of <code>temp_celsiust</code> (rounded to the
-nearest integer)?</p>
-<ul>
-<li>The mean value of <code>temp_celsius</code> (rounded to the nearest
-integer) is 21.</li>
-</ul>
-</div>
-</div>
-<div id="task-9" class="section level1">
-<h1>Task 9</h1>
-<p>Please download <code>epcr_multi_treat.rds</code>, import it into
-your R global environment as <code>epcr_multi_treat</code> and view the
-data.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXBjcl9tdWx0aV90cmVhdCA8LSByZWFkX3JkcyhcIi9Vc2Vycy9icmFkY2FubmVsbC9Ecm9wYm94L0RhdGFzZXRzL2VwY3IvZXBjcl9tdWx0aV90cmVhdC5SZHNcIilcbmBgYCJ9 -->
-<pre class="r"><code>epcr_multi_treat &lt;- read_rds(&quot;/Users/bradcannell/Dropbox/Datasets/epcr/epcr_multi_treat.Rds&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXBjcl9tdWx0aV90cmVhdFxuYGBgIn0= -->
-<pre class="r"><code>epcr_multi_treat</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="task-10" class="section level1">
-<h1>Task 10</h1>
-<p>Please create a new column in <code>epcr_multi_treat</code> that
-sequentially counts the number of rows each person in the data frame
-has.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXBjcl9tdWx0aV90cmVhdCA8LSBlcGNyX211bHRpX3RyZWF0IHw+IFxuICBncm91cF9ieShuYW1lKSB8PiBcbiAgbXV0YXRlKGluY2lkZW50X251bWJlciA9IHJvd19udW1iZXIoKSkgfD4gXG4gIHVuZ3JvdXAoKVxuYGBgIn0= -->
-<pre class="r"><code>epcr_multi_treat &lt;- epcr_multi_treat |&gt; 
-  group_by(name) |&gt; 
-  mutate(incident_number = row_number()) |&gt; 
-  ungroup()</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="task-11" class="section level1">
-<h1>Task 11</h1>
-<p>Restructure the <code>epcr_multi_treat</code> data from long to wide.
-Name the restructured data frame <code>epcr_multi_treat_wide</code>.
-Please make sure the restructured data frame includes at least the
-following columns: the arrival time at each person’s first 911 response,
-the arrival time at each person’s second 911 response, the incident
-complaint(s) at each person’s first 911 response, and the incident
-complaint(s) at each person’s second 911 response.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXBjcl9tdWx0aV90cmVhdF93aWRlIDwtIGVwY3JfbXVsdGlfdHJlYXQgfD4gXG4gIHBpdm90X3dpZGVyKFxuICAgIGlkX2NvbHMgICAgID0gXCJuYW1lXCIsXG4gICAgbmFtZXNfZnJvbSAgPSBcImluY2lkZW50X251bWJlclwiLFxuICAgIHZhbHVlc19mcm9tID0gYyhcImFycml2YWxfdGltZVwiLCBcImluY2lkZW50X2NvbXBsYWludFwiKVxuICApXG5gYGAifQ== -->
-<pre class="r"><code>epcr_multi_treat_wide &lt;- epcr_multi_treat |&gt; 
-  pivot_wider(
-    id_cols     = &quot;name&quot;,
-    names_from  = &quot;incident_number&quot;,
-    values_from = c(&quot;arrival_time&quot;, &quot;incident_complaint&quot;)
-  )</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="notes-for-students-1" class="section level2">
-<h2>Notes for students</h2>
-<ol style="list-style-type: decimal">
-<li>We didn’t talk about the <code>id_cols</code> argument in the
-readings for this module. Take a look at the help documentation for
-<code>pivot_wider</code> and play around with adding and removing the
-<code>id_cols</code> argument to get a feel for what it does.</li>
-</ol>
-</div>
-</div>
-<div id="task-12" class="section level1">
-<h1>Task 12</h1>
-<p>Please create a new column in <code>epcr_multi_treat_wide</code> that
-contains the number of days that elapsed between each person’s first and
-second 911 response.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXBjcl9tdWx0aV90cmVhdF93aWRlIDwtIGVwY3JfbXVsdGlfdHJlYXRfd2lkZSB8PiBcbiAgbXV0YXRlKHJlcGVhdF90aW1lID0gYXJyaXZhbF90aW1lXzEgJS0tJSBhcnJpdmFsX3RpbWVfMiAlLyUgZGF5cygxKSlcbmBgYCJ9 -->
-<pre class="r"><code>epcr_multi_treat_wide &lt;- epcr_multi_treat_wide |&gt; 
-  mutate(repeat_time = arrival_time_1 %--% arrival_time_2 %/% days(1))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-</div>
-<div id="task-13" class="section level1">
-<h1>Task 13</h1>
-<p>Please calculate the number of missing values and the mean, median,
-minimum, and maximum value of the <code>repeat_time</code> column.</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXBjcl9tdWx0aV90cmVhdF93aWRlIHw+IFxuICBzdW1tYXJpc2UoXG4gICAgbl9taXNzID0gc3VtKGlzLm5hKHJlcGVhdF90aW1lKSksXG4gICAgbWVhbiAgID0gbWVhbihyZXBlYXRfdGltZSwgbmEucm0gPSBUUlVFKSxcbiAgICBtZWRpYW4gPSBtZWRpYW4ocmVwZWF0X3RpbWUsIG5hLnJtID0gVFJVRSksXG4gICAgbWluICAgID0gbWluKHJlcGVhdF90aW1lLCBuYS5ybSA9IFRSVUUpLFxuICAgIG1heCAgICA9IG1heChyZXBlYXRfdGltZSwgbmEucm0gPSBUUlVFKVxuICApXG5gYGAifQ== -->
-<pre class="r"><code>epcr_multi_treat_wide |&gt; 
-  summarise(
-    n_miss = sum(is.na(repeat_time)),
-    mean   = mean(repeat_time, na.rm = TRUE),
-    median = median(repeat_time, na.rm = TRUE),
-    min    = min(repeat_time, na.rm = TRUE),
-    max    = max(repeat_time, na.rm = TRUE)
-  )</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<div id="question-10" class="section level2">
-<h2>Question 10</h2>
-<p>What is the minimum number of days that elapsed between any person’s
-first and second 911 response (rounded to the nearest integer)?</p>
-<ul>
-<li>The minimum number of days that elapsed between any person’s first
-and second 911 response (rounded to the nearest integer) was 0.</li>
-</ul>
-<!-- rnb-text-end -->
-</div>
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUmVzdHJ1Y3R1cmluZyBEYXRhIEZyYW1lcyIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyBPdmVydmlldwoKVGhpcyB3ZWVrLCB3ZSB3aWxsIHByYWN0aWNlIHJlc3RydWN0dXJpbmcgZGF0YSBmcmFtZXMuIFdlIHdpbGwgZG8gc28gdXNpbmcgYSBjb3VwbGUgb2YgZGlmZmVyZW50IGRhdGEgc2V0czoKCiogW0NsaWNrIGhlcmUgdG8gZG93bmxvYWQgZGZ3dGVtcHMyMDEyLnNhczdiZGF0XShodHRwczovL3d3dy5kcm9wYm94LmNvbS9zL29rNWF0aHd4YWVjcTNyOC9kZnd0ZW1wczIwMTIuc2FzN2JkYXQ/ZGw9MSkuIFRoaXMgZGF0YSBzZXQgY29udGFpbnMgdGhlIGF2ZXJhZ2UgZGFpbHkgdGVtcGVyYXR1cmUgZm9yIERhbGxhcywgVFggaW4gdGhlIHllYXIgMjAxMi4KCiogW0NsaWNrIGhlcmUgdG8gZG93bmxvYWQgZXBjcl9tdWx0aV90cmVhdC5yZHNdKGh0dHBzOi8vd3d3LmRyb3Bib3guY29tL3MvYXg2Y3EzcW81NmpkcmNsL2VwY3JfbXVsdGlfdHJlYXQucmRzP2RsPTEpLiBUaGlzIGRhdGEgaXMgZnJvbSBhIGxvY2FsIEVtZXJnZW5jeSBNZWRpY2FsIFNlcnZpY2VzIChFTVMpIHByb3ZpZGVy4oCZcyBFbGVjdHJvbmljIFBhdGllbnQgQ2FyZSBSZXBvcnRpbmcgKEVQQ1IpIHN5c3RlbS4gRWFjaCByb3cgaW4gdGhlIEVQQ1IgZGF0YSByZXByZXNlbnRzIGEgdW5pcXVlIDkxMSBlbWVyZ2VuY3kgcmVzcG9uc2UsIGJ1dCBub3QgYSB1bmlxdWUgcGVyc29uLiBFYWNoIHBlcnNvbiBoYXMgZXhhY3RseSB0d28gcm93cy4KCmBgYHtyIG1lc3NhZ2U9RkFMU0V9CmxpYnJhcnkoaGF2ZW4pCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkodGlkeXIpCmxpYnJhcnkoZ2dwbG90MikKbGlicmFyeShzdHJpbmdyKQpsaWJyYXJ5KHJlYWRyKQpsaWJyYXJ5KGx1YnJpZGF0ZSkKYGBgCgojIFRhc2sgMQoKUGxlYXNlIGRvd25sb2FkIGBkZnd0ZW1wczIwMTIuc2FzN2JkYXRgLCBpbXBvcnQgaXQgaW50byB5b3VyIFIgZ2xvYmFsIGVudmlyb25tZW50IGFzIGB0ZW1wc18yMDEyYCBhbmQgdmlldyB0aGUgZGF0YS4KCmBgYHtyfQp0ZW1wc18yMDEyIDwtIHJlYWRfc2FzKCIvVXNlcnMvYnJhZGNhbm5lbGwvRHJvcGJveC9EYXRhc2V0cy9BdmVyYWdlIFRlbXBlcmF0dXJlcy9kZnd0ZW1wczIwMTIuc2FzN2JkYXQiKQpgYGAKCmBgYHtyfQp0ZW1wc18yMDEyCmBgYAoKIyMgUXVlc3Rpb24gMQoKVGhlIGB0ZW1wc18yMDEyYCBkYXRhIGZyYW1lIGNvbnRhaW5zIF9fX18gcm93cyBhbmQgX19fXyBjb2x1bW5zLgoKKiBUaGUgYHRlbXBzXzIwMTJgIGRhdGEgZnJhbWUgY29udGFpbnMgMTIgcm93cyBhbmQgMzIgY29sdW1ucy4KCiMjIFF1ZXN0aW9uIDIKCkRvZXMgdGhlIGB0ZW1wc18yMDEyYCBkYXRhIGZyYW1lIGN1cnJlbnRseSBoYXZlIGEgcGVyc29uLXBlcmlvZCAobG9uZykgc3RydWN0dXJlIG9yIGEgcGVyc29uLWxldmVsICh3aWRlKSBzdHJ1Y3R1cmU/CgoqIFRoZSBgdGVtcHNfMjAxMmAgZGF0YSBmcmFtZSBjdXJyZW50bHkgaGFzIGEgcGVyc29uLWxldmVsICh3aWRlKSBzdHJ1Y3R1cmUuCgojIyBRdWVzdGlvbiAzCgpXaGljaCBvZiB0aGUgdGlkeSBkYXRhIGd1aWRlbGluZXMgZG9lcyBgdGVtcHNfMjAxMmAgdmlvbGF0ZT8KCiogSW4gdGhlIGB0ZW1wc18yMDEyYCBkYXRhIGZyYW1lLCBlYWNoIHZhcmlhYmxlIGRvZXMgbm90IGhhdmUgaXRzIG93biBjb2x1bW4uIFRoZSBkYXkgb2YgdGhlIG1vbnRoIHZhcmlhYmxlIGRvZXMgbm90IGhhdmUgYSBjb2x1bW4gYXQgYWxsLiBJbnN0ZWFkLCBpdCdzIGVtYmVkZGVkIGluIHRoZSBvdGhlciBjb2x1bW4gbmFtZXMuIEFkZGl0aW9uYWxseSwgZWFjaCBvYnNlcnZhdGlvbiBkb2VzIG5vdCBoYXZlIGl0cyBvd24gcm93LiBJbiB0aGUgYHRlbXBzXzIwMTJgIGRhdGEgZnJhbWUsIGVhY2ggb2JzZXJ2YXRpb24gaXMgYSBzaW5nbGUgZGF5OyBob3dldmVyLCBlYWNoIHJvdyBpcyBub3QgYSBzaW5nbGUgZGF5LgoKTG9va2luZyBhdCB0aGUgYHRlbXBzXzIwMTJgIGRhdGEgZnJhbWUsIHBsZWFzZSBjb25zaWRlciBlYWNoIG9mIHRoZSBmb2xsb3dpbmcgcXVlc3Rpb25zLiBIb3cgd291bGQgeW91IGNhbGN1bGF0ZSB0aGUgbWVhbiBvdmVyYWxsIHRlbXBlcmF0dXJlIGZvciB0aGUgeWVhcj8gSG93IHlvdSBwbG90IGF2ZXJhZ2UgbW9udGhseSB0ZW1wZXJhdHVyZXM/IEhvdyB3b3VsZCB5b3UgY29udmVydCBhbGwgdGhlIHRlbXBlcmF0dXJlcyBmcm9tIEZhaHJlbmhlaXQgdG8gQ2VsY2l1cz8gCgpBbGwgMyB0YXNrcyBhYm92ZSAoYW5kIHByb2JhYmx5IG1hbnkgb3RoZXJzKSB3b3VsZCBiZSBkaWZmaWN1bHQgdG8gZG8gd2l0aCB0aGUgYHRlbXBzXzIwMTJgIGRhdGEgZnJhbWUuIEhvd2V2ZXIsIHdlIHdpbGwgZWFzaWx5IGRvIGFsbCB0aHJlZSBvZiB0aGVzZSB0aGluZ3MgYmVsb3cgYWZ0ZXIgcmVzdHJ1Y3R1cmluZyB0aGUgYHRlbXBzXzIwMTJgIGRhdGEgZnJhbWUgZnJvbSB3aWRlIHRvIGxvbmcuCgojIFRhc2sgMgoKUmVzdHJ1Y3R1cmUgdGhlIGB0ZW1wc18yMDEyYCBkYXRhIGZyb20gd2lkZSB0byBsb25nLiBOYW1lIHRoZSByZXN0cnVjdHVyZWQgZGF0YSBmcmFtZSBgdGVtcHNfMjAxMl9sb25nYC4gUGxlYXNlIG1ha2Ugc3VyZSB0aGUgcmVzdHJ1Y3R1cmVkIGRhdGEgZnJhbWUgaW5jbHVkZXMgYSBjb2x1bW4gdGhhdCBjb250YWlucyB0aGUgZGF5IG9mIHRoZSBtb250aCBhbmQgYSBzaW5nbGUgY29sdW1uIHRoYXQgY29udGFpbnMgdGhlIHRlbXBlcmF0dXJlIGluIGRlZ3JlZXMgRmFocmVuaGVpdC4gUGxlYXNlIG5hbWUgdGhlc2UgY29sdW1ucyBgZGF5YCBhbmQgYHRlbXBfZmFocmVuaGVpdGAgcmVzcGVjdGl2ZWx5LgoKYGBge3J9CnRlbXBzXzIwMTJfbG9uZyA8LSB0ZW1wc18yMDEyIHw+IAogIHBpdm90X2xvbmdlcigKICAgIGNvbHMgICAgICAgICAgICA9IC1tb250aCwgCiAgICBuYW1lc190byAgICAgICAgPSAiZGF5IiwgCiAgICBuYW1lc19wcmVmaXggICAgPSAidGVtcF9mIiwKICAgIG5hbWVzX3RyYW5zZm9ybSA9IGxpc3QoZGF5ID0gYXMuaW50ZWdlciksCiAgICB2YWx1ZXNfdG8gICAgICAgPSAidGVtcF9mYWhyZW5oZWl0IgogICkgfD4gCiAgcHJpbnQoKQpgYGAKCiMjIFF1ZXN0aW9uIDQKClRoZSBgdGVtcHNfMjAxMl9sb25nYCBkYXRhIGZyYW1lIGNvbnRhaW5zIF9fX18gcm93cyBhbmQgX19fXyBjb2x1bW5zLgoKKiBUaGUgYHRlbXBzXzIwMTJfbG9uZ2AgZGF0YSBmcmFtZSBjb250YWlucyAzNzIgcm93cyBhbmQgMyBjb2x1bW5zLgoKIyBUYXNrIDMKClBsZWFzZSBjYWxjdWxhdGUgdGhlIG51bWJlciBvZiBtaXNzaW5nIHZhbHVlcyBhbmQgdGhlIG1lYW4sIG1lZGlhbiwgbWluaW11bSwgYW5kIG1heGltdW0gdmFsdWUgb2YgdGhlIGB0ZW1wX2ZhaHJlbmhlaXRgIGNvbHVtbi4KCmBgYHtyfQp0ZW1wc18yMDEyX2xvbmcgfD4gCiAgc3VtbWFyaXNlKAogICAgbl9taXNzID0gc3VtKGlzLm5hKHRlbXBfZmFocmVuaGVpdCkpLAogICAgbWVhbiAgID0gbWVhbih0ZW1wX2ZhaHJlbmhlaXQsIG5hLnJtID0gVFJVRSksCiAgICBtZWRpYW4gPSBtZWRpYW4odGVtcF9mYWhyZW5oZWl0LCBuYS5ybSA9IFRSVUUpLAogICAgbWluICAgID0gbWluKHRlbXBfZmFocmVuaGVpdCwgbmEucm0gPSBUUlVFKSwKICAgIG1heCAgICA9IG1heCh0ZW1wX2ZhaHJlbmhlaXQsIG5hLnJtID0gVFJVRSkKICApCmBgYAoKIyMgUXVlc3Rpb24gNQoKV2hhdCBpcyB0aGUgbWVhbiB2YWx1ZSBvZiB0aGUgYHRlbXBfZmFocmVuaGVpdGAgY29sdW1uIChyb3VuZGVkIHRvIHRoZSBuZWFyZXN0IGludGVnZXIpPwoKKiBUaGUgbWVhbiB2YWx1ZSBvZiB0aGUgYHRlbXBfZmFocmVuaGVpdGAgY29sdW1uIGlzIDkgZGVncmVlcyBGYWhyZW5oZWl0LiBEb2VzIHRoaXMgc2VlbSBsaWtlIGEgcmVhc29uYWJsZSBlc3RpbWF0ZSBmb3IgdGhlIGF2ZXJhZ2UgdGVtcGVyYXR1cmUgaW4gRGFsbGFzIG92ZXIgdGhlIGNvdXJzZSBvZiBhIHllYXI/CgojIFRhc2sgNAoKSW4gdGhlIHByZXZpb3VzIHRhc2ssIHlvdSBzaG91bGQgaGF2ZSBmb3VuZCB0ZW1wZXJhdHVyZSB2YWx1ZXMgdGhhdCB3ZXJlIGVxdWFsIHRvIC05OTkuIFRoZSB0ZW1wZXJhdHVyZSBpbiBEYWxsYXMgd2FzIG9idmlvdXNseSBuZXZlciAtOTk5IGRlZ3JlZXMgRmFocmVuaGVpdC4gSXQgdHVybnMgb3V0IHRoYXQgdGhlc2UgdmFsdWVzIHdlcmUganVzdCBjb2RlcyB1c2VkIHRvIHJlcHJlc2VudCBtaXNzaW5nIGRhdGEuIFBsZWFzZSByZWNvZGUgYWxsIGluc3RhbmNlcyBvZiAtOTk5IGZvciBgdGVtcF9mYWhyZW5oZWl0YCB0byBtaXNzaW5nLgoKYGBge3J9CnRlbXBzXzIwMTJfbG9uZyA8LSB0ZW1wc18yMDEyX2xvbmcgfD4gCiAgbXV0YXRlKHRlbXBfZmFocmVuaGVpdCA9IGlmX2Vsc2UodGVtcF9mYWhyZW5oZWl0ID09IC05OTksIE5BX3JlYWxfLCB0ZW1wX2ZhaHJlbmhlaXQpKQpgYGAKCiMgVGFzayA1CgpQbGVhc2Ugb25jZSBhZ2FpbiBjYWxjdWxhdGUgdGhlIG51bWJlciBvZiBtaXNzaW5nIHZhbHVlcyBhbmQgdGhlIG1lYW4sIG1lZGlhbiwgbWluaW11bSwgYW5kIG1heGltdW0gdmFsdWUgb2YgdGhlIGB0ZW1wX2ZhaHJlbmhlaXRgIGNvbHVtbi4KCmBgYHtyfQp0ZW1wc18yMDEyX2xvbmcgfD4gCiAgc3VtbWFyaXNlKAogICAgbl9taXNzID0gc3VtKGlzLm5hKHRlbXBfZmFocmVuaGVpdCkpLAogICAgbWVhbiAgID0gbWVhbih0ZW1wX2ZhaHJlbmhlaXQsIG5hLnJtID0gVFJVRSksCiAgICBtZWRpYW4gPSBtZWRpYW4odGVtcF9mYWhyZW5oZWl0LCBuYS5ybSA9IFRSVUUpLAogICAgbWluICAgID0gbWluKHRlbXBfZmFocmVuaGVpdCwgbmEucm0gPSBUUlVFKSwKICAgIG1heCAgICA9IG1heCh0ZW1wX2ZhaHJlbmhlaXQsIG5hLnJtID0gVFJVRSkKICApCmBgYAoKIyMgUXVlc3Rpb24gNgoKSG93IG1hbnkgbWlzc2luZyB2YWx1ZXMgYXJlIHRoZXJlIGluIHRoZSBgdGVtcF9mYWhyZW5oZWl0YCBjb2x1bW4/CgoqIFRoZXJlIGFyZSAyMSBtaXNzaW5nIHZhbHVlcyBpbiB0aGUgYHRlbXBfZmFocmVuaGVpdGAgY29sdW1uLgoKIyBUYXNrIDYKClBsZWFzZSB1c2UgYHRlbXBzXzIwMTJfbG9uZ2AgdG8gY3JlYXRlIGEgYm94cGxvdCBvZiB0ZW1wZXJhdHVyZSBieSBtb250aC4gUGxlYXNlIG1hcCBtb250aHMgdG8gdGhlIHgtYXhpcyBhbmQgdGVtcGVyYXR1cmVzIHRvIHRoZSB5LWF4aXMuCgpgYGB7cn0KZ2dwbG90KHRlbXBzXzIwMTJfbG9uZykgKyAKICBnZW9tX2JveHBsb3QoYWVzKG1vbnRoLCB0ZW1wX2ZhaHJlbmhlaXQpKQpgYGAKCiMjIE5vdGVzIGZvciBzdHVkZW50cwoKMS4gVGhlIHBsb3QgYWJvdmUgbWF5IGJlIHdoYXQgeW91ciBmaXJzdCBhdHRlbXB0IGxvb2tlZCBsaWtlLiBJdCBpc24ndCB0ZWNobmljYWxseSB3cm9uZywgYnV0IGl0IGNvdWxkIGNlcnRhaW5seSBiZSBpbXByb3ZlZCBvbi4gTW9zdCBpbXBvcnRhbnRseSwgYSB2ZXJ5IGNsZWFyIHRyZW5kIHRoYXQgZXhpc3RzIGluIGF2ZXJhZ2UgdGVtcGVyYXR1cmVzIHRocm91Z2hvdXQgdGhlIHllYXIgaXMgY29tcGxldGVseSBsb3N0IGluIHRoZSBwbG90IGFib3ZlLgoKMi4gVGhlIHdhcm5pbmcgYWJvdmUgdGhhdCBzYXlzICJSZW1vdmVkIDIxIHJvd3MgY29udGFpbmluZyBub24tRmluaXRlIHZhbHVlcyAoc3RhdF9ib3hwbG90KSIgaXMganVzdCB0ZWxsaW5nIHVzIHRoYXQgdGhlIDIxIHJvd3Mgd2l0aCBhIG1pc3NpbmcgdmFsdWUgZm9yIHRlbXBfZmFocmVuaGVpdCB3ZXJlIGRyb3BwZWQgaW4gb3JkZXIgdG8gbWFrZSB0aGlzIHBsb3QuIEl0J3Mgbm90IHJlYWxseSBhIHByb2JsZW0sIGJ1dCBpdCBpcyBraW5kIG9mIHVnbHkuIFdlIHdpbGwgZml4IGl0IGJlbG93IGJ5IGRyb3BwaW5nIHRoZSByb3dzIHdpdGggbWlzc2luZyB2YWx1ZXMgZnJvbSB0aGUgZGF0YSBmcmFtZSBvdXJzZWx2ZXMuCgozLiBDdXJyZW50bHksIG1vbnRoIGlzIGEgY2hhcmFjdGVyIHZlY3Rvci4gUmVtZW1iZXIgdGhhdCBjaGFyYWN0ZXIgdmVjdG9ycyBhcmUgb3JkZXJlZCBhbHBoYWJldGljYWxseSBieSBkZWZhdWx0LiBJIHRoaXMgY2FzZSwgdGhlIGFscGhhYmV0aWNhbCwgcmF0aGVyIHRoYW4gY2hyb25vbG9naWNhbCwgb3JkZXJpbmcgY2F1c2VzIHRvIHRoZSB0cmVuZCBpbiB0ZW1wZXJhdHVyZSBjaGFuZ2UgdGhyb3VnaG91dCB0aGUgeWVhciB0byBiZSB0b3RhbGx5IGludmlzaWJsZS4gVG8gZml4IHRoaXMsIHdlIHdpbGwgY29lcmNlIG1vbnRocyB0byBhIGZhY3RvciB2ZWN0b3IgYmVsb3csIGFuZCBvcmRlciB0aGUgZmFjdG9yIGxldmVscyBjaHJvbm9sb2dpY2FsbHkgKGkuZS4sIEphbiB0byBEZWMpLgoKNC4gRmluYWxseSwgd2Ugd2lsbCBnZXQgcmlkIG9mIHRoZSBncmF5IGJhY2tncm91bmQgYW5kIG1ha2UgdGhlIGF4aXMgbGFiZWxzIGxvb2sgYSBsaXR0bGUgYml0IGJldHRlci4KCmBgYHtyfQp0ZW1wc18yMDEyX2xvbmcgPC0gdGVtcHNfMjAxMl9sb25nIHw+IAogICMgRHJvcCB0aGUgMjEgcm93cyB3aXRoIG1pc3NpbmcgZGF0YSB0byBnZXQgcmlkIG9mIHRoZSB3YXJuaW5nIGFib3ZlCiAgZmlsdGVyKCFpcy5uYSh0ZW1wX2ZhaHJlbmhlaXQpKSB8PiAKICAjIENvZXJjZSBtb250aCB0byBhIGZhY3RvciBhbmQgb3JkZXIgY2hyb25vbG9naWNhbGx5CiAgbXV0YXRlKAogICAgIyBGaXJzdCwgaGF2ZSB0byBjaGFuZ2UgdGhlIGNhc2UKICAgICMgQ3VycmVudGx5IHNvbWUgbW9udGhzIGFyZSB3cml0dGVuIGluIHVwcGVyIGNhc2UKICAgICMgT3RoZXJzIGFyZSB3cml0dGVuIGluIHRpdGxlIGNhc2UKICAgIG1vbnRoICAgPSBzdHJfdG9fdGl0bGUobW9udGgpLAogICAgIyBVc2UgYnVpbHQtaW4gbW9udGguYWJiIHZlY3RvciB0byBjb252ZW5pZW50bHkgb3JkZXIgbW9udGhfZiBjaHJvbm9sb2dpY2FsbHkKICAgIG1vbnRoX2YgPSBmYWN0b3IobW9udGgsIG1vbnRoLmFiYikKICApIHw+IAogIHByaW50KCkKYGBgCgpgYGB7cn0KZ2dwbG90KHRlbXBzXzIwMTJfbG9uZykgKyAKICBnZW9tX2JveHBsb3QoYWVzKG1vbnRoX2YsIHRlbXBfZmFocmVuaGVpdCkpICsKICBsYWJzKAogICAgeCA9ICJNb250aCIsCiAgICB5ID0gIlRlbXBlcmF0dXJlIiwKICAgIGNvbG9yID0gIlNjYWxlIgogICkgKwogIHRoZW1lX2NsYXNzaWMoKQpgYGAKCiMjIFF1ZXN0aW9uIDcKCldoaWNoIG1vbnRoIGFwcGVhcnMgdG8gaGF2ZSB0aGUgaGlnaGVzdCBhdmVyYWdlIHRlbXBlcmF0dXJlPwoKKiBKdWx5IGFwcGVhcnMgdG8gaGF2ZSB0aGUgaGlnaGVzdCBhdmVyYWdlIHRlbXBlcmF0dXJlLiBJdCdzIG1lZGlhbiAodGhlIGJsYWNrIGxpbmUgaW4gdGhlIG1pZGRsZSBvZiB0aGUgYm94cGxvdCkgaXMgaGlnaGVzdCBvZiBhbGwgdGhlIG1vbnRocy4KCiMjIFF1ZXN0aW9uIDgKCldoaWNoIG1vbnRoIGFwcGVhcnMgdG8gaGF2ZSB0aGUgbGFyZ2VzdCByYW5nZSBvZiB0ZW1wZXJhdHVyZXM/CgoqIERlY2VtYmVyIGFwcGVhcnMgdG8gaGF2ZSB0aGUgbGFyZ2VzdCByYW5nZSBvZiB0ZW1wZXJhdHVyZXMuIFRoZSBsZW5ndGggYmV0d2VlbiB0aGUgdG9wIGFuZCBib3R0b20gb2YgaXRzIHdoaXNrZXJzIGFwcGVhcnMgdG8gYmUgdGhlIGxvbmdlc3Qgb2YgYWxsIHRoZSBtb250aHMuCgojIFRhc2sgNwoKVGhlIGZvcm11bGEgdG8gY29udmVydCBGYWhyZW5oZWl0IHRvIENlbHNpdXMgaXMgVGhlIHRlbXBlcmF0dXJlIFQgaW4gZGVncmVlcyBDZWxzaXVzICjCsEMpIGlzIGVxdWFsIHRvIHRoZSB0ZW1wZXJhdHVyZSBUIGluIGRlZ3JlZXMgRmFocmVuaGVpdCAowrBGKSBtaW51cyAzMiwgdGltZXMgNS85LiAKCiQkVF97Q30gPSAoVF97Rn0gLSAzMikgKiA1IC8gOSQkCgpQbGVhc2UgY3JlYXRlIGEgbmV3IGNvbHVtbiBpbiB0aGUgYHRlbXBzXzIwMTJfbG9uZ2AgZGF0YSBmcmFtZSB0aGF0IGNvbnRhaW5zIHRoZSBkYWlseSBhdmVyYWdlIHRlbXBlcmF0dXJlIGluIGRlZ3JlZXMgQ2Vsc2l1cy4gUGxlYXNlIG5hbWUgdGhlIG5ldyBjb2x1bW4gdGVtcF9jZWxzaXVzLgoKYGBge3J9CnRlbXBzXzIwMTJfbG9uZyA8LSB0ZW1wc18yMDEyX2xvbmcgfD4gCiAgbXV0YXRlKHRlbXBfY2Vsc2l1cyA9ICh0ZW1wX2ZhaHJlbmhlaXQgLSAzMikgKiA1IC8gOSkgfD4gCiAgcHJpbnQoKQpgYGAKCiMgVGFzayA4CgpQbGVhc2UgY2FsY3VsYXRlIHRoZSBudW1iZXIgb2YgbWlzc2luZyB2YWx1ZXMgYW5kIHRoZSBtZWFuLCBtZWRpYW4sIG1pbmltdW0sIGFuZCBtYXhpbXVtIHZhbHVlIG9mIHRoZSBgdGVtcF9jZWxzaXVzYCBjb2x1bW4uCgpgYGB7cn0KdGVtcHNfMjAxMl9sb25nIHw+IAogIHN1bW1hcmlzZSgKICAgIG5fbWlzcyA9IHN1bShpcy5uYSh0ZW1wX2NlbHNpdXMpKSwKICAgIG1lYW4gICA9IG1lYW4odGVtcF9jZWxzaXVzLCBuYS5ybSA9IFRSVUUpLAogICAgbWVkaWFuID0gbWVkaWFuKHRlbXBfY2Vsc2l1cywgbmEucm0gPSBUUlVFKSwKICAgIG1pbiAgICA9IG1pbih0ZW1wX2NlbHNpdXMsIG5hLnJtID0gVFJVRSksCiAgICBtYXggICAgPSBtYXgodGVtcF9jZWxzaXVzLCBuYS5ybSA9IFRSVUUpCiAgKQpgYGAKCiMjIFF1ZXN0aW9uIDkKCldoYXQgaXMgdGhlIG1lYW4gdmFsdWUgb2YgYHRlbXBfY2Vsc2l1c3RgIChyb3VuZGVkIHRvIHRoZSBuZWFyZXN0IGludGVnZXIpPwoKKiBUaGUgbWVhbiB2YWx1ZSBvZiBgdGVtcF9jZWxzaXVzYCAocm91bmRlZCB0byB0aGUgbmVhcmVzdCBpbnRlZ2VyKSBpcyAyMS4KCiMgVGFzayA5IAoKUGxlYXNlIGRvd25sb2FkIGBlcGNyX211bHRpX3RyZWF0LnJkc2AsIGltcG9ydCBpdCBpbnRvIHlvdXIgUiBnbG9iYWwgZW52aXJvbm1lbnQgYXMgYGVwY3JfbXVsdGlfdHJlYXRgIGFuZCB2aWV3IHRoZSBkYXRhLgoKYGBge3J9CmVwY3JfbXVsdGlfdHJlYXQgPC0gcmVhZF9yZHMoIi9Vc2Vycy9icmFkY2FubmVsbC9Ecm9wYm94L0RhdGFzZXRzL2VwY3IvZXBjcl9tdWx0aV90cmVhdC5SZHMiKQpgYGAKCmBgYHtyfQplcGNyX211bHRpX3RyZWF0CmBgYAoKIyBUYXNrIDEwIAoKUGxlYXNlIGNyZWF0ZSBhIG5ldyBjb2x1bW4gaW4gYGVwY3JfbXVsdGlfdHJlYXRgIHRoYXQgc2VxdWVudGlhbGx5IGNvdW50cyB0aGUgbnVtYmVyIG9mIHJvd3MgZWFjaCBwZXJzb24gaW4gdGhlIGRhdGEgZnJhbWUgaGFzLgoKYGBge3J9CmVwY3JfbXVsdGlfdHJlYXQgPC0gZXBjcl9tdWx0aV90cmVhdCB8PiAKICBncm91cF9ieShuYW1lKSB8PiAKICBtdXRhdGUoaW5jaWRlbnRfbnVtYmVyID0gcm93X251bWJlcigpKSB8PiAKICB1bmdyb3VwKCkKYGBgCgojIFRhc2sgMTEKClJlc3RydWN0dXJlIHRoZSBgZXBjcl9tdWx0aV90cmVhdGAgZGF0YSBmcm9tIGxvbmcgdG8gd2lkZS4gTmFtZSB0aGUgcmVzdHJ1Y3R1cmVkIGRhdGEgZnJhbWUgYGVwY3JfbXVsdGlfdHJlYXRfd2lkZWAuIFBsZWFzZSBtYWtlIHN1cmUgdGhlIHJlc3RydWN0dXJlZCBkYXRhIGZyYW1lIGluY2x1ZGVzIGF0IGxlYXN0IHRoZSBmb2xsb3dpbmcgY29sdW1uczogdGhlIGFycml2YWwgdGltZSBhdCBlYWNoIHBlcnNvbuKAmXMgZmlyc3QgOTExIHJlc3BvbnNlLCB0aGUgYXJyaXZhbCB0aW1lIGF0IGVhY2ggcGVyc29u4oCZcyBzZWNvbmQgOTExIHJlc3BvbnNlLCB0aGUgaW5jaWRlbnQgY29tcGxhaW50KHMpIGF0IGVhY2ggcGVyc29u4oCZcyBmaXJzdCA5MTEgcmVzcG9uc2UsIGFuZCB0aGUgaW5jaWRlbnQgY29tcGxhaW50KHMpIGF0IGVhY2ggcGVyc29u4oCZcyBzZWNvbmQgOTExIHJlc3BvbnNlLgoKYGBge3J9CmVwY3JfbXVsdGlfdHJlYXRfd2lkZSA8LSBlcGNyX211bHRpX3RyZWF0IHw+IAogIHBpdm90X3dpZGVyKAogICAgaWRfY29scyAgICAgPSAibmFtZSIsCiAgICBuYW1lc19mcm9tICA9ICJpbmNpZGVudF9udW1iZXIiLAogICAgdmFsdWVzX2Zyb20gPSBjKCJhcnJpdmFsX3RpbWUiLCAiaW5jaWRlbnRfY29tcGxhaW50IikKICApCmBgYAoKIyMgTm90ZXMgZm9yIHN0dWRlbnRzCgoxLiBXZSBkaWRuJ3QgdGFsayBhYm91dCB0aGUgYGlkX2NvbHNgIGFyZ3VtZW50IGluIHRoZSByZWFkaW5ncyBmb3IgdGhpcyBtb2R1bGUuIFRha2UgYSBsb29rIGF0IHRoZSBoZWxwIGRvY3VtZW50YXRpb24gZm9yIGBwaXZvdF93aWRlcmAgYW5kIHBsYXkgYXJvdW5kIHdpdGggYWRkaW5nIGFuZCByZW1vdmluZyB0aGUgYGlkX2NvbHNgIGFyZ3VtZW50IHRvIGdldCBhIGZlZWwgZm9yIHdoYXQgaXQgZG9lcy4KCiMgVGFzayAxMgoKUGxlYXNlIGNyZWF0ZSBhIG5ldyBjb2x1bW4gaW4gYGVwY3JfbXVsdGlfdHJlYXRfd2lkZWAgdGhhdCBjb250YWlucyB0aGUgbnVtYmVyIG9mIGRheXMgdGhhdCBlbGFwc2VkIGJldHdlZW4gZWFjaCBwZXJzb27igJlzIGZpcnN0IGFuZCBzZWNvbmQgOTExIHJlc3BvbnNlLgoKYGBge3J9CmVwY3JfbXVsdGlfdHJlYXRfd2lkZSA8LSBlcGNyX211bHRpX3RyZWF0X3dpZGUgfD4gCiAgbXV0YXRlKHJlcGVhdF90aW1lID0gYXJyaXZhbF90aW1lXzEgJS0tJSBhcnJpdmFsX3RpbWVfMiAlLyUgZGF5cygxKSkKYGBgCgojIFRhc2sgMTMKClBsZWFzZSBjYWxjdWxhdGUgdGhlIG51bWJlciBvZiBtaXNzaW5nIHZhbHVlcyBhbmQgdGhlIG1lYW4sIG1lZGlhbiwgbWluaW11bSwgYW5kIG1heGltdW0gdmFsdWUgb2YgdGhlIGByZXBlYXRfdGltZWAgY29sdW1uLgoKYGBge3J9CmVwY3JfbXVsdGlfdHJlYXRfd2lkZSB8PiAKICBzdW1tYXJpc2UoCiAgICBuX21pc3MgPSBzdW0oaXMubmEocmVwZWF0X3RpbWUpKSwKICAgIG1lYW4gICA9IG1lYW4ocmVwZWF0X3RpbWUsIG5hLnJtID0gVFJVRSksCiAgICBtZWRpYW4gPSBtZWRpYW4ocmVwZWF0X3RpbWUsIG5hLnJtID0gVFJVRSksCiAgICBtaW4gICAgPSBtaW4ocmVwZWF0X3RpbWUsIG5hLnJtID0gVFJVRSksCiAgICBtYXggICAgPSBtYXgocmVwZWF0X3RpbWUsIG5hLnJtID0gVFJVRSkKICApCmBgYAoKIyMgUXVlc3Rpb24gMTAKCldoYXQgaXMgdGhlIG1pbmltdW0gbnVtYmVyIG9mIGRheXMgdGhhdCBlbGFwc2VkIGJldHdlZW4gYW55IHBlcnNvbuKAmXMgZmlyc3QgYW5kIHNlY29uZCA5MTEgcmVzcG9uc2UgKHJvdW5kZWQgdG8gdGhlIG5lYXJlc3QgaW50ZWdlcik/CgoqIFRoZSBtaW5pbXVtIG51bWJlciBvZiBkYXlzIHRoYXQgZWxhcHNlZCBiZXR3ZWVuIGFueSBwZXJzb27igJlzIGZpcnN0IGFuZCBzZWNvbmQgOTExIHJlc3BvbnNlIChyb3VuZGVkIHRvIHRoZSBuZWFyZXN0IGludGVnZXIpIHdhcyAwLgo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUmVwZWF0ZWQgT3BlcmF0aW9ucyBJSSIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyBPdmVydmlldwoKVGhpcyB3ZWVrLCB3ZSB3aWxsIHByYWN0aWNlIHVzaW5nIGZvciBsb29wcyBhbmQgcGVyZm9ybWluZyByZXBlYXRlZCBvcGVyYXRpb25zIHdpdGggZnVuY3Rpb25zIGZyb20gdGhlIHB1cnJyIHBhY2thZ2UuCgoqIFtDbGljayBoZXJlIHRvIGRvd25sb2FkIENsaWVudHMgbGlzdC5jc3ZdKCoqbGluayB1cGRhdGUqKikuIEFzIHlvdSBtYXkgYWxyZWFkeSBrbm93LCB3ZSBwcm92aWRlIHNob3J0LXRlcm0gbWVudGFsIGhlYWx0aCBjb3Vuc2VsaW5nIHNlcnZpY2VzIGhlcmUgYXQgdGhlIE5UUkhELiBPbmNlIGVucm9sbGVkIGluIHRoZXNlIHNlcnZpY2VzLCBvdXIgY2xpZW50cyBhcmUgaW52aXRlZCB0byBjb21lIGluIGZvciBhIG1heGltdW0gb2Ygc2l4IHNlc3Npb25zLiBBdCBlYWNoIHNlc3Npb24sIG91ciBjbGllbnRzIGNvbXBsZXRlIGEgYnJpZWYgaGVhbHRoIHN1cnZleS4gVGhlIEp1bmUsIEp1bHkgYW5kIEF1Z3VzdCBkYXRhIHdhcyBqdXN0IHNlbnQgdG8gbWUsIGFuZCBJIGNvdWxkIHVzZSB5b3VyIGhlbHAgcHJlcGFyaW5nIGl0IGZvciBhbmFseXNpcy4KCmBgYHtyIG1lc3NhZ2U9RkFMU0V9CmxpYnJhcnkocmVhZHIpCmxpYnJhcnkoZHBseXIpCmxpYnJhcnkoc3RyaW5ncikKbGlicmFyeSh0aWR5cikKbGlicmFyeShwdXJycikKbGlicmFyeShyZWFkeGwpCmBgYAoKIyBUYXNrIDEKClBsZWFzZSBkb3dubG9hZCBudHJoZF9jbGllbnRzX0p1bmVfSnVseV9BdWd1c3QueGxzeCwgaW1wb3J0IGVhY2ggc2hlZXQgaW4gdGhlIGV4Y2VsIGZpbGUgdXNpbmcgYSBmb3IgbG9vcC4KCmBgYHtyfQojIFNhdmUgdGhlIGZpbGUgcGF0aCB0byBhbiBvYmplY3Qgc28gd2UgZG9uJ3QgaGF2ZSB0byB0eXBlIGl0IHJlcGVhdGVkbHkgCnBhdGggPC0gIkM6L1VzZXJzL2plbGx5L09uZURyaXZlIC0gVGhlIFVuaXZlcnNpdHkgb2YgVGV4YXMgSGVhbHRoIFNjaWVuY2UgQ2VudGVyIGF0IEhvdXN0b24vVEEvbnRyaGRfY2xpZW50c19KdW5lX0p1bHlfQXVndXN0Lnhsc3giCgojIFVzZSByZWFkeGw6OmV4Y2VsX3NoZWV0cyB0byBnZXQgdGhlIG5hbWUgb2YgZWFjaCBzaGVldCBpbiB0aGUgd29ya2Jvb2suCiMgdGhpcyBtYWtlcyBvdXIgY29kZSBtb3JlIHJvYnVzdC4KCmZvcihpIGluIHNlcV9hbG9uZyhzaGVldHMpKSB7CiAgIyBDb252ZXJ0IHNoZWV0IG5hbWUgdG8gbG93ZXJjYXNlIGJlZm9yZSB1c2luZyBpdCB0byBuYW1lIHRoZSBkYXRhIGZyYW1lCiAgbmV3X25tIDwtIHRvbG93ZXIoc2hlZXRzW1tpXV0pCiAgYXNzaWduKG5ld19ubSwgcmVhZF9leGNlbChwYXRoLCBzaGVldCA9IHNoZWV0c1tbaV1dKSkKfQpgYGAKCiMgVGFzayAyCgpOb3cgaW1wb3J0IHRoZSBzYW1lIGZpbGUgdXNpbmcgdGhlIHB1cnJyIHBhY2thZ2UgaW5zdGVhZCAoaGludDogdHJ5IHVzaW5nIHB1cnJyOjp3YWxrKCkgZnVuY3Rpb24pLiAKCmBgYHtyfQoKd2FsaygKICAueCA9IGV4Y2VsX3NoZWV0cyhwYXRoKSwKICAuZiA9IGZ1bmN0aW9uKHgpIHsKICAgIG5ld19ubSA8LSB0b2xvd2VyKHgpCiAgICBhc3NpZ24obmV3X25tLCByZWFkX2V4Y2VsKHBhdGgsIHNoZWV0ID0geCksIGVudmlyID0gLkdsb2JhbEVudikKICB9CikKYGBgCgojIyBOb3RlcyB0byBzdHVkZW50cwpBbHRlcm5hdGl2ZWx5LCB5b3UgY2FuIGFsc28gdXNlIHRoZSBtYXAoKSBmdW5jdGlvbiB0byByZXR1cm4gYSBsaXN0IG9mIGRhdGEgZnJhbWVzIGFuZCB0aGVuIGV4dHJhY3QgZWFjaCBzaGVldCBpbnRvIGEgc2VwYXJhdGUgZGF0YSBmcmFtZSBmdXJ0aGVyICh3aXRoIGEgYml0IG9mIHJlcGV0aXRpb24sIG9mIGNvdXJzZSEpIAojIyBRdWVzdGlvbgoKMS4gQ2FsY3VsYXRlIHRoZSBtZWFuIHdlaWdodCBmb3IgZWFjaCBtb250aC4KCmBgYHtyfQojV2UgY2FuIGltcGxlbWVudCB0aGUgY29udGludW91cyB2YXJpYWJsZSBjYWxjdWxhdGlvbiBmdW5jdGlvbiBmcm9tIHRoZSB0ZXh0Ym9vay4KY29udGludW91c19zdGF0cyA8LSBmdW5jdGlvbihkYXRhLCB2YXIpIHsKICBkYXRhIHw+ICAKICAgIHN1bW1hcmlzZSgKICAgICAgdmFyaWFibGUgPSBxdW9fbmFtZSh2YXIpLAogICAgICBuX21pc3MgICA9IHN1bShpcy5uYSh7eyB2YXJ9fSApKSwKICAgICAgbWVhbiAgICAgPSBtZWFuKHt7IHZhciB9fSwgbmEucm0gPSBUUlVFKSwKICAgICAgbWVkaWFuICAgPSBtZWRpYW4oe3sgdmFyIH19LCBuYS5ybSA9IFRSVUUpLAogICAgICBtaW4gICAgICA9IG1pbih7eyB2YXIgfX0sIG5hLnJtID0gVFJVRSksCiAgICAgIG1heCAgICAgID0gbWF4KHt7IHZhciB9fSwgbmEucm0gPSBUUlVFKQogICAgKSAKfQoKbW9udGhzPC1saXN0KGp1bmUsIGp1bHksIGF1Z3VzdCkKCmZvciAoaSBpbiBtb250aHMpewpyZXN1bHRzPC1tYXBfZGZyKAogIC54ID0gcXVvcyhIZWlnaHQsIFdlaWdodCksCiAgLmYgPSBjb250aW51b3VzX3N0YXRzLCBkYXRhID0gaQopCnByaW50KHJlc3VsdHMpfQpgYGAKCiogSnVuZTogNjYuN2luY2hlcywgMTU3bGJzCkp1bHk6IDY2LjNpbmNoZXMsIDE1N2xicyAKQXVndXN0OiA2Ny4yaW5jaGVzLCAxNjJsYnMKCgojIFRhc2sgMy4gCgojTmVlZCBpZGVhcyBmb3IgYWRkaXRpb25hbCB0YXNrcwo=</div>
 
 
 
@@ -2243,7 +1912,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("lab_restructuring_data_frames.Rmd");
+  window.initializeSourceEmbed("lab_repeated_operations_II_JH.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

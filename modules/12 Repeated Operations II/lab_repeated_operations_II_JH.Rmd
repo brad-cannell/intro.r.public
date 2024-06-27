@@ -60,7 +60,7 @@ Alternatively, you can also use the map() function to return a list of data fram
 ```{r}
 #We can implement the continuous variable calculation function from the textbook.
 continuous_stats <- function(data, var) {
-  data %>%  
+  data |>  
     summarise(
       variable = quo_name(var),
       n_miss   = sum(is.na({{ var}} )),
