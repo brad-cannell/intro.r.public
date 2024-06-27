@@ -175,10 +175,13 @@ class_survey <- class_survey |>
 
 # Task 4
 
-Please coerce all of the columns with a Not Sure option from character type to numeric type. Please use the `across()` function to help you remove some of the repetition from your code.
+Now, we want to coerce all of the columns with a "Not Sure" response option coded as a "9" from character type to numeric type. We could pass a separate line of code to the `mutate()` function for each column we want to coerce. Doing would like like the following code.
 
 ```{r}
-# Old way
+#| eval: false
+
+# Code to coerce each column of interest to numeric without using repeated 
+# operations.
 class_survey |> 
   mutate(
     required     = as.numeric(required), 
@@ -199,8 +202,52 @@ class_survey |>
   )
 ```
 
+However, the code above is more tedious to write, more difficult to maintain, more error prone, and less concise than it needs to be. Instead, please coerce all of the columns with a "Not Sure" "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function to help remove some of the repetition from the code.
+
+## Question 3
+
+Which of the following code chunks will correctly coerce all of the columns with a "Not Sure" "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function?
+
 ```{r}
-# With across()
+#| eval: false
+
+# Incorrect. If we pass the the function name with parentheses to the .fns 
+# argument, then we must also use a purrr-style lambda (~) and the special .x
+# symbol.
+class_survey |> 
+  mutate(
+    across(
+      .cols = c(
+        required, still_enroll, package, genhealth, asthma, seatbelt, 
+        insurance, persdoc, hispanic, race, veteran, marital, employment, 
+        sex, color
+      ),
+      .fns  = as.numeric()
+    )
+  )
+```
+
+```{r}
+#| eval: false
+
+# Correct.
+class_survey |> 
+  mutate(
+    across(
+      .cols = c(
+        required, still_enroll, package, genhealth, asthma, seatbelt, 
+        insurance, persdoc, hispanic, race, veteran, marital, employment, 
+        sex, color
+      ),
+      .fns  = ~ as.numeric(.x)
+    )
+  )
+```
+
+```{r}
+#| eval: false
+
+# Correct.
 class_survey |> 
   mutate(
     across(
@@ -215,7 +262,7 @@ class_survey |>
 ```
 
 ```{r}
-# With across() and our character vector
+# Correct. This also uses the cols_9 vector we created earlier.
 class_survey <- class_survey |> 
   mutate(
     across(
@@ -227,7 +274,10 @@ class_survey <- class_survey |>
 
 ## Notes for students
 
-1. Using `across()` removes all of the repetition from our code, which is great. Passing the character vector of column names we previously created to the `.cols` argument (using the `all_of()` tidy-select function) make our code even easier to read and maintain.
+1. Using `across()` removes all of the repetition from our code, which is great. Passing the character vector of column names we previously created to the `.cols` argument (using the `all_of()` tidy-select function) makes our code even easier to read and maintain.
+
+# 🔴 Left off here...
+Continue to review the code and change the questions to selecting the correct code (or something better if you can come up with it).
 
 # Task 5
 
@@ -332,7 +382,7 @@ class_survey |>
   )
 ```
 
-## Question 3
+## Question 4
 
 Tasks 4 through 7 above essentially required you to do the same thing in four different slightly different ways. For this particular task, which method did you prefer, and why?
 
@@ -369,7 +419,7 @@ not_sure_count |>
   arrange(desc(n_not_sure))
 ```
 
-## Question 4
+## Question 5
 
 Which column in the class_survey data frame contains the greatest number of Not Sure responses?
 
@@ -389,7 +439,7 @@ class_survey <- class_survey |>
   )
 ```
 
-## Question 5
+## Question 7
 
 Which column in the class_survey data frame contains the greatest number of missing values?
 
