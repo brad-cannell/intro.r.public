@@ -59,7 +59,7 @@ df <- read_function("path")
 
 Question 1 often asks students to list the number of rows and columns in the data. It's easy and helps make sure they are starting with the correct data. Typically, the question text will be bulleted and written twice. The first bullet will contain the question text as it is written in the Word document. The second bullet will contain the correct answer. 
 
-* The **study_data** data frame contains ____ rows and ____ columns.
+The **study_data** data frame contains ____ rows and ____ columns.
 
 * The **study_data** data frame contains 189 rows and 15 columns.
 
