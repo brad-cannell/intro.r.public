@@ -175,7 +175,7 @@ class_survey <- class_survey |>
 
 # Task 4
 
-Now, we want to coerce all of the columns with a "Not Sure" response option coded as a "9" from character type to numeric type. We could pass a separate line of code to the `mutate()` function for each column we want to coerce. Doing would like like the following code.
+Now, we want to coerce all of the columns with a "Not Sure" response option coded as a "9" from character type to numeric type. We could pass a separate line of code to the `mutate()` function for each column we want to coerce. Doing would look like the following code.
 
 ```{r}
 #| eval: false
@@ -202,7 +202,7 @@ class_survey |>
   )
 ```
 
-However, the code above is more tedious to write, more difficult to maintain, more error prone, and less concise than it needs to be. Instead, please coerce all of the columns with a "Not Sure" "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function to help remove some of the repetition from the code.
+However, the code above is more tedious to write, more difficult to maintain, more error-prone, and less concise than it needs to be. Instead, please coerce all of the columns with a "Not Sure" "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function to help remove some of the repetition from the code.
 
 ## Question 3
 
@@ -276,16 +276,15 @@ class_survey <- class_survey |>
 
 1. Using `across()` removes all of the repetition from our code, which is great. Passing the character vector of column names we previously created to the `.cols` argument (using the `all_of()` tidy-select function) makes our code even easier to read and maintain.
 
-# 🔴 Left off here...
-Continue to review the code and change the questions to selecting the correct code (or something better if you can come up with it).
+# Setup for Tasks 5 and 6
 
-# Task 5
+In previous tasks, we renamed our variables of interest and coerced them from character type to numeric type. Now, we want to start asking some questions of our data. For starters, we want to know how many participants selected "Not Sure" as their response for each variable in the **class_survey** data that included "Not Sure" as an option. 
 
-Please calculate the number of participants who selected Not Sure as their response for each variable in the class_survey data that included Not Sure as an option. As you complete this task, please write a function that will help remove some of the repetition from your code.
+Here is how we might have completed this task in prior modules.
 
 ```{r}
-# Here's how we might have completed this task prior to this module.
-# So much repetition!
+#| eval: false
+
 class_survey |> 
   summarise(
     required_9     = sum(required == 9, na.rm = TRUE),
@@ -306,56 +305,231 @@ class_survey |>
   )
 ```
 
+Notice how much repetition is in that code! Luckily, we have already learned a few different ways to remove it. Specifically, we can create and use our own function, we can use the `across()` function, and we can combine both of these methods. We will explore all these options in the tasks that follow, beginning with writing our own function.
+
+## Question 4
+
+There are multiple ways we can write a function to count the number of "Not Sure" responses in our variables of interest, but all of those ways will have at least two common elements: an informative function name and the `function()` function. Because we want our function to count the number of "Not Sure" responses in our variables of interest, and because all of the "Not Sure" responses are coded as "9" or "99", `count_nines` seems like a good name for our new function. Please, fill in the blanks below to correctly create the a skeleton for our `count_nines()` function.
+
 ```{r}
-# Now, let's write a function.
-n_nines <- function(x) {
-  sum(x == 9 | x == 99, na.rm = TRUE)
+#| eval: false
+
+count_nines <- function() {
+  # Function body will go here
+}
+```
+
+## Question 5
+
+Now, we want to fill in the body of our `count_nines()` function. Let's start by taking another look at the code we are trying to remove repetition from.
+
+```{r}
+#| eval: false
+
+class_survey |> 
+  summarise(
+    required_9     = sum(required == 9, na.rm = TRUE),
+    still_enroll_9 = sum(still_enroll == 9, na.rm = TRUE),
+    package_9      = sum(package == 9, na.rm = TRUE),
+    genhealth_9    = sum(genhealth == 9, na.rm = TRUE),
+    asthma_9       = sum(asthma == 9, na.rm = TRUE),
+    seatbelt_9     = sum(seatbelt == 9, na.rm = TRUE),
+    insurance_9    = sum(insurance == 9, na.rm = TRUE),
+    persdoc_9      = sum(persdoc == 9, na.rm = TRUE), 
+    hispanic_9     = sum(hispanic == 9, na.rm = TRUE),
+    race_9         = sum(race == 9, na.rm = TRUE),
+    veteran_9      = sum(veteran == 9, na.rm = TRUE), 
+    marital_9      = sum(marital == 9, na.rm = TRUE), 
+    employment_9   = sum(employment == 9, na.rm = TRUE), 
+    sex_9          = sum(sex == 9, na.rm = TRUE),
+    color_9        = sum(color == 99, na.rm = TRUE) # Notice that color uses 99
+  )
+```
+
+Recall our rule of thumb is that we want to consider writing a function when we notice that we are repeating ourselves (in code) more than twice. What elements of the code above are we repeating more than twice?
+
+* The `sum()` function.
+* The variable name `== 9` (or 99).
+* The `na.rm = TRUE` argument to the `sum()` function.
+
+## Question 6
+
+Often, copying and pasting the repetitive part of our code into our function body is a good place to start. In this case, doing so would result in code that looks like this:
+
+```{r}
+#| eval: false
+
+count_nines <- function() {
+  sum( == 9, na.rm = TRUE)
+}
+```
+
+However, the code above won't quite work. Currently, inside the `sum()` function, we are telling R that we want it to compare the value of something to 9 (i.e., `== 9`), but we don't tell it _what_ that something is. There is just a blank space. In other words, we need to fill the blank space shown here with a column name: `sum(____ == 9, na.rm = TRUE)`. But, what column name should we choose? Well, if we hard code in a column name (e.g., `sum(required == 9, na.rm = TRUE)`), then R will compare the values in the **required** column to 9 every time we run the `count_nines()` function. This isn’t a problem if the only values we care about comparing are in the **required** column, but of course, that isn’t the case. We need a way to make our function work for other columns, too. Said another way, we need to make our function more general. How can we make the `count_nines()` function more general?
+
+* We can define a function argument that can receive input values and pass those input values into the function body.
+
+## Question 7
+
+Which of the following code chunks correctly defines a function argument that can receive input values and pass those input values into the function body?
+
+```{r}
+#| eval: false
+
+# Incorrect. This code doesn't define any function arguments inside the function() function.
+count_nines <- function() {
+  sum(column == 9, na.rm = TRUE)
 }
 ```
 
 ```{r}
-# Use the n_nines function to reduce the amount of repetitive code.
+#| eval: false
+
+# Correct. 
+count_nines <- function(column) {
+  sum(column == 9, na.rm = TRUE)
+}
+```
+
+```{r}
+#| eval: false
+
+# Incorrect. This code defines an argument in the function() function named "column". However, the value passed to the column argument isn't passed into the function body. To do so, we would need to replace the "x" in the function body with the word "column".
+count_nines <- function(column) {
+  sum(x == 9, na.rm = TRUE)
+}
+```
+
+```{r}
+#| eval: false
+
+# Incorrect. This code defines an argument in the function() function named "x". However, the value passed to the x argument isn't passed into the function body. To do so, we would need to replace the word "column" in the function body with an "x". 
+count_nines <- function(x) {
+  sum(column == 9, na.rm = TRUE)
+}
+```
+
+## Question 8
+
+We are almost done creating a function we can use to remove repetition from our code. There's just one problem remaining. Currently, we can pass the name of any column to the `count_nines()` function, which will return the number of rows with a value of 9. However, we already saw that one column uses the value 99 to represent "Not Sure" responses. So, we will need to adjust the code in the function body to account for that.
+
+Which of the following code chunks correctly adjusts the `count_nines()` function so that it will count the number of rows that contain a 99 as well as the number of rows that contain a 9?
+
+```{r}
+#| eval: false
+
+# Incorrect. We can't use the literal word "OR" as a logical operator in R. R uses the pipe character instead.
+count_nines <- function(column) {
+  sum(column == 9 OR column == 99, na.rm = TRUE)
+}
+```
+
+```{r}
+#| eval: false
+
+# Incorrect. We can't use the literal word "AND" as a logical operator in R. R uses the ampersand sign instead. Additionally, the and logical operator would return TRUE only if the value of column is 9 AND 99. Of course, it can never be both values at the same time, so the logical statement column == 9 & column == 99 would always return false.
+count_nines <- function(column) {
+  sum(column == 9 AND column == 99, na.rm = TRUE)
+}
+```
+
+```{r}
+#| eval: true
+
+# Correct. 
+count_nines <- function(column) {
+  sum(column == 9 | column == 99, na.rm = TRUE)
+}
+```
+
+```{r}
+#| eval: false
+
+# Incorrect. The "&" logical operator would return TRUE only if the value of column is 9 AND 99. Of course, it can never be both values at the same time, so the logical statement column == 9 & column == 99 would always return false. We need to use the logical "or" operator instead. 
+count_nines <- function(column) {
+  sum(column == 9 & column == 99, na.rm = TRUE)
+}
+```
+
+# Task 5
+
+Please calculate the number of participants who selected "Not Sure" as their response for each variable in the **class_survey** data that included "Not Sure" as an option using the `count_nines()` function we previously created.
+
+```{r}
+# Use the count_nines function to reduce the amount of repetitive code.
 class_survey |> 
   summarise(
-    required_9     = n_nines(required),
-    still_enroll_9 = n_nines(still_enroll),
-    package_9      = n_nines(package),
-    genhealth_9    = n_nines(genhealth),
-    asthma_9       = n_nines(asthma),
-    seatbelt_9     = n_nines(seatbelt),
-    insurance_9    = n_nines(insurance),
-    persdoc_9      = n_nines(persdoc), 
-    hispanic_9     = n_nines(hispanic),
-    race_9         = n_nines(race),
-    veteran_9      = n_nines(veteran), 
-    marital_9      = n_nines(marital), 
-    employment_9   = n_nines(employment), 
-    sex_9          = n_nines(sex),
-    color_9        = n_nines(color) 
+    required_9     = count_nines(required),
+    still_enroll_9 = count_nines(still_enroll),
+    package_9      = count_nines(package),
+    genhealth_9    = count_nines(genhealth),
+    asthma_9       = count_nines(asthma),
+    seatbelt_9     = count_nines(seatbelt),
+    insurance_9    = count_nines(insurance),
+    persdoc_9      = count_nines(persdoc), 
+    hispanic_9     = count_nines(hispanic),
+    race_9         = count_nines(race),
+    veteran_9      = count_nines(veteran), 
+    marital_9      = count_nines(marital), 
+    employment_9   = count_nines(employment), 
+    sex_9          = count_nines(sex),
+    color_9        = count_nines(color) 
   )
 ```
 
+## Question 9
+
+How many participants selected "Not Sure" as their response for the question that corresponds to the **still_enroll_9** column?
+
+* 14 participants selected "Not Sure" as their response for the question that corresponds to the **still_enroll_9** column.
+
 # Task 6
 
-Please use the across() function to apply the function you created in Task 4 to calculate the number of participants who selected Not Sure as their response for each variable in the class_survey data that included Not Sure as an option. 
+We using the `count_nines()` function in the code below to reduced some of the repetition that was in our previous code. 
 
 ```{r}
-# Use summarise across to remove even more repetitive code.
+#| eval: false
+
+class_survey |> 
+  summarise(
+    required_9     = count_nines(required),
+    still_enroll_9 = count_nines(still_enroll),
+    package_9      = count_nines(package),
+    genhealth_9    = count_nines(genhealth),
+    asthma_9       = count_nines(asthma),
+    seatbelt_9     = count_nines(seatbelt),
+    insurance_9    = count_nines(insurance),
+    persdoc_9      = count_nines(persdoc), 
+    hispanic_9     = count_nines(hispanic),
+    race_9         = count_nines(race),
+    veteran_9      = count_nines(veteran), 
+    marital_9      = count_nines(marital), 
+    employment_9   = count_nines(employment), 
+    sex_9          = count_nines(sex),
+    color_9        = count_nines(color) 
+  )
+```
+
+However, there is some remaining repetition that we can eliminate. Please use the `across()` function to apply the `count_nines()` function and calculate the number of participants who selected "Not Sure" as their response for each variable in the **class_survey** data that included "Not Sure" as an option.
+
+## Question 10
+
+Which of the following code chunks correctly uses the `across()` function to apply the `count_nines()` function and calculate the number of participants who selected "Not Sure" as their response for each variable in the **class_survey** data that included "Not Sure" as an option?
+
+```{r}
+# Correct.
 class_survey |> 
   summarise(
     across(
       .cols = all_of(cols_9),
-      .fns  = n_nines
+      .fns  = count_nines
     )
   )
 ```
 
-# Task 7 
-
-Please repeat Task 5. This time, however, please pass the code you wrote in your function to the .fns argument as an anonymous function.
-
 ```{r}
-# Use an anonymous function.
+#| eval: false
+
+# Incorrect. This code uses an anonymous function instead of the count_nines() function. It works, so there's nothing wrong with this code, per se, but it is incorrect for the purposes of this question because it doesn't specifically use the count_nines() function.
 class_survey |> 
   summarise(
     across(
@@ -367,67 +541,104 @@ class_survey |>
   )
 ```
 
-# Task 8
-
-Please repeat Task 6. This time, however, please pass your anonymous function to the .fns argument using the purrr-style lambda syntax.
-
 ```{r}
-# Use the dplyr purr_style lambda syntax.
+#| eval: false
+
+# Incorrect. This will return an error. We must pass the function name only (i.e., "count_nines" without parentheses) to the .fns argument, or we must use the purrr-style lambda syntax.
 class_survey |> 
   summarise(
     across(
       .cols = all_of(cols_9),
-      .fns  = ~ sum(.x == 9 | .x == 99, na.rm = TRUE)
+      .fns  = count_nines()
     )
   )
 ```
 
-## Question 4
+```{r}
+# Correct.
+class_survey |> 
+  summarise(
+    across(
+      .cols = all_of(cols_9),
+      .fns  = ~ count_nines(.x)
+    )
+  )
+```
 
-Tasks 4 through 7 above essentially required you to do the same thing in four different slightly different ways. For this particular task, which method did you prefer, and why?
+## Question 11
 
-# Task 9
+At this point, we've removed all of the repetition from the original code we used to count the number of "Not Sure" responses in our variables of interest. However, the results would be easier to work with if they were in long form instead of wide form. 
 
-Please repeat Task 7. This time, however, please change the .names argument so that the column names in our results data frame all end with “n_not_sure”. Please assign the results data from the name not_sure_count.
+To start that process, please change the .names argument in the code below so that the column names in our results data frame all end with “_n_not_sure”. Please assign the results data frame the name **not_sure_count**.
 
 ```{r}
-# Make the column names more informative.
+#| eval: false
+
 not_sure_count <- class_survey |> 
   summarise(
     across(
       .cols  = all_of(cols_9),
-      .fns   = ~ sum(.x == 9 | .x == 99, na.rm = TRUE),
-      .names = "{col}-n_not_sure" # Using a hyphen here makes the next task easier
+      .fns   = count_nines,
+      .names = ____
     )
   )
 ```
 
-# Task 10
+Which of the following lines of code will correctly append "_n_not_sure" to the column names in our results data frame when added to the `.names` argument of the code above?
 
-Please restructure not_sure_count so that it has two columns. The first column should contain each of the column names from class_survey that we analyzed in tasks 4 through 8. The second column of not_sure_count should contain the number of Not Sure responses for each of the column names from class_survey that we analyzed in tasks 4 through 8.
+```{r}
+# Correct
+not_sure_count <- class_survey |> 
+  summarise(
+    across(
+      .cols  = all_of(cols_9),
+      .fns   = count_nines,
+      .names = "{col}_n_not_sure" # Using a hyphen here makes the next task easier
+    )
+  )
+```
 
-```{r rows.print = 15}
-# When there are lots of columns to look through, pivot longer makes it easier to
-# view the results.
+## Question 12
+
+Please restructure **not_sure_count** so that it has two columns. The first column should contain each column name from **class_survey** that we have been analyzing. The second column of **not_sure_count** should contain the number of "Not Sure" responses for each column name from **class_survey** that we have been analyzing.
+
+Please select the function name that will correctly complete the code chunk below. 
+
+```{r}
+#| eval: false
+
 not_sure_count |> 
-  pivot_longer(
+  _____ (
     cols          = everything(),
     names_to      = "column",
-    names_pattern = "(\\w+)-",
+    names_pattern = "(\\w+)_n_not_sure",
     values_to     = "n_not_sure"
   ) |> 
   arrange(desc(n_not_sure))
 ```
 
-## Question 5
+```{r}
+#| rows.print: 15
 
-Which column in the class_survey data frame contains the greatest number of Not Sure responses?
+not_sure_count |> 
+  pivot_longer(
+    cols          = everything(),
+    names_to      = "column",
+    names_pattern = "(\\w+)_n_not_sure",
+    values_to     = "n_not_sure"
+  ) |> 
+  arrange(desc(n_not_sure))
+```
 
-* The package column contains the greatest number of Not Sure responses (n = 14).
+## Question 13
 
-# Task 11
+Which column in the **class_survey** data frame contains the greatest number of "Not Sure" responses?
 
-Please recode all Not Sure responses in the class_survey data frame to missing. 
+* The **package** column contains the greatest number of Not Sure responses (n = 14).
+
+# Task 7
+
+Please recode all "Not Sure" responses in the **class_survey** data frame to missing. 
 
 ```{r}
 class_survey <- class_survey |> 
@@ -439,9 +650,9 @@ class_survey <- class_survey |>
   )
 ```
 
-## Question 7
+## Question 14
 
-Which column in the class_survey data frame contains the greatest number of missing values?
+Which column in the **class_survey** data frame contains the greatest number of missing values?
 
 ```{r}
 class_survey |> 
@@ -459,11 +670,11 @@ class_survey |>
   arrange(desc(n_missing))
 ```
 
-* The still_enroll column contains the greatest number of missing values (n = 21).
+* The **still_enroll** column contains the greatest number of missing values (n = 21).
 
-# Task 12
+# Task 8
 
-There are six variables in the class_survey data frame that have Yes and No as response options. They are required, still_enroll, asthma, insurance, hispanic, and veteran. Please create new factor versions of each of these variables. Please use the across() function to help you remove some of the repetition from your code. Please also use the “_f” variable naming convention.
+There are six variables in the **class_survey** data frame that have "Yes" and "No" as response options. They are **required**, **still_enroll**, **asthma**, **insurance**, **hispanic**, and **veteran**. Please create new factor versions of each of these variables. Please use the `across()` function to help you remove some of the repetition from your code. Please also use the “_f” variable naming convention.
 
 ```{r}
 yn_cols <- c("required", "still_enroll", "asthma", "insurance", "hispanic", "veteran")
@@ -480,7 +691,7 @@ class_survey <- class_survey |>
   )
 ```
 
-## Question 6
+## Question 15
 
 How many people reported that they have ever been told by a doctor, nurse, or other health professional that they have asthma?
 
@@ -493,5 +704,4 @@ class_survey |>
 
 ## Notes for students
 
-1. Some of you may be wondering if we can use across() to apply count() to all the yes/no factor variables in one code chunk. Unfortunately, that isn't currently possible. As of this writing, we will need to use a for loop or the purrr package to repeatedly apply the count function across more than one column in our data frame.
-
+1. Some of you may be wondering if we can use `across()` to apply `count()` to all the yes/no factor variables in one code chunk. Unfortunately, that isn't currently possible. As of this writing, we will need to use a for loop or the `purrr` package to repeatedly apply the `count()` function across more than one column in our data frame.
