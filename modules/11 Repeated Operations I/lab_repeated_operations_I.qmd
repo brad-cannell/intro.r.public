@@ -27,7 +27,7 @@ This week, we will practice [writing functions](https://www.r4epi.com/writing-fu
 
 # Task 1
 
-Please download **Class Survey 5141.csv** and import it into your R global environment as **class_survey**.
+Please download **class_survey.Rds** and import it into your R global environment as **class_survey**.
 
 ```{r}
 class_survey <- read_rds("/Users/bradcannell/Dropbox/Datasets/Class Survey/class_survey.Rds")
