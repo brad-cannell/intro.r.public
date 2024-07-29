@@ -21,7 +21,7 @@ library(tidyr)
 
 This week, we will practice [writing functions](https://www.r4epi.com/writing-functions.html) and performing [column-wise repeated operations with dplyr](https://www.r4epi.com/column-wise-operations-in-dplyr.html) verbs. In some cases, we will be completing tasks that we already completed in previous modules, but we will do so using methods from this module. We will use the following data sets for all the tasks in this lab:
 
-* [Click here to download Class Survey 5141.csv](https://www.dropbox.com/s/70q553h37cacjka/Class%20Survey%205141.csv?dl=1). This is the class survey data we used in the conditional operations lab. Feel free to reuse your code from that lab for the tasks below that are repeated from that lab.
+* [Click here to download class_survey.Rds](https://www.dropbox.com/scl/fi/pkp4soyhclbromv3spbo0/class_survey.Rds?rlkey=e956hcz3dpf3sbbmcfkqb27g2&dl=1). This is the class survey data we used in the conditional operations lab. Feel free to reuse your code from that lab for the tasks below that are repeated from that lab.
 
 * [Click here to view the codebook for the class survey data](https://www.dropbox.com/s/kjyfq8cfur0hzdp/5313%20-%205314%20Day%20One%20Survey%20Codebook.pdf?dl=0).
 
@@ -480,7 +480,7 @@ class_survey |>
 
 How many participants selected "Not Sure" as their response for the question that corresponds to the **still_enroll_9** column?
 
-* 14 participants selected "Not Sure" as their response for the question that corresponds to the **still_enroll_9** column.
+* 7 participants selected "Not Sure" as their response for the question that corresponds to the **still_enroll_9** column.
 
 # Task 6
 
