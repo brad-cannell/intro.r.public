@@ -20,13 +20,12 @@ knitr::opts_chunk$set(
 [![CRAN status](https://www.r-pkg.org/badges/version/project)](https://CRAN.R-project.org/package=project)
 <!-- badges: end -->
 
-This is the public repository for Brad Cannell’s Introduction to R Programming and Data Management Public Repository course at UTHealth. It is still under development. Currently, this repository is for:
+This is the public repository for Brad Cannell’s Introduction to R Programming and Data Management Public Repository course. It is still under development. Currently, this repository is for:
 
 1. R code for lab warm-ups.
 2. R code for labs.
 3. Other files intended to be shared with students and/or the public.
 4. Loading practice data sets.
-
 
 ## Installation
 
