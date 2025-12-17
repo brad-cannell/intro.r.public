@@ -7,15 +7,25 @@ format:
 
 # 🛑 Formatting (delete this section before posting to Canvas) 🛑
 
-* Please name this file `lab_module_name.qmd`.
-* The Overview section, each task number, and each question number should be written as a level-one headers (e.g., `# Task 1`).
-* All R code being run, should be put into R code chunks.
-* All R code being discussed in the text should be placed inside backticks (e.g., `install.packages("dplyr")`).
-* R package names being discussed in the text should be formatted as code (e.g., "...the `dplyr` package...). 
-* When functions are discussed in the text, they should be formatted as code and empty parentheses added to the end of the function name (e.g., "The `tibble()` function can be used to create data frames…").
-* Data set/frame names, variable names, and other key words should be written with **bold** text (e.g., "Please download **chocolate study 1.xls**".
-* There should be 1 line break (returns) immediately above all headers.
-* There should be one line break (return) immediately above each code chunk. There should be at least 1 line break immediately below each code chunk. If the the code chunk is immediately followed by a level-one header, then there will be two line breaks.
+1. Please name this file `lab_module_name.qmd`. For example, lab_writing_functions.qmd for the Writing Functions module.
+
+2. The Overview section, each task number, and each question number should be written as a level-one header (e.g., `# Overview` and `# Task 1`).
+
+3. All R code being run, should be written into R code chunks.
+
+4. All R code being discussed in the text (but not run) should be written inline (i.e., placed inside backticks). For example, "Run `install.packages("dplyr")` to install the `dplyr` package.".
+
+5. R package names being discussed in the text should be formatted as code (e.g., "...the `dplyr` package...).
+
+6. When functions are discussed in the text, they should be formatted as code and empty parentheses added to the end of the function name (e.g., "The `tibble()` function can be used to create data frames…").
+
+7. Data set and data frame names, variable names, and other key words should be written with **bold** text (e.g., "Please download **chocolate study 1.xls**".
+
+8. There should be one line break (return) immediately above all headers.
+
+9. There should be one line break (return) immediately above each code chunk. 
+
+10. There should be at least one line break (return) immediately below each code chunk. If the code chunk is immediately followed by a level-one header, then there will be two line breaks.
 
 
 # Load packages
