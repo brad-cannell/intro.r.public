@@ -1,5 +1,7 @@
 ---
-title: "Lab: Data Transfer"
+title: "Lab: Introduction to Data Transfer in R"
+author: Brad Cannell
+date-modified: 2026-02-08
 format:
   html:
     embed-resources: true
@@ -69,7 +71,7 @@ choco_1 <- read_excel("Chocolate Study 1.xls")
 
 ```{r}
 # For Dr. Cannell's computer.
-choco_1 <- read_excel("/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 1.xls")
+choco_1 <- read_excel('/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Chocolate/Chocolate Study 1.xls')
 ```
 
 # Task 3 
@@ -124,7 +126,7 @@ choco_2 <- read_csv("Chocolate Study 2.csv")
 
 ```{r}
 # For Dr. Cannell's computer.
-choco_2 <- read_csv("/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 2.csv")
+choco_2 <- read_csv('/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Chocolate/Chocolate Study 2.csv')
 ```
 
 # Task 5 
@@ -220,7 +222,7 @@ choco_3 <- read_fwf(
 ```{r}
 # For Dr. Cannell's computer.
 choco_3 <- read_fwf(
-  "/Users/bradcannell/Dropbox/Datasets/Chocolate/Chocolate Study 3.txt",
+  '/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Chocolate/Chocolate Study 3.txt',
   col_positions = fwf_widths(
     widths    = c(5, 9, 8, 4, 6, 13, 9, 9, 6, 6, 6, 6, 6, 6, 8, 7, 7, 7, 7, 9, 6),
     col_names = c(
@@ -263,7 +265,7 @@ After locating the data from the correct years, import the **Alcohol Use** data 
 * Instead of downloading the data from the NHANES website to your computer, try passing a link to the XPT file directly to the `read_xpt()` function. [R4Epi](https://www.r4epi.com/importing-binary-files.html#importing-sas-data-sets) has an example that you can reference. 
 
 ```{r}
-alq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/ALQ_J.XPT")
+alq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/ALQ_J.xpt")
 ```
 
 ## Question 7

@@ -1,5 +1,2 @@
-^intro\.r\.public\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
-^NOTES$
-^LICENSE\.md$
-^README\.Rmd$

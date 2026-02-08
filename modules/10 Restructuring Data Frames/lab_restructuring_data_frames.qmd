@@ -1,5 +1,7 @@
 ---
 title: "Lab: Restructuring Data Frames"
+author: Brad Cannell
+date-modified: 2026-02-08
 format:
   html:
     embed-resources: true

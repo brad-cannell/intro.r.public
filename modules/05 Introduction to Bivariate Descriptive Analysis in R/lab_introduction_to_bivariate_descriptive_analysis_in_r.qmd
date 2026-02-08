@@ -1,5 +1,7 @@
 ---
-title: "Lab: Descriptive Analysis II"
+title: "Lab: Introduction to Bivariate Descriptive Analysis in R"
+author: Brad Cannell
+date-modified: 2026-02-08
 format:
   html:
     embed-resources: true
@@ -35,7 +37,7 @@ Please use the following links to download the **WHAS 500** data to your compute
 Import **whas500.txt** into your R global environment as **whas500**.
 
 ```{r}
-whas500 <- read_table("/Users/bradcannell/Library/CloudStorage/Dropbox/Datasets/WHAS/whas500.txt", 
+whas500 <- read_table("/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/WHAS/whas500.txt", 
   col_types = cols(
     id        = col_character(), 
     age       = col_integer(), 

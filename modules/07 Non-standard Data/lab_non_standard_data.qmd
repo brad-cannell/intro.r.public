@@ -1,5 +1,7 @@
 ---
 title: "Lab: Working with Non-standard Data"
+author: Brad Cannell
+date-modified: 2026-02-08
 format:
   html:
     embed-resources: true

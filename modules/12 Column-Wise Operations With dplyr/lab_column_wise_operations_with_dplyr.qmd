@@ -1,5 +1,7 @@
 ---
 title: "Lab: Repeated Oprerations I"
+author: Brad Cannell
+date-modified: 2026-02-08
 format:
   html:
     embed-resources: true
@@ -19,23 +21,59 @@ library(tidyr)
 
 # Overview
 
-This week, we will practice [writing functions](https://www.r4epi.com/writing-functions.html) and performing [column-wise repeated operations with dplyr](https://www.r4epi.com/column-wise-operations-in-dplyr.html) verbs. In some cases, we will be completing tasks that we already completed in previous modules, but we will do so using methods from this module. We will use the following data sets for all the tasks in this lab:
+In this lab, we will practice writing custom R functions to reduce repetition and improve code clarity. Writing functions is a critical step in moving from one-off scripts to reusable, readable, and maintainable analytic code.
+
+Using a class survey dataset, we will:
+
+- Identify repeated operations in our code
+
+- Write functions that generalize those operations
+
+- Apply functions to real data
+
+- Reflect on how functions improve workflow efficiency
+
+# Data for This Lab
+
+We will use the class survey dataset introduced earlier in the course.
 
 * [Click here to download class_survey.Rds](https://www.dropbox.com/scl/fi/pkp4soyhclbromv3spbo0/class_survey.Rds?rlkey=e956hcz3dpf3sbbmcfkqb27g2&dl=1). This is the class survey data we used in the conditional operations lab. Feel free to reuse your code from that lab for the tasks below that are repeated from that lab.
 
-* [Click here to view the codebook for the class survey data](https://www.dropbox.com/s/kjyfq8cfur0hzdp/5313%20-%205314%20Day%20One%20Survey%20Codebook.pdf?dl=0).
+* [Click here to view the codebook for the class survey data](https://www.dropbox.com/s/kjyfq8cfur0hzdp/5313%20-%205314%20Day%20One%20Survey%20Codebook.pdf?dl=0). Review the associated codebook to understand variable coding and response options.
+
+Several survey questions include **Not Sure** as a response option, which will serve as the motivating example for writing functions.
 
 # Task 1
 
 Please download **class_survey.Rds** and import it into your R global environment as **class_survey**.
 
 ```{r}
-class_survey <- read_rds("/Users/bradcannell/Dropbox/Datasets/Class Survey/class_survey.Rds")
+class_survey <- read_rds("Data/class_survey.Rds")
 ```
 
 # Task 2
 
-Please look at the codebook for the **class_survey** data. Several questions on the survey included a "Not Sure" response option coded as a "9". They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. Before analyzing this data, we will convert all of the "9" values to "NA" values. However, the very first thing we want to do is give each of those columns more informative names. Specifically, we want to rename those columns **required**, **still_enroll**, **package**, **genhealth**, **asthma**, **seatbelt**, **insurance**, **persdoc**, **hispanic**, **race**, **veteran**, **marital**, **employment**, **sex**, and **color**. We have already learned how to rename columns using the `rename()` function. 
+Please look at the codebook for the **class_survey** data. Several questions on the survey included a "Not Sure" response option coded as a "9". They were questions 2, 4, 6, 7, 9, 10, 13, 14, 15, 16, 17, 18, 20, and 26. 
+
+Before analyzing this data, we will convert all of the "9" values to "NA" values. However, the very first thing we want to do is give each of those columns more informative names. Specifically, we want to rename those columns: 
+
+- **required** 
+- **still_enroll**
+- **package**
+- **genhealth**
+- **asthma**
+- **seatbelt**
+- **insurance**
+- **persdoc**
+- **hispanic**
+- **race**
+- **veteran**
+- **marital**
+- **employment**
+- **sex**
+- **color** 
+
+We have already learned how to rename columns using the `rename()` function. 
 
 ```{r}
 #| eval: false
@@ -62,7 +100,7 @@ class_survey |>
   )
 ```
 
-However, we can also rename multiple columns at once by creating a character vector of column names and applying them using the `rename_with()` function instead. And using this method has some advantages. 
+We can also rename multiple columns at once by creating a character vector of column names and applying them using the `rename_with()` function instead. Using this method has some advantages. 
 
 Please create a character vector containing the new column names we want to use. Please name the character vector **cols_9**. The order of the column names in this vector is important, so please use the exact order given above.
 
@@ -171,7 +209,7 @@ class_survey <- class_survey |>
 
 ## Notes for students
 
-1. We’ve used `rename_with()` before to apply the `str_to_lower()` function to all of our column names. However, we can pass any function to the `.fn` argument of `rename_with()`. Passing the character vector, we created earlier as an anonymous function (we wrote the anonymous function above using a purrr-style lambda) to the `.fn` argument has the effect of assigning the names in the character vector to the columns of **class_survey**. It’s very important that (1) the number column names in the character vector matches the number of columns you pass to the `.cols` argument, and (2) the order of the column names in the character vector matches the order of the columns you pass to the `.cols` argument.
+1. We’ve used `rename_with()` before to apply the `str_to_lower()` function to all of our column names. However, we can pass any function to the `.fn` argument of `rename_with()`. Passing the character vector we created earlier as an anonymous function (we wrote the anonymous function above using a purrr-style lambda) to the `.fn` argument has the effect of assigning the names in the character vector to the columns of **class_survey**. It’s very important that (1) the number column names in the character vector matches the number of columns you pass to the `.cols` argument, and (2) the order of the column names in the character vector matches the order of the columns you pass to the `.cols` argument.
 
 # Task 4
 
@@ -202,11 +240,11 @@ class_survey |>
   )
 ```
 
-However, the code above is more tedious to write, more difficult to maintain, more error-prone, and less concise than it needs to be. Instead, please coerce all of the columns with a "Not Sure" "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function to help remove some of the repetition from the code.
+However, the code above is more tedious to write, more difficult to maintain, more error-prone, and less concise than it needs to be. Instead, let's coerce all of the columns with a "Not Sure" "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function to help remove some of the repetition from the code.
 
 ## Question 3
 
-Which of the following code chunks will correctly coerce all of the columns with a "Not Sure" "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function?
+Which of the following code chunks will correctly coerce all of the columns with a "Not Sure" response option coded as a "9" from character type to numeric type using the `across()` function?
 
 ```{r}
 #| eval: false

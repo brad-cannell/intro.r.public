@@ -1,6 +1,4 @@
 .Rproj.user
-NOTES
 .Rhistory
-.Rdata
-.httr-oauth
-.DS_Store
+.RData
+.Ruserdata

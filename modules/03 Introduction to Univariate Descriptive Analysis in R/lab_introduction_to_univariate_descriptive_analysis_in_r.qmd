@@ -1,5 +1,7 @@
 ---
-title: "Lab: Descriptive Analysis I"
+title: "Lab: 03 Introduction to Univariate Descriptive Analysis in R"
+author: Brad Cannell
+date-modified: 2026-02-08
 format:
   html:
     embed-resources: true
