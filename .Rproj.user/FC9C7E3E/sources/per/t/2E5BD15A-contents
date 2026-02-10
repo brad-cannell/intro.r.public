@@ -1,0 +1,224 @@
+---
+title: "Lab: Writing Functions"
+format:
+  html:
+    embed-resources: true
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use up at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+#| label: load-packages
+library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
+```
+
+# Overview
+
+In this lab, you are a data analyst supporting a public health research team conducting a descriptive analysis of health and demographic characteristics in a study population. The team regularly produces the same set of summary statistics across different variables and subgroups, and manual repetition has made their analysis scripts long and difficult to maintain.
+
+The task is to write custom R functions that streamline these repeated analytic steps, allowing summaries to be generated consistently and efficiently for different inputs. This lab reinforces how writing functions supports reproducible, readable, and scalable data analysis workflows — an essential skill for applied epidemiologic research.
+
+# Task 1
+
+In this task, load the study dataset that will be used throughout the lab for descriptive analyses and function development.
+
+Run the code below to simulate importing the study dataset and assign it the name **study_data**.
+
+```{r}
+set.seed(12345) # necessary for reproducibility
+
+n <- 400  # number of study participants
+
+study_data <- tibble(
+  # Participant ID
+  id = seq_len(n),
+
+  # Demographics
+  sex = sample(c("Female", "Male"), n, replace = TRUE, prob = c(0.55, 0.45)),
+
+  age = round(
+    rnorm(n, mean = 50, sd = 15)
+  ),
+
+  race_ethnicity = sample(
+    c("White", "Black", "Hispanic", "Other"),
+    n,
+    replace = TRUE,
+    prob = c(0.50, 0.20, 0.20, 0.10)
+  )
+) |>
+  # Ensure realistic age bounds
+  mutate(
+    age = pmin(pmax(age, 18), 90),
+
+    age_group = case_when(
+      age < 40 ~ "18–39",
+      age < 60 ~ "40–59",
+      TRUE ~ "60+"
+    )
+  ) |>
+  # Continuous health measures
+  mutate(
+    bmi = rnorm(n, mean = 28, sd = 5),
+    systolic_bp = rnorm(n, mean = 125, sd = 15),
+    cholesterol = rnorm(n, mean = 195, sd = 35)
+  ) |>
+  # Binary health indicators
+  mutate(
+    smoker = sample(c("Yes", "No"), n, replace = TRUE, prob = c(0.25, 0.75)),
+    diabetes = sample(c("Yes", "No"), n, replace = TRUE, prob = c(0.15, 0.85)),
+    hypertension = sample(c("Yes", "No"), n, replace = TRUE, prob = c(0.30, 0.70))
+  ) |>
+  # Introduce missing data (to reflect real-world study data)
+  mutate(
+    bmi = ifelse(runif(n) < 0.05, NA, bmi),
+    systolic_bp = ifelse(runif(n) < 0.04, NA, systolic_bp),
+    cholesterol = ifelse(runif(n) < 0.06, NA, cholesterol)
+  )
+```
+
+# Task 2
+
+The research team has requested **basic descriptive statistics** for several key health measures to understand the overall distribution of values in the study sample. At this stage of the project, these summaries are computed **one variable at a time**, even when the same statistics are needed repeatedly.
+
+In this task, we will follow that approach to produce the requested summaries.
+
+Using the **study_data** dataset, calculate the **mean**, **median**, and **standard deviation** for each of the following variables:
+
+- Body mass index (**bmi**)
+
+- Systolic blood pressure (**systolic_bp**)
+
+- Total cholesterol (**cholesterol**)
+
+Be sure to handle missing values appropriately.
+
+Write the code needed to compute these statistics below. At this stage, do not use custom functions—focus on producing the requested summaries directly.
+
+## BMI
+
+```{r}
+study_data |> 
+  summarise(
+    mean   = mean(bmi, na.rm = TRUE),
+    median = median(bmi, na.rm = TRUE),
+    sd     = sd(bmi, na.rm = TRUE)
+  )
+```
+
+## Systolic blood pressure
+
+```{r}
+study_data |> 
+  summarise(
+    mean   = mean(systolic_bp, na.rm = TRUE),
+    median = median(systolic_bp, na.rm = TRUE),
+    sd     = sd(systolic_bp, na.rm = TRUE)
+  )
+```
+
+## Total cholesterol
+
+```{r}
+study_data |> 
+  summarise(
+    mean   = mean(cholesterol, na.rm = TRUE),
+    median = median(cholesterol, na.rm = TRUE),
+    sd     = sd(cholesterol, na.rm = TRUE)
+  )
+```
+
+## Question 1
+
+Based on the summaries computed in Task 2, which of the following variables has the largest mean value?
+
+* Body mass index (**bmi**)
+
+* Systolic blood pressure (**systolic_bp**) 
+
+* Total cholesterol (**cholesterol**) ✅
+
+* All three variables have approximately the same mean 
+
+The computed mean values show that total cholesterol has a mean of approximately 195.162, which is larger than the mean systolic blood pressure (124.0754) and the mean body mass index (27.56948). Although these variables are measured on different scales and represent different health constructs, this question focuses solely on comparing the numeric mean values produced by the summaries. Based on those results, total cholesterol has the largest mean value.
+
+## Question 2
+
+What is the approximate mean systolic blood pressure in the study sample? (Round to the nearest whole number.)
+
+* 124
+
+Running the summary code for **systolic_bp** produces a mean of approximately 124.0754 mmHg. When rounded to the nearest whole number, this value becomes 124. This calculation requires correct use of the `mean()` function and proper handling of missing values using `na.rm = TRUE`.
+
+## Question 3
+
+The standard deviation of total cholesterol is greater than the standard deviation of body mass index.
+
+* True ✅
+
+* False
+
+Total cholesterol has much greater variability than body mass index in this dataset. The computed standard deviation for cholesterol is approximately 34.94384 while the standard deviation for BMI is approximately 4.838513. Because 34.94384 is larger than 4.838513, the statement is true. Answering this question correctly requires computing and comparing standard deviations across variables, not just inspecting a single summary.
+
+## Question 4
+
+Which parts of the code written in Task 2 were identical across all three summaries?
+
+* The names of the variables being summarized
+
+* The functions used to compute the statistics (`mean()`, `median()`, `sd()`) ✅
+
+* The use of `na.rm = TRUE` ✅
+
+* The structure of the `summarise()` call ✅
+
+Across all three summaries, the analytic logic is the same. Each summary uses the same statistical functions, the same missing-value handling, and the same `summarise()` structure. The only element that changes is the name of the variable being summarized. When this much repetition appears in analysis code — especially more than two times — it is a strong signal that writing a function or using another form of iterative processing would improve readability and maintainability.
+
+# Task 3
+
+In Task 2, we computed the same set of descriptive statistics — mean, median, and standard deviation — for multiple health measures. Although this approach produced the requested results, it required writing nearly identical code several times, making the analysis script longer and harder to maintain.
+
+To improve the workflow, let's encapsulate this repeated logic in a custom function. Doing so will allow the same summaries to be generated consistently while reducing duplication in the code.
+
+In this task, we will write a function that summarizes a single numeric variable.
+
+Write a function named `summarize_numeric()` that:
+
+1. Takes a numeric vector as its input
+
+2. Computes the mean, median, and standard deviation
+
+3. Handles missing values appropriately
+
+4. Returns the results in a single tibble
+
+The function should not assume anything about the variable being summarized beyond it being numeric.
+
+```{r}
+summarize_numeric <- function(x, na_rm = TRUE) {
+  tibble(
+    mean   = mean(x, na.rm = na_rm),
+    median = median(x, na.rm = na_rm),
+    sd     = sd(x, na.rm = na_rm)
+  )
+}
+
+summarize_numeric
+```
+
+```{r}
+test <- function(x) {
+  study_data |> 
+    summarise(
+      mean   = mean(x, na.rm = TRUE),
+      median = median(x, na.rm = TRUE),
+      sd     = sd(x, na.rm = TRUE)
+    )
+}
+
+test(cholesterol)
+```
+
+

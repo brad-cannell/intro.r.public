@@ -1,7 +1,5 @@
 ---
-title: "Lab: Introduction to Univariate Descriptive Analysis in R"
-author: Brad Cannell
-date-modified: 2026-02-10
+title: "Lab: Descriptive Analysis I"
 format:
   html:
     embed-resources: true
@@ -14,12 +12,13 @@ Remember, it's considered a best practice to load all the packages that our file
 ```{r}
 #| label: load-packages
 library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
-library(ggplot2, warn.conflicts = FALSE)
+library(freqtables)
+library(ggplot2)
 ```
 
 # Overview
 
-In today’s lab, we will practice performing and interpreting descriptive analysis on categorical and numerical variables using R. Examples 2 and 3 are taken from the [Daniels Biostatistics textbook](https://bcs.wiley.com/he-bcs/Books?action=index&bcsId=2191&itemId=0471456543). Sometimes, calculating statistics by hand and then checking them with statistical software can help you develop a better intuition for interpreting output.
+In today’s lab we will practice performing an interpreting descriptive analysis on categorical and numerical variables using R. Examples 2 and 3 are taken from the [Daniels Biostatistics textbook](https://bcs.wiley.com/he-bcs/Books?action=index&bcsId=2191&itemId=0471456543). Sometimes calculating statistics by hand, and then checking them with statistical software, can help you develop a better intuition for interpreting output.
 
 # Example 1. Descriptive analysis of 2010 Census data
 
@@ -178,9 +177,20 @@ table(census$region_f)
 ```
 
 ```{r}
+# Using gmodels::CrossTable
+gmodels::CrossTable(census$region_f)
+```
+
+```{r}
 # Using dplyr
 census |> 
   count(region_f)
+```
+
+```{r}
+# Using freqtables
+census |> 
+  freq_table(region_f)
 ```
 
 ## Task 5
@@ -198,7 +208,7 @@ ggplot(census) +
 
 ## Task 6
 
-Reorder the **region_f** factor so that regions are ordered from the fewest to the greatest number of states. Then create a bar graph showing the number of states in each region, with the smallest region on the far left and the largest region on the far right.
+Reorder the **region_f** column from the region that contains the fewest number of states to the region that contains the greatest number of states. Then, create another bar graph depicting the number of states in each region. The region that contains the fewest number of states should be the farthest left bar on the graph and the region containing the greatest number of states should be the farthest right bar on the graph.
 
 ```{r}
 census |> 

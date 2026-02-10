@@ -1,0 +1,13 @@
+{
+    "sortOrder": [
+        {
+            "columnIndex": 2,
+            "ascending": true
+        },
+        {
+            "columnIndex": 1,
+            "ascending": false
+        }
+    ],
+    "path": "~/Library/CloudStorage/Dropbox/Teaching/GitHub/intro.r.public/modules"
+}

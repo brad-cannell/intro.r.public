@@ -1,0 +1,332 @@
+---
+title: "Lab: Conditional Operations"
+format:
+  html:
+    embed-resources: true
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that your file will use up at the top of the file. If you have not yet installed a package, you will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, you would run `install.packages("dplyr")`. However, you typically **do not** want to type the code to install the package here in your Quarto file because you only need to install the package once on a given computer. Not every time you run your R code.
+
+```{r}
+#| label: load-packages
+library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
+library(readr)
+library(lubridate)
+library(stringr)
+```
+
+# Overview
+
+In this lab we will practice working with date variables, calculating length variables, using conditional operations, recoding missing values, and using Boolean logic. The data set we will use is the Class Survey Data 5141 data set. Additionally, you will also need the codebook, which is named Class Survey Data Codebook. Both are available via the following links:
+
+* [Click here to download the data](https://www.dropbox.com/s/70q553h37cacjka/Class%20Survey%205141.csv?dl=1).
+
+* [Click here to view the codebook](https://www.dropbox.com/s/kjyfq8cfur0hzdp/5313%20-%205314%20Day%20One%20Survey%20Codebook.pdf?dl=0).
+
+# Task 1
+
+Import **Class Survey 5141.csv** into your R global environment as **class_survey**.
+
+```{r}
+class_survey <- read_csv("/Users/bradcannell/Dropbox/Datasets/Class Survey/Class Survey 5141.csv")
+```
+
+```{r}
+# Remove the second row -- data labels
+# Also remove the last column of all NA's
+# Coerce all names to lowercase
+class_survey <- class_survey |>
+  slice(-1) |> 
+  rename_with(str_to_lower)
+```
+
+## Notes for students
+
+1. There are many different ways you could have dealt with the first two rows in this data. For example, you could have added `skip = 1` to your `read_csv()` call above. I choose to import the file as-is and clean it in subsequent steps.
+
+# Task 2
+
+Subset the data to contain only the variables for the following questions: 
+
+HINT: Some of the variable names in the survey data set may be slightly different than the variable names listed in the codebook.
+
+a. Do you have any kind of health care coverage?   
+b. Do you have one or more people you think of as your personal doctor or health care provider?   
+c. Have you ever served on active duty in the United States Armed Forces…?    
+d. What is your marital status?    
+e. What is your employment status?    
+f. What is your annual salary?    
+g. What year were you born?    
+h. What month were you born?    
+i. What is your gender?    
+
+```{r}
+class_survey <- class_survey |> 
+  select(q13, q14, q17, q18, q20, q21_1, q24, q25, q26)
+```
+
+# Task 3
+
+View the structure of **class_survey** using the `str()` function.
+
+```{r}
+str(class_survey)
+```
+
+## Question 1
+
+The **class_survey** data frame contains ____ rows and ____ columns.
+
+* The **class_survey** data frame contains 52 rows and 9 columns.
+
+# Task 4
+
+Please rename the remaining column names as follows:
+
+* Do you have any kind of health care coverage? to **insurance**      
+* Do you have one or more people you think of as your personal doctor or health care provider? to **persdoc**   
+* Have you ever served on active duty in the United States Armed Forces…? to **veteran**   
+* Marital status? to **marital**   
+* Employment status? to **employment**      
+* What is your annual salary? to **salary**   
+* What year were you born? to **birth_year**   
+* What month were you born? to **birth_month**   
+* What is your gender? to **gender**    
+
+```{r}
+class_survey <- class_survey |> 
+  rename(
+    insurance   = q13,
+    persdoc     = q14, 
+    veteran     = q17, 
+    marital     = q18, 
+    employment  = q20, 
+    salary      = q21_1, 
+    birth_year  = q24, 
+    birth_month = q25, 
+    gender      = q26
+  )
+```
+
+# Task 5
+
+Please calculate the number of participants who selected "Not Sure" as their response for each of the following variables: **insurance**, **persdoc**, **veteran**, **marital**, **employment**, and **gender**.
+
+```{r}
+class_survey |> 
+  summarise(
+    insurance    = sum(insurance == "9", na.rm = TRUE),
+    persdoc      = sum(persdoc == "9", na.rm = TRUE),
+    veteran      = sum(veteran == "9", na.rm = TRUE),
+    marital      = sum(marital == "9", na.rm = TRUE),
+    employment   = sum(employment == "9", na.rm = TRUE),
+    gender       = sum(gender == "9", na.rm = TRUE)
+  )
+```
+
+## Notes for students
+
+1. Notice again, that we are repeating ourselves a lot in the code chunk above. We will learn how to remove this repetition in the repeated operations modules.
+
+## Question 2
+
+How many participants responded "Not Sure" to the question, “Do you have one or more people you think of as your personal doctor or health care provider?”
+
+* Three participants responded "Not Sure" to the question, “Do you have one or more people you think of as your personal doctor or health care provider?”
+
+# Task 6
+
+Please use the `if_else()` function to recode all "9"s in the columns we inspected in Task 5 to "NA"s.
+
+```{r}
+class_survey <- class_survey |> 
+  mutate(persdoc = if_else(persdoc == "9", NA_character_, persdoc))
+```
+
+# Task 7
+
+Create a new factor variable for each of the categorical variables in the **class_survey** data frame (i.e., **insurance**, **persdoc**, **veteran**, **marital**, **employment**, **birth_month**, and **gender**). Please use the **_f** naming convention when you create these new columns. Please use the codebook to get the appropriate factor labels. Because we have dropped all of the Not Sure responses from our categorical variables, please do not program Not Sure as a possible value in your factors.
+
+
+```{r}
+# Create a character vector you can reuse for all yes/no factor levels
+yn_levs <- c("0", "1")
+# Create a character vector you can reuse for all yes/no factor labels
+yn_labs <- c("No", "Yes")
+```
+
+## Notes for students
+
+1. You don't have to do what I did above. You could have entered these values directly into the `factor()` functions below. I did it this way for a couple of reasons. First, it reduces the amount of typing I have to do in the code chunk below (and makes it easier to read). Second, because I'm typing less, the likelihood of me making a typo is reduced. Finally, if I ever need to change the levels or labels, I just change them once in the code chunk above, as opposed to changing every `factor()` function in the code chunk below.
+
+```{r}
+class_survey <- class_survey |> 
+  mutate(
+    insurance_f   = factor(insurance, yn_levs, yn_labs),
+    persdoc_f     = factor(persdoc, "0":"2", c("No", "Yes, only one", "Yes, more than one")),
+    veteran_f     = factor(veteran, yn_levs, yn_labs),
+    marital_f     = factor(
+      marital, "1":"5", 
+      c("Married", "Divorced", "Widowed", "Separated", "Never Married")
+    ),
+    employment_f  = factor(
+      employment, "1":"8",
+      c("Employed for wages", "Self-employed", "Out of work for 1 year or more", 
+        "Out of work for less than 1 year", "A Homemaker", "A student", "Retired",
+        "Unable to work")
+    ),
+    birth_month_f = factor(birth_month, "1":"12", month.name),
+    gender_f      = factor(gender, "1":"2", c("Female", "Male"))
+  )
+```
+
+## Notes for students
+
+1. Notice that we were able to use R's built-in **month.name** character vector to make this task just a little be easier to complete.
+
+# Task 8
+
+Recode the values in the birth_year column to the actual year of birth, as opposed to the coded value for the birth_year. 
+
+HINT: This should only require one line of code.
+
+```{r}
+class_survey <- class_survey |> 
+  mutate(birth_year = as.numeric(birth_year) + 1949)
+```
+
+## Notes for students
+
+1. As you can see in the codebook, students would select their year of birth (choices ranged from 1950 to 2013), but the value that was recorded in the data was a category code -- similar to the other categorical variables in the data. Now, we could use a bunch of conditional operations to recode these categories. For example, `if_else(birth_year == 1, 1950, birth_year)` and so on. But, I really hope you didn't do that. Instead, all we have to do is coerce the character category values to numeric, and then add 1949 to each of them. And because the addition operator is vectorized, we just have to tell R to add 1949 to the birth_year vector and R will add 1949 separately to each element of that vector. Why 1949? Well, category 1 is 1950. What is 1 + 1949? It's 1950. Category 2 is 1951. What is 2 + 1949? It's 1951. And so on. 
+
+# Task 9
+
+Calculate the number of participants born in each year.
+
+```{r}
+class_survey |> 
+  count(birth_year) |> 
+  arrange(desc(n))
+```
+
+## Question 3
+
+In what year was the greatest number of participants born?
+
+* The greatest number of participants were born in 1990 (n = 14).
+
+# Task 10
+
+Please create a new column that contains each student’s date of birth. Name the column **dob** and assume each student was born on the 15th day of the month. Additionally, create another calculated variable that contains each student’s age (as of their last birthday) at the time of the survey. Everyone took the survey on January 10, 2014. Name this column **age**. 
+
+```{r}
+class_survey <- class_survey |>
+  mutate(
+    dob = paste(birth_month, 15, birth_year) |> mdy(),
+    age = dob %--% ymd("2014-01-10") %/% years(1)
+  )
+```
+
+```{r}
+filter(class_survey, is.na(age))
+```
+
+
+## Notes for students
+
+1. Notice that we had to `paste()` the three separate elements of the date of birth together before passing it to a function that coerces it to date type. We could have used the `as.Date()` function that we've used before, but I chose to use `lubridate`'s `mdy()` function. You can get more info here if you are curious: https://lubridate.tidyverse.org/.
+
+2. You might have noticed a warning that says "Warning: There was 1 warning in `mutate()`. In argument: `dob = mdy(paste(birth_month, 15, birth_year))`. Caused by warning: 3 failed to parse." This warning might look alarming, but it is just R telling us that it couldn't create the **dob** value for three people because their year of birth, month of birth, or both were missing. 
+
+3. We created the **age** column above in the same way we've already learned. I just wanted to point out that the `ymd()` function is from the `lubridate` package. You can get more info here if you are curious: https://lubridate.tidyverse.org/.
+
+## Question 4
+
+How many missing observations are there for the variable **age**? 
+
+```{r}
+is.na(class_survey$age) |> sum()
+```
+
+* There are 3 missing observations for the variable **age**.
+
+# Task 11
+
+Determine the average age of students on the first day of class.
+
+```{r}
+mean(class_survey$age, na.rm = TRUE) |> round()
+```
+
+## Question 5
+
+What was the average age of students on the first day of class (rounded to the nearest integer)?
+
+* The average age of students on the first day of class was 26 (rounded to the nearest integer).
+
+# Task 12
+
+Use the `quantile()` function to determine quartiles of annual salary.
+
+```{r}
+# Must coerce salary to numeric type first
+class_survey$salary <- as.numeric(class_survey$salary)
+```
+
+```{r}
+quantile(class_survey$salary, na.rm = TRUE)
+```
+
+# Task 13
+
+Use conditional operations to create a new column that categorizes students into groups defined by quartiles of salary. Please name the new column salary_4cat. Please also create a factor version of the salary_4cat column that uses the _f naming convention.
+
+```{r}
+class_survey <- class_survey |> 
+  mutate(
+    salary_4cat = case_when(
+      is.na(salary)  ~ NA_real_,
+      salary < 3534  ~ 1,
+      salary < 11492 ~ 2,
+      salary < 35068 ~ 3,
+      TRUE           ~ 4
+    ),
+    salary_4cat_f = factor(salary_4cat)
+  )
+```
+
+## Question 6
+
+After completing all tasks above, the **class_survey** data frame contains ____ rows and ____ columns.
+
+```{r}
+dim(class_survey)
+```
+
+* After completing all tasks above, the **class_survey** data frame contains 52 rows and 20 columns.
+
+# Task 14
+
+Determine the percentage of students in each of the salary categories by gender.
+
+```{r}
+class_survey |> 
+  filter(!is.na(salary_4cat_f) & !is.na(gender_f)) |> 
+  group_by(gender_f) |> 
+  count(salary_4cat_f, .drop = FALSE) |> 
+  mutate(group_percent = n / sum(n) * 100)
+```
+
+## Notes for students
+
+1. Notice that I filtered out all missing values for **salary_4cat_f** and **gender_f** before performing the descriptive analysis. This is called a complete case analysis.
+
+2. Notice that I passed `FALSE` to the `.drop` argument of the `count()` function. That tells R to create a row in the results data frame for Males with in the first quartile of salary even though there are males in the first quartile of salary observed in the data (i.e., n = 0). This also only works for factor variables. 
+
+## Question 7
+
+Females most commonly reported an annual salary that was in the  ____ quartile of annual salaries overall. Males most commonly reported an annual salary that was in the  ____ quartile of annual salaries overall.
+
+* Females most commonly reported an annual salary that was in the 1st quartile of annual salaries overall (36%). Males most commonly reported an annual salary that was in the 2nd quartile of annual salaries overall (43%).
