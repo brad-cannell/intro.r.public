@@ -16,8 +16,6 @@ Remember, it's considered a best practice to load all the packages that our file
 library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
 library(readr)
 library(ggplot2)
-library(meantables)
-library(freqtables)
 ```
 
 # Overview
@@ -28,9 +26,9 @@ In this week’s lab, you will practice describing relationships between variabl
 
 Please use the following links to download the **WHAS 500** data to your computer and view the codebook:
 
-* [Click here to view/download the WHAS 500 data codebook](https://www.dropbox.com/s/hx37w38ruytjwi9/WHAS%20500%20Description.pdf?dl=0). Look over the codebook to learn a little bit about the data you will be working with.
+* [Click here to view/download the WHAS 500 data codebook](https://tcu.box.com/s/jcoowjwssvp84u1cnd3l3iz48qcrn5tl). Look over the codebook to learn a little bit about the data you will be working with.
 
-* [Click here to view/download the WHAS 500 data](https://www.dropbox.com/s/c14gqhjbny0mlra/whas500.txt?dl=0).
+* [Click here to view/download the WHAS 500 data](https://tcu.box.com/s/vy7ita9hsrm1e312ses9tlm47w27dgyd).
 
 # Task 2
 
@@ -160,15 +158,6 @@ whas500 |>
   summarise(mean_bmi = mean(bmi))
 ```
 
-```{r}
-#| message: false
-
-## Using meantables
-whas500 |> 
-  group_by(gender) |> 
-  mean_table(bmi)
-```
-
 ## Note for students
 
 * Notice that I use the `message=FALSE` option in my R code chunk above. I do this because dplyr version 1.0 gives you a message that says "`summarise()` ungrouping output (override with `.groups` argument)" when you use `group_by()` with `summarise()`. I don't find that message useful or informative, so I suppress it with the `message=FALSE` option.
@@ -224,30 +213,72 @@ Based on the boxplots, what can we conclude about the relationship between **bmi
 
 # Task 9 
 
-Create a two-way frequency table for cohort year and history of cardiovascular disease.
+Create a two-way frequency table for cohort year by history of cardiovascular disease.
 
 ```{r}
-# Using gmodels
-gmodels::CrossTable(whas500$year, whas500$cvd)
+year_by_cvd <- whas500 |> 
+  # Drop missing values
+  filter(!is.na(year), !is.na(cvd)) |> 
+  
+  # Calculate the joint counts
+  count(year, cvd, .drop = FALSE) |> 
+  
+  # Add overall counts and proportions
+  mutate(
+    n_overall    = sum(n),
+    prop_overall = n / n_overall
+  ) |> 
+
+  # Add row counts and row proportions
+  group_by(year) |>
+  mutate(
+    n_row = sum(n),
+    prop_row  = n / n_row
+  ) |>
+  ungroup()
+
+year_by_cvd
 ```
 
-```{r}
-# Using freqtables
-whas500 |> 
-  freq_table(year, cvd) |> 
-  # Make the results easier to read --- 
-  # Use select() to keep only the columns I'm interested in
-  select(row_var:n_row, percent_row) |> 
-  # Use filter() to see only the rows corresponding to people who had CVD.
-  filter(col_cat == 1)
-```
+Optionally, filter the results to make them easier to read:
 
 ```{r}
-# Using freqtables
-whas500 |> 
-  freq_table(cvd, year) |> 
-  select(row_var:n_row, percent_row) |> 
-  filter(row_cat == 1)
+year_by_cvd |> 
+  filter(cvd == 1)
+```
+
+Create a two-way frequency table for history of cardiovascular disease by cohort year.
+
+```{r}
+cvd_by_year <- whas500 |> 
+  # Drop missing values
+  filter(!is.na(cvd), !is.na(year)) |> 
+  
+  # Calculate the joint counts
+  count(cvd, year, .drop = FALSE) |> 
+  
+  # Add overall counts and proportions
+  mutate(
+    n_overall    = sum(n),
+    prop_overall = n / n_overall
+  ) |> 
+
+  # Add row counts and row proportions
+  group_by(cvd) |>
+  mutate(
+    n_row = sum(n),
+    prop_row  = n / n_row
+  ) |>
+  ungroup()
+
+cvd_by_year
+```
+
+Optionally, filter the results to make them easier to read:
+
+```{r}
+cvd_by_year |> 
+  filter(cvd == 1)
 ```
 
 ## Questions 8
