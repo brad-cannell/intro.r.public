@@ -247,6 +247,22 @@ year_by_cvd |>
   filter(cvd == 1)
 ```
 
+## Questions 8
+
+8. What proportion of people from the cohort year 1999 reported a history of cardiovascular disease?
+
+* 138 out of 188 (0.734) people from the cohort year 1999 reported a history of cardiovascular disease.
+
+## Questions 9
+
+Which cohort year had the highest percentage of people reporting cardiovascular disease?
+
+* 73.8% of people from cohort year 1997 reported a history of cardiovascular disease. 73.4% of people from cohort year 1999 reported a history of cardiovascular disease. 78.3% of people from cohort year 2001 reported a history of cardiovascular disease. Therefore, cohort year 2001 had the highest percentage of people reporting cardiovascular disease. 
+
+## Questions 10
+
+Of those reporting a history of cardiovascular disease, what percentage was in the cohort year 1997?
+
 Create a two-way frequency table for history of cardiovascular disease by cohort year.
 
 ```{r}
@@ -280,21 +296,5 @@ Optionally, filter the results to make them easier to read:
 cvd_by_year |> 
   filter(cvd == 1)
 ```
-
-## Questions 8
-
-8. What proportion of people from the cohort year 1999 reported a history of cardiovascular disease?
-
-* 138 out of 188 (0.734) people from the cohort year 1999 reported a history of cardiovascular disease.
-
-## Questions 9
-
-Which cohort year had the highest percentage of people reporting cardiovascular disease?
-
-* 73.8% of people from cohort year 1997 reported a history of cardiovascular disease. 73.4% of people from cohort year 1999 reported a history of cardiovascular disease. 78.3% of people from cohort year 2001 reported a history of cardiovascular disease. Therefore, cohort year 2001 had the highest percentage of people reporting cardiovascular disease. 
-
-## Questions 10
-
-Of those reporting a history of cardiovascular disease, what percentage was in the cohort year 1997?
 
 * Of the 375 people who reported a history of cardiovascular disease, 118 (31.5%) were in cohort year 1997.
