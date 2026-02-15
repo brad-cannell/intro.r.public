@@ -29,9 +29,9 @@ Additionally, we need you to download, clean, and save some NHANES data on alcoh
 
 Click the links below to download the raw data files to your computer: 
 
-* [chocolate study 1.xls](https://www.dropbox.com/s/9riqfhtf582o2az/Chocolate%20Study%201.xls?dl=1)   
-* [chocolate study 2.csv](https://www.dropbox.com/s/ggln051redw1g98/Chocolate%20Study%202.csv?dl=1)
-* [chocolate study 3.txt](https://www.dropbox.com/s/90ndmdc463ui88j/Chocolate%20Study%203.txt?dl=1)
+* [chocolate study 1.xls](https://tcu.box.com/s/y93mcruntyao2p5qfhir0ef1hupj75lv)   
+* [chocolate study 2.csv](https://tcu.box.com/s/1dcx6wkry67fm5cl03o9i9b31bipzhda)
+* [chocolate study 3.txt](https://tcu.box.com/s/rv42prkob7p1flfkk4jdyjecgpbuovjh)
 
 # Task 2
 
