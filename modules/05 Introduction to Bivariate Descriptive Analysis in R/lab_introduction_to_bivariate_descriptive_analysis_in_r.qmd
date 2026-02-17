@@ -28,7 +28,7 @@ Please use the following links to download the **WHAS 500** data to your compute
 
 * [Click here to view/download the WHAS 500 data codebook](https://tcu.box.com/s/jcoowjwssvp84u1cnd3l3iz48qcrn5tl). Look over the codebook to learn a little bit about the data you will be working with.
 
-* [Click here to view/download the WHAS 500 data](https://tcu.box.com/s/vy7ita9hsrm1e312ses9tlm47w27dgyd).
+* [Click here to view/download the WHAS 500 data](https://tcu.box.com/s/vy7ita9hsrm1e312ses9tlm47w27dgyd). 
 
 # Task 2
 
