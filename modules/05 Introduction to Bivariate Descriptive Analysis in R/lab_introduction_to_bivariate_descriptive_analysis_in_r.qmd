@@ -1,7 +1,7 @@
 ---
 title: "Lab: Introduction to Bivariate Descriptive Analysis in R"
 author: Brad Cannell
-date-modified: 2026-02-08
+date-modified: 2026-02-17
 format:
   html:
     embed-resources: true
