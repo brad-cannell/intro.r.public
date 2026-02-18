@@ -188,22 +188,8 @@ census |>
 Create a bar graph depicting the number of states in each region.
 
 ```{r}
-plot <- ggplot(census) +
-  geom_bar(aes(x = region_f))
-```
-
-```{r}
-plot_2 <- plot +
-  theme_bw()
-```
-
-```{r}
 ggplot(census) +
-  geom_point(aes(x = pop, y = pop65, color = region_f))
-```
-
-```{r}
-table(census$region_f)
+  geom_bar(aes(x = region_f))
 ```
 
 ### Notes for students
@@ -595,14 +581,14 @@ class |>
 
 ```{r}
 class |> 
-  filter(!is.na(weight)) |> 
+  # filter(!is.na(weight)) |> 
   ggplot() +
     geom_boxplot(aes(y = weight))
 ```
 
 ```{r}
 class |> 
-  filter(!is.na(gpa)) |> 
+  # filter(!is.na(gpa)) |> 
   ggplot() +
     geom_boxplot(aes(y = gpa))
 ```
