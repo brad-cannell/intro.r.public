@@ -25,14 +25,14 @@ As you may already know, we provide short-term mental health counseling services
 
 Click the link below to download the raw data file to your computer:
 
-[ntrhd_clients_may.csv](https://www.dropbox.com/s/i1myxu7u10uqz2l/ntrhd_clients_may.csv?dl=1)
+[ntrhd_clients_may.csv](https://tcu.box.com/s/bo95bfkrcn7j4c80ms75151bbqya5i60)
 
 # Task 2
 
 Import **ntrhd_clients_may.csv** into your R global environment as **clients_may**.
 
 ```{r}
-clients_may <- read_csv("/Users/bradcannell/Dropbox/Datasets/NTRHD Clients/ntrhd_clients_may.csv")
+clients_may <- read_csv('/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/NTRHD Clients/ntrhd_clients_may.csv')
 ```
 
 # Task 3
@@ -224,10 +224,18 @@ What percentage of May clients had a “yes” response to any of the alcohol dr
 
 After completing all tasks above, the **clients_may_dedup** data frame contains ____ rows and ____ columns. 
 
+```{r}
+dim(clients_may_dedup)
+```
+
 * After completing all tasks above, the **clients_may_dedup** data frame contains 34 rows and 14 columns.
 
 ## Question 6
 
 After completing all tasks above, the ninth column in the **clients_may_dedup** data frame is ____.
+
+```{r}
+select(clients_may_dedup, 9) |> names()
+```
 
 * After completing all tasks above, the ninth column in the **clients_may_dedup** data frame is **drink_blackout**.
