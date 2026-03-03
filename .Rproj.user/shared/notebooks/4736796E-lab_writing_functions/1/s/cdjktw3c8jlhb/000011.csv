@@ -1,6 +1,0 @@
-"0","study_data |> "
-"0","  summarise("
-"0","    mean   = mean(bmi, na.rm = TRUE),"
-"0","    median = median(bmi, na.rm = TRUE),"
-"0","    sd     = sd(bmi, na.rm = TRUE)"
-"0","  )"

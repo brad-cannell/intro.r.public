@@ -1,6 +1,0 @@
-"0","study_data |> "
-"0","  summarise("
-"0","    mean   = mean(systolic_bp, na.rm = TRUE),"
-"0","    median = median(systolic_bp, na.rm = TRUE),"
-"0","    sd     = sd(systolic_bp, na.rm = TRUE)"
-"0","  )"
