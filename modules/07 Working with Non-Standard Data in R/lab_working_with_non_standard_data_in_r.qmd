@@ -1,7 +1,7 @@
 ---
-title: "Lab: Working with Non-standard Data"
+title: "Lab: Working with Non-Standard Data in R"
 author: Brad Cannell
-date-modified: 2026-02-08
+date-modified: 2026-03-08
 format:
   html:
     embed-resources: true
@@ -27,16 +27,16 @@ A local hospital asked the NTRHD to survey a random sample of its patients about
 
 Click the link below to download the raw data file to your computer:
 
-[hospital_survey.csv](https://www.dropbox.com/s/aqnarnes5fh8udf/hospital_survey.csv?dl=1)
+[hospital_survey.csv](https://tcu.box.com/s/un0dgxpz256579i2kbbaotlbador3brx)
 
-[Click here to view and/or download the data dictionary](https://www.dropbox.com/s/d2cq63eliif2bc7/Codebook%20for%20Hospital%20Survey%20Data.pdf?dl=0).
+[Click here to view and/or download the data dictionary](https://tcu.box.com/s/929a4m8o7l3fc61cnb1f15rz5znkakce).
 
 # Task 2
 
 Import **hospital_survey.csv** into your R global environment as **hospital**.
 
 ```{r}
-hospital <- read_csv("/Users/bradcannell/Dropbox/Datasets/Hospital Survey/hospital_survey.csv")
+hospital <- read_csv('/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Hospital Survey/hospital_survey.csv')
 ```
 
 # Task 3
