@@ -1,7 +1,7 @@
 ---
-title: "Lab: Conditional Operations"
+title: "Lab: Conditional Operations in R"
 author: Brad Cannell
-date-modified: 2026-02-08
+date-modified: 2026-03-10
 format:
   html:
     embed-resources: true
@@ -23,16 +23,16 @@ library(stringr)
 
 In this lab we will practice working with date variables, calculating length variables, using conditional operations, recoding missing values, and using Boolean logic. The data set we will use is the Class Survey Data 5141 data set. Additionally, you will also need the codebook, which is named Class Survey Data Codebook. Both are available via the following links:
 
-* [Click here to download the data](https://www.dropbox.com/s/70q553h37cacjka/Class%20Survey%205141.csv?dl=1).
+* [Click here to download the data](https://tcu.box.com/s/nalectv75gnfsoffui7gdj6s4jxxyaaw).
 
-* [Click here to view the codebook](https://www.dropbox.com/s/kjyfq8cfur0hzdp/5313%20-%205314%20Day%20One%20Survey%20Codebook.pdf?dl=0).
+* [Click here to view the codebook](https://tcu.box.com/s/2urnv4y1nwrlj8z60bernll6qzpmypzo).
 
 # Task 1
 
 Import **Class Survey 5141.csv** into your R global environment as **class_survey**.
 
 ```{r}
-class_survey <- read_csv("/Users/bradcannell/Dropbox/Datasets/Class Survey/Class Survey 5141.csv")
+class_survey <- read_csv('/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Class Survey/Class Survey 5141.csv')
 ```
 
 ```{r}
