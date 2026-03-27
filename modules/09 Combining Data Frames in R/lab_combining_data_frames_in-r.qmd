@@ -1,7 +1,7 @@
 ---
-title: "Lab: Working with Multiple Data Frames"
+title: "Lab: Combining Data Frames in R"
 author: Brad Cannell
-date-modified: 2026-02-08
+date-modified: 2026-03-27
 format:
   html:
     embed-resources: true
@@ -23,7 +23,7 @@ library(ggplot2)
 
 This week, we will practice combining data frames. This will include using real health data from the National Health and Nutrition Examination Survey (NHANES). NHANES data is publicly available via the CDC website. There are different data sets corresponding to demographics, laboratory data, questionnaire data, and examination data. First, however, we will practice by combining data about three different cities — each stored in a separate sheet of a single Excel file. 
 
-* [Click here to download city_ses.xlsx](https://www.dropbox.com/s/6nt00hmdzfdigp3/city_ses.xlsx?dl=1).
+* [Click here to download city_ses.xlsx](https://tcu.box.com/s/213tdtqnnyezp62z3vmyclkqx390frd1).
 
 # Task 1
 
@@ -31,21 +31,21 @@ Please download **cities_ses.xlsx** and import all three sheets (Houston, Atlant
 
 ```{r}
 houston <- read_excel(
-  "/Users/bradcannell/Dropbox/Datasets/Cities SES/city_ses.xlsx",
+  '/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Cities SES/city_ses.xlsx',
   sheet = "Houston"
 )
 ```
 
 ```{r}
 atlanta <- read_excel(
-  "/Users/bradcannell/Dropbox/Datasets/Cities SES/city_ses.xlsx",
+  '/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Cities SES/city_ses.xlsx',
   sheet = "Atlanta"
 )
 ```
 
 ```{r}
 charlotte <- read_excel(
-  "/Users/bradcannell/Dropbox/Datasets/Cities SES/city_ses.xlsx",
+  '/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Cities SES/city_ses.xlsx',
   sheet = "Charlotte"
 )
 ```
@@ -145,7 +145,7 @@ Please name your data frames to match the names of the data sets on the NHANES w
 
 ```{r}
 # Demographics
-demo_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/DEMO_J.XPT")
+demo_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/DEMO_J.xpt")
 ```
 
 ```{r}
@@ -155,7 +155,7 @@ dim(demo_j)
 
 ```{r}
 # Medical Conditions
-mcq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/MCQ_J.XPT")
+mcq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/MCQ_J.xpt")
 ```
 
 ```{r}
@@ -165,7 +165,7 @@ dim(mcq_j)
 
 ```{r}
 # Smoking - Cigarette Use
-smq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Nhanes/2017-2018/SMQ_J.XPT")
+smq_j <- read_xpt("https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/SMQ_J.xpt")
 ```
 
 ```{r}
@@ -187,7 +187,7 @@ Which data frame contains 6,724 rows?
 
 # Task 7
 
-Familiarize yourself with the codebook for the data set **smq_j**, which is available on the [NHANES website](https://wwwn.cdc.gov/nchs/nhanes/search/datapage.aspx?Component=Questionnaire&CycleBeginYear=2017).
+Familiarize yourself with the codebook for the data set **smq_j**, which is available on the [NHANES website](https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2017/DataFiles/SMQ_J.htm).
 
 ## Question 6
 
