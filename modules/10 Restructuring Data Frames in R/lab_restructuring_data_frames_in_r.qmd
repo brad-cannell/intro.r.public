@@ -1,7 +1,7 @@
 ---
 title: "Lab: Restructuring Data Frames"
 author: Brad Cannell
-date-modified: 2026-02-08
+date-modified: 2026-04-03
 format:
   html:
     embed-resources: true
@@ -27,16 +27,16 @@ library(ggplot2)
 
 This week, we will practice restructuring data frames. We will do so using a couple of different data sets:
 
-* [Click here to download dfwtemps2012.sas7bdat](https://www.dropbox.com/s/ok5athwxaecq3r8/dfwtemps2012.sas7bdat?dl=1). This data set contains the average daily temperature for Dallas, TX in the year 2012.
+* [Click here to download dfwtemps2012.sas7bdat](https://tcu.box.com/s/1uj0a4uoiox3d3aybtt6ampgxp6v1ig0). This data set contains the average daily temperature for Dallas, TX in the year 2012.
 
-* [Click here to download epcr_multi_treat.rds](https://www.dropbox.com/s/ax6cq3qo56jdrcl/epcr_multi_treat.rds?dl=1). This data is from a local Emergency Medical Services (EMS) provider’s Electronic Patient Care Reporting (EPCR) system. Each row in the EPCR data represents a unique 911 emergency response, but not a unique person. Each person has exactly two rows.
+* [Click here to download epcr_multi_treat.rds](https://tcu.box.com/s/bdkk8k5hxib4xqwmzwhstu6cgl6km24m). This data is from a local Emergency Medical Services (EMS) provider’s Electronic Patient Care Reporting (EPCR) system. Each row in the EPCR data represents a unique 911 emergency response, but not a unique person. Each person has exactly two rows.
 
 # Task 1
 
 Please download **dfwtemps2012.sas7bdat**, import it into your R global environment as **temps_2012** and view the data.
 
 ```{r}
-temps_2012 <- read_sas("/Users/bradcannell/Dropbox/Datasets/Average Temperatures/dfwtemps2012.sas7bdat")
+temps_2012 <- read_sas('/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/Average Temperatures/dfwtemps2012.sas7bdat')
 ```
 
 ```{r}
@@ -236,7 +236,7 @@ What is the mean value of **temp_celsius** (rounded to the nearest integer)?
 Please download **epcr_multi_treat.rds**, import it into your R global environment as **epcr_multi_treat** and view the data.
 
 ```{r}
-epcr_multi_treat <- read_rds("/Users/bradcannell/Dropbox/Datasets/epcr/epcr_multi_treat.Rds")
+epcr_multi_treat <- read_rds('/Users/bradcannell/Library/CloudStorage/Box-Box/Datasets/epcr/epcr_multi_treat.rds')
 ```
 
 ```{r}
