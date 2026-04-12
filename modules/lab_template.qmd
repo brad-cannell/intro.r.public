@@ -69,7 +69,9 @@ library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
 
 # Overview
 
-Provide a brief narrative overview of the lab scenario here. Describe the context — the organization, dataset, or public health problem — and give learners a clear sense of what they will accomplish by the end of the lab. Two to four sentences is typically sufficient.
+The Epi-Workbench Research Consortium (EWBRC) is a fictional public health research organization used throughout Epi-Workbench labs. Scenarios are set within EWBRC to give learners a consistent institutional context across labs.
+
+Provide a brief narrative overview of the lab scenario here. Describe the public health problem or research question EWBRC is working on, the dataset being used, and what learners will accomplish by the end of the lab. Two to four sentences is typically sufficient.
 
 
 # Task 1
