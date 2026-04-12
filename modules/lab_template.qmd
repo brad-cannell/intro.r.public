@@ -1,36 +1,65 @@
 ---
-title: "Lab: Module Name"
+title: "Lab: Lesson Name"
+author: "Author Name"
+date-modified: today
 format:
   html:
     embed-resources: true
 ---
 
-# 🛑 Formatting (delete this section before posting to Canvas) 🛑
+# 🛑 Formatting guide (delete this section before posting to the LMS) 🛑
 
-1. Please name this file `lab_module_name.qmd`. For example, lab_writing_functions.qmd for the Writing Functions module.
+## File naming
 
-2. The Overview section, each task number, and each question number should be written as a level-one header (e.g., `# Overview` and `# Task 1`).
+Name this file using the convention `lab_lesson_name.qmd`. For example, `lab_introduction_to_writing_functions_in_r.qmd` for the Introduction to Writing Functions in R lesson.
 
-3. All R code being run, should be written into R code chunks.
+## YAML header
 
-4. All R code being discussed in the text (but not run) should be written inline (i.e., placed inside backticks). For example, "Run `install.packages("dplyr")` to install the `dplyr` package.".
+The YAML header should always include `title`, `author`, and `date-modified`. The `format` block should always include `embed-resources: true` so that the rendered HTML file is self-contained.
 
-5. R package names being discussed in the text should be formatted as code (e.g., "...the `dplyr` package...).
+## Header hierarchy
 
-6. When functions are discussed in the text, they should be formatted as code and empty parentheses added to the end of the function name (e.g., "The `tibble()` function can be used to create data frames…").
+Use the following header levels consistently throughout the lab:
 
-7. Data set and data frame names, variable names, and other key words should be written with **bold** text (e.g., "Please download **chocolate study 1.xls**".
+- `# Load packages` — level-one header (appears once, at the top)
+- `# Overview` — level-one header (appears once, after Load packages)
+- `# Task N` — level-one header for each task (e.g., `# Task 1`, `# Task 2`)
+- `## Notes for students` — level-two header, used after code chunks when explanation is needed
+- `## Question N` — level-two header for each follow-up question (e.g., `## Question 1`)
 
-8. There should be one line break (return) immediately above all headers.
+There should be one blank line immediately above all headers.
 
-9. There should be one line break (return) immediately above each code chunk. 
+## Inline code and formatting conventions
 
-10. There should be at least one line break (return) immediately below each code chunk. If the code chunk is immediately followed by a level-one header, then there will be two line breaks.
+- All R code being **run** should be placed in R code chunks.
+- All R code being **discussed in text** (but not run) should be written inline using backticks. For example: "Run `install.packages("dplyr")` in the R console."
+- R **package names** discussed in text should be formatted as inline code (e.g., "the `dplyr` package").
+- **Function names** discussed in text should be formatted as inline code with empty parentheses appended (e.g., "the `mutate()` function").
+- **Data frame names**, **variable names**, **file names**, and other key terms should be written in **bold** (e.g., "the **clients_may** data frame", "please download **study_data.csv**").
+
+## Spacing around code chunks
+
+- There should be one blank line immediately above each code chunk.
+- There should be at least one blank line immediately below each code chunk.
+- If a code chunk is immediately followed by a level-one header (`#`), there should be two blank lines below the code chunk.
+
+## Notes for students
+
+Use a `## Notes for students` section after a code chunk when you want to explain *why* the code works the way it does, flag common mistakes, or connect the current concept to something learners will see later. Notes should be written as a numbered list. Each note should be at least one full sentence. Notes are not required after every code chunk — use them when they add genuine value.
+
+## Question types
+
+Questions follow immediately after the task (or code chunk) they assess. Supported question types include:
+
+- **Fill-in-the-blank / numerical response:** State the question, then provide the answer as a bullet (see Question 1 example below).
+- **Multiple choice with distractors:** Present 3–4 code chunks, each preceded by a comment explaining whether it is correct or incorrect and why (see Question 2 example below). Incorrect options should reflect plausible mistakes learners might make.
+
+---
 
 
 # Load packages
 
-Remember, it's considered a best practice to load all the packages that your file will use up at the top of the file. If you have not yet installed a package, you will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, you would run `install.packages("dplyr")`. However, you typically **do not** want to type the code to install the package here in your Quarto file because you only need to install the package once on a given computer. Not every time you run your R code.
+Remember, it's considered a best practice to load all the packages that our file will use up at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
 
 ```{r}
 #| label: load-packages
@@ -40,48 +69,111 @@ library(dplyr, warn.conflicts = FALSE) # The "warn.conflicts" part is optional
 
 # Overview
 
-Here is an overview of what we will cover in this lab. You will be talking about the purpose of the code below during the live lab warm-up session; however, some written material here will probably be helpful to students who are reviewing the code later, outside of the lab session.  
+Provide a brief narrative overview of the lab scenario here. Describe the context — the organization, dataset, or public health problem — and give learners a clear sense of what they will accomplish by the end of the lab. Two to four sentences is typically sufficient.
 
 
 # Task 1
 
-Copy and paste the task text from the Word document. Often, task 1 asks students to download an external data set.
+Task 1 typically asks learners to simulate data using `tribble()` or another inline method, or to download an external data file. If downloading, provide clearly labeled links:
 
-* [data set 1](link)   
-* [data set 1](link)
-
-
-# Task 2
-
-Task 2 often asks students to import some data.
+* [data_file_1.csv](link)
+* [data_file_2.csv](link)
 
 ```{r}
-df <- read_function("path")
+df <- tribble(
+  ~var1, ~var2, ~var3,
+  "a",   1,     TRUE,
+  "b",   2,     FALSE
+)
 ```
 
 ## Notes for students
 
-1. We may choose to add notes immediately below R code chunks that expound upon the code above.
-2. The notes should be written as a numbered list and should follow the formatting rules written at the top of this Rmd document. 
+1. Explain something important about the code above that a learner might not immediately understand. What does it do? Why was this approach chosen over an alternative?
 
+2. Add a second note if there is another concept worth highlighting. If there is nothing substantive to add, omit the Notes for students section entirely.
+
+
+# Task 2
+
+Task 2 often asks learners to inspect the structure of the data they just created or imported. Use the `str()` or `glimpse()` functions.
+
+```{r}
+glimpse(df)
+```
 
 ## Question 1
 
-Question 1 often asks students to list the number of rows and columns in the data. It's easy and helps make sure they are starting with the correct data. Typically, the question text will be bulleted and written twice. The first bullet will contain the question text as it is written in the Word document. The second bullet will contain the correct answer. 
+*Example of a fill-in-the-blank / numerical response question.*
 
-The **study_data** data frame contains ____ rows and ____ columns.
+The **df** data frame contains ____ rows and ____ columns.
 
-* The **study_data** data frame contains 189 rows and 15 columns.
+* The **df** data frame contains 2 rows and 3 columns.
+
+
+# Task 3
+
+Subsequent tasks ask learners to perform data management steps, run analyses, or create visualizations — depending on the topic of the lab. Each task should require learners to write and run code. Tasks should build on one another sequentially.
+
+```{r}
+#| eval: false
+
+# Example code chunk — replace with task-specific code.
+df |>
+  mutate(new_var = var2 * 2)
+```
 
 ## Question 2
 
-See Canvas. There are no R calculations for this question.
+*Example of a multiple-choice question with distractors.*
+
+Which of the following code chunks will correctly create a new column called **new_var** that doubles the values in **var2**?
+
+```{r}
+#| eval: false
+
+# Incorrect: This code overwrites df with a vector instead of a modified data frame.
+df <- df$var2 * 2
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: The mutate() function requires a data frame as input. Passing df$var2
+# directly discards the rest of the data frame.
+mutate(df$var2, new_var = var2 * 2)
+```
+
+```{r}
+#| eval: false
+
+# Correct.
+df <- df |>
+  mutate(new_var = var2 * 2)
+```
+
+```{r}
+#| eval: false
+
+# Correct. This is equivalent to the pipe-based version above.
+df <- mutate(df, new_var = var2 * 2)
+```
 
 
-# Text for question feedback blocks
+# Task 4
 
-Please make sure you understand why this is the correct answer. You may use the "Previous" button below to update your answer if your original answer was incorrect. 
+Continue adding tasks as needed. There is no fixed number of tasks required, but labs typically include between 6 and 14 tasks. Each task should be focused and completable in an hour.
 
-Click the "Next" button below to move on to the next question. 
+```{r}
+# Task code here
+```
 
+## Notes for students
 
+1. Add notes when helpful. Omit this section when there is nothing substantive to add.
+
+## Question 3
+
+Add a follow-up question here. At least one question per task is typical, though not every task requires a question.
+
+* Correct answer here.
