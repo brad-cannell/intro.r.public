@@ -26,71 +26,71 @@ You are a data analyst in the Environmental Health Division of the Epi-Workbench
 Create the air quality and respiratory health dataset that your team will use throughout this lab. Run the code below to create a tibble called **air_quality_health** containing 60 rows of quarterly monitoring data — PM2.5 concentrations, ozone levels, and respiratory visit counts — for 20 stations across four regions. After creating the dataset, print it to confirm it loaded correctly.
 
 ```{r}
-foodborne_surveillance <- tribble(
-  ~county_id,  ~state_cluster, ~month, ~salmonella_cases, ~ecoli_cases, ~hosp_rate,
-  "CTY-NE1",   "Northeast",    "M1",   8L,                3L,           12.4,
-  "CTY-NE1",   "Northeast",    "M2",   11L,               5L,           15.8,
-  "CTY-NE1",   "Northeast",    "M3",   14L,               6L,           18.2,
-  "CTY-NE2",   "Northeast",    "M1",   6L,                2L,           10.1,
-  "CTY-NE2",   "Northeast",    "M2",   9L,                4L,           13.7,
-  "CTY-NE2",   "Northeast",    "M3",   12L,               5L,           44.6,
-  "CTY-NE3",   "Northeast",    "M1",   7L,                3L,           11.5,
-  "CTY-NE3",   "Northeast",    "M2",   NA,                4L,           14.2,
-  "CTY-NE3",   "Northeast",    "M3",   13L,               6L,           17.0,
-  "CTY-NE4",   "Northeast",    "M1",   5L,                2L,           9.3,
-  "CTY-NE4",   "Northeast",    "M2",   10L,               4L,           12.9,
-  "CTY-NE4",   "Northeast",    "M3",   11L,               5L,           16.1,
-  "CTY-NE5",   "Northeast",    "M1",   7L,                3L,           10.8,
-  "CTY-NE5",   "Northeast",    "M2",   12L,               5L,           14.6,
-  "CTY-NE5",   "Northeast",    "M3",   10L,               4L,           15.4,
-  "CTY-SE1",   "Southeast",    "M1",   NA,                6L,           20.3,
-  "CTY-SE1",   "Southeast",    "M2",   18L,               8L,           24.1,
-  "CTY-SE1",   "Southeast",    "M3",   22L,               10L,          28.7,
-  "CTY-SE2",   "Southeast",    "M1",   14L,               5L,           18.6,
-  "CTY-SE2",   "Southeast",    "M2",   19L,               7L,           23.4,
-  "CTY-SE2",   "Southeast",    "M3",   25L,               9L,           30.2,
-  "CTY-SE3",   "Southeast",    "M1",   12L,               4L,           17.1,
-  "CTY-SE3",   "Southeast",    "M2",   16L,               6L,           21.8,
-  "CTY-SE3",   "Southeast",    "M3",   21L,               8L,           NA,
-  "CTY-SE4",   "Southeast",    "M1",   15L,               5L,           19.5,
-  "CTY-SE4",   "Southeast",    "M2",   20L,               8L,           25.0,
-  "CTY-SE4",   "Southeast",    "M3",   26L,               10L,          31.4,
-  "CTY-SE5",   "Southeast",    "M1",   13L,               4L,           18.0,
-  "CTY-SE5",   "Southeast",    "M2",   17L,               7L,           22.6,
-  "CTY-SE5",   "Southeast",    "M3",   23L,               9L,           29.1,
-  "CTY-MW1",   "Midwest",      "M1",   10L,               3L,           13.5,
-  "CTY-MW1",   "Midwest",      "M2",   14L,               5L,           16.8,
-  "CTY-MW1",   "Midwest",      "M3",   17L,               7L,           20.4,
-  "CTY-MW2",   "Midwest",      "M1",   8L,                2L,           11.2,
-  "CTY-MW2",   "Midwest",      "M2",   12L,               NA,           15.0,
-  "CTY-MW2",   "Midwest",      "M3",   15L,               6L,           18.3,
-  "CTY-MW3",   "Midwest",      "M1",   9L,                3L,           12.0,
-  "CTY-MW3",   "Midwest",      "M2",   13L,               5L,           16.1,
-  "CTY-MW3",   "Midwest",      "M3",   16L,               6L,           19.5,
-  "CTY-MW4",   "Midwest",      "M1",   7L,                2L,           10.5,
-  "CTY-MW4",   "Midwest",      "M2",   11L,               4L,           14.3,
-  "CTY-MW4",   "Midwest",      "M3",   14L,               5L,           17.6,
-  "CTY-MW5",   "Midwest",      "M1",   8L,                3L,           11.8,
-  "CTY-MW5",   "Midwest",      "M2",   12L,               4L,           15.5,
-  "CTY-MW5",   "Midwest",      "M3",   15L,               6L,           18.9,
-  "CTY-SW1",   "Southwest",    "M1",   5L,                2L,           8.7,
-  "CTY-SW1",   "Southwest",    "M2",   8L,                3L,           11.4,
-  "CTY-SW1",   "Southwest",    "M3",   11L,               4L,           14.0,
-  "CTY-SW2",   "Southwest",    "M1",   6L,                2L,           9.5,
-  "CTY-SW2",   "Southwest",    "M2",   42L,               3L,           12.8,
-  "CTY-SW2",   "Southwest",    "M3",   12L,               5L,           15.3,
-  "CTY-SW3",   "Southwest",    "M1",   4L,                1L,           8.2,
-  "CTY-SW3",   "Southwest",    "M2",   7L,                3L,           10.6,
-  "CTY-SW3",   "Southwest",    "M3",   10L,               4L,           13.1,
-  "CTY-SW4",   "Southwest",    "M1",   5L,                2L,           9.0,
-  "CTY-SW4",   "Southwest",    "M2",   9L,                3L,           NA,
-  "CTY-SW4",   "Southwest",    "M3",   NA,                5L,           14.5,
-  "CTY-SW5",   "Southwest",    "M1",   6L,                2L,           9.8,
-  "CTY-SW5",   "Southwest",    "M2",   10L,               4L,           12.2,
-  "CTY-SW5",   "Southwest",    "M3",   11L,               4L,           14.8
+air_quality_health <- tribble(
+  ~station_id, ~region,      ~quarter, ~pm25,  ~ozone, ~resp_visits,
+  "STN-NE1",   "Northeast",  "Q1",     12.3,   45.2,   85L,
+  "STN-NE1",   "Northeast",  "Q2",     15.8,   52.1,   92L,
+  "STN-NE1",   "Northeast",  "Q3",     18.1,   61.4,   110L,
+  "STN-NE2",   "Northeast",  "Q1",     9.7,    40.8,   72L,
+  "STN-NE2",   "Northeast",  "Q2",     14.2,   48.9,   88L,
+  "STN-NE2",   "Northeast",  "Q3",     16.5,   55.3,   95L,
+  "STN-NE3",   "Northeast",  "Q1",     11.0,   43.1,   78L,
+  "STN-NE3",   "Northeast",  "Q2",     NA,     50.7,   90L,
+  "STN-NE3",   "Northeast",  "Q3",     19.4,   58.2,   105L,
+  "STN-NE4",   "Northeast",  "Q1",     8.5,    38.6,   65L,
+  "STN-NE4",   "Northeast",  "Q2",     13.1,   47.3,   82L,
+  "STN-NE4",   "Northeast",  "Q3",     17.9,   56.8,   98L,
+  "STN-NE5",   "Northeast",  "Q1",     10.6,   42.5,   76L,
+  "STN-NE5",   "Northeast",  "Q2",     16.0,   51.4,   94L,
+  "STN-NE5",   "Northeast",  "Q3",     41.7,   63.9,   155L,
+  "STN-SE1",   "Southeast",  "Q1",     NA,     54.3,   120L,
+  "STN-SE1",   "Southeast",  "Q2",     22.6,   62.8,   138L,
+  "STN-SE1",   "Southeast",  "Q3",     28.3,   70.1,   165L,
+  "STN-SE2",   "Southeast",  "Q1",     18.4,   50.6,   112L,
+  "STN-SE2",   "Southeast",  "Q2",     24.1,   59.4,   142L,
+  "STN-SE2",   "Southeast",  "Q3",     30.5,   68.7,   178L,
+  "STN-SE3",   "Southeast",  "Q1",     16.9,   48.2,   105L,
+  "STN-SE3",   "Southeast",  "Q2",     21.3,   57.6,   130L,
+  "STN-SE3",   "Southeast",  "Q3",     26.8,   NA,     160L,
+  "STN-SE4",   "Southeast",  "Q1",     19.7,   52.9,   118L,
+  "STN-SE4",   "Southeast",  "Q2",     25.4,   61.3,   148L,
+  "STN-SE4",   "Southeast",  "Q3",     31.2,   72.5,   185L,
+  "STN-SE5",   "Southeast",  "Q1",     17.5,   49.8,   108L,
+  "STN-SE5",   "Southeast",  "Q2",     23.0,   58.1,   135L,
+  "STN-SE5",   "Southeast",  "Q3",     29.6,   69.4,   172L,
+  "STN-MW1",   "Midwest",    "Q1",     14.8,   36.2,   68L,
+  "STN-MW1",   "Midwest",    "Q2",     19.3,   44.5,   86L,
+  "STN-MW1",   "Midwest",    "Q3",     22.7,   50.8,   102L,
+  "STN-MW2",   "Midwest",    "Q1",     11.5,   NA,     58L,
+  "STN-MW2",   "Midwest",    "Q2",     16.8,   41.3,   75L,
+  "STN-MW2",   "Midwest",    "Q3",     20.1,   48.6,   90L,
+  "STN-MW3",   "Midwest",    "Q1",     13.2,   34.9,   62L,
+  "STN-MW3",   "Midwest",    "Q2",     17.6,   42.7,   80L,
+  "STN-MW3",   "Midwest",    "Q3",     21.4,   49.1,   96L,
+  "STN-MW4",   "Midwest",    "Q1",     10.3,   32.8,   55L,
+  "STN-MW4",   "Midwest",    "Q2",     15.1,   40.6,   73L,
+  "STN-MW4",   "Midwest",    "Q3",     18.9,   46.3,   88L,
+  "STN-MW5",   "Midwest",    "Q1",     12.0,   35.5,   60L,
+  "STN-MW5",   "Midwest",    "Q2",     16.4,   43.1,   78L,
+  "STN-MW5",   "Midwest",    "Q3",     19.8,   47.9,   92L,
+  "STN-WE1",   "West",       "Q1",     7.2,    28.4,   42L,
+  "STN-WE1",   "West",       "Q2",     10.8,   35.6,   55L,
+  "STN-WE1",   "West",       "Q3",     14.3,   42.1,   68L,
+  "STN-WE2",   "West",       "Q1",     8.9,    30.7,   48L,
+  "STN-WE2",   "West",       "Q2",     38.4,   37.9,   195L,
+  "STN-WE2",   "West",       "Q3",     15.6,   44.8,   75L,
+  "STN-WE3",   "West",       "Q1",     6.1,    29.1,   40L,
+  "STN-WE3",   "West",       "Q2",     9.5,    34.2,   50L,
+  "STN-WE3",   "West",       "Q3",     13.0,   41.5,   65L,
+  "STN-WE4",   "West",       "Q1",     7.8,    31.3,   45L,
+  "STN-WE4",   "West",       "Q2",     11.4,   36.8,   58L,
+  "STN-WE4",   "West",       "Q3",     NA,     43.7,   70L,
+  "STN-WE5",   "West",       "Q1",     8.3,    30.0,   46L,
+  "STN-WE5",   "West",       "Q2",     12.1,   38.4,   60L,
+  "STN-WE5",   "West",       "Q3",     14.9,   45.2,   72L
 )
 
-foodborne_surveillance
+air_quality_health
 ```
 
 # Task 2
@@ -111,50 +111,50 @@ It turns out that another analyst wrote a script to calculate the PM2.5 summary 
 
 ```{r}
 # Block 1: Northeast
-northeast_summary_v2 <- foodborne_surveillance |>
-  filter(state_cluster == "Northeast") |>
+northeast_summary_v2 <- air_quality_health |>
+  filter(region == "Northeast") |>
   summarize(
-    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
-    median_salmonella = median(salmonella_cases, na.rm = TRUE),
-    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
   )
 northeast_summary_v2
 ```
 
 ```{r}
 # Block 2: Southeast
-southeast_summary_v2 <- foodborne_surveillance |>
-  filter(state_cluster == "Northeast") |>
+southeast_summary_v2 <- air_quality_health |>
+  filter(region == "Southeast") |>
   summarize(
-    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
-    median_salmonella = median(salmonella_cases, na.rm = TRUE),
-    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
   )
 southeast_summary_v2
 ```
 
 ```{r}
 # Block 3: Midwest
-midwest_summary_v2 <- foodborne_surveillance |>
-  filter(state_cluster == "Midwest") |>
+midwest_summary_v2 <- air_quality_health |>
+  filter(region == "Southeast") |>
   summarize(
-    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
-    median_salmonella = median(salmonella_cases, na.rm = TRUE),
-    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
   )
 midwest_summary_v2
 ```
 
 ```{r}
-# Block 4: Southwest
-southwest_summary_v2 <- foodborne_surveillance |>
-  filter(state_cluster == "Southwest") |>
+# Block 4: West
+west_summary_v2 <- air_quality_health |>
+  filter(region == "West") |>
   summarize(
-    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
-    median_salmonella = median(salmonella_cases, na.rm = TRUE),
-    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
   )
-southwest_summary_v2
+west_summary_v2
 ```
 
 ## Question 2
