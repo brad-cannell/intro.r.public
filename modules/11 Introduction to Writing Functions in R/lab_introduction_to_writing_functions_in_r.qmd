@@ -1,6 +1,6 @@
 ---
 title: "Lab: Introduction to Writing Functions in R"
-author: "Epi-Workbench"
+author: "Brad Cannell"
 date-modified: 2026-04-14
 format:
   html:
