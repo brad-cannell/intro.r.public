@@ -1,0 +1,328 @@
+---
+title: "Culminating Exercise: Introduction to Writing Functions in R"
+author: "[Your Name]"
+date-modified: [Enter Date]
+format:
+  html:
+    embed-resources: true
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+```
+
+
+# Overview
+
+You are a data analyst in the Infectious Disease Surveillance Division of the Epi-Workbench Research Consortium (EWBRC), where your team tracks foodborne illness outbreaks and laboratory-confirmed case counts across a network of county health departments organized into four state clusters. A junior analyst recently completed a monthly report summarizing case counts and hospitalization rates by pathogen and state cluster, but the script they submitted for review repeats nearly identical blocks of analysis — computing the same summary statistics, applying the same filters, referencing the same logic — over and over, with only the pathogen name swapped in each time. The team lead has flagged the script as fragile and difficult to maintain, has identified a subtle bug introduced by the copy-and-paste approach, and has asked you to audit it and refactor the entire workflow using custom functions. By the end of this exercise, you will have built a flexible, reusable set of functions that can summarize outbreak and hospitalization data across any grouping variable or case-count column — and you will have applied those functions to a second dataset to confirm they generalize beyond the original context.
+
+
+# Task 1
+
+Create the foodborne surveillance dataset that your team will use throughout this exercise. Run the code below to create a tibble called **foodborne_surveillance** containing 60 rows of monthly reporting data. After creating the dataset, print it to confirm it loaded correctly.
+
+```{r}
+foodborne_surveillance <- tribble(
+  ~county_id,  ~state_cluster, ~month, ~salmonella_cases, ~ecoli_cases, ~hosp_rate,
+  "CTY-NE1",   "Northeast",    "M1",   8L,                3L,           12.4,
+  "CTY-NE1",   "Northeast",    "M2",   11L,               5L,           15.8,
+  "CTY-NE1",   "Northeast",    "M3",   14L,               6L,           18.2,
+  "CTY-NE2",   "Northeast",    "M1",   6L,                2L,           10.1,
+  "CTY-NE2",   "Northeast",    "M2",   9L,                4L,           13.7,
+  "CTY-NE2",   "Northeast",    "M3",   12L,               5L,           44.6,
+  "CTY-NE3",   "Northeast",    "M1",   7L,                3L,           11.5,
+  "CTY-NE3",   "Northeast",    "M2",   NA,                4L,           14.2,
+  "CTY-NE3",   "Northeast",    "M3",   13L,               6L,           17.0,
+  "CTY-NE4",   "Northeast",    "M1",   5L,                2L,           9.3,
+  "CTY-NE4",   "Northeast",    "M2",   10L,               4L,           12.9,
+  "CTY-NE4",   "Northeast",    "M3",   11L,               5L,           16.1,
+  "CTY-NE5",   "Northeast",    "M1",   7L,                3L,           10.8,
+  "CTY-NE5",   "Northeast",    "M2",   12L,               5L,           14.6,
+  "CTY-NE5",   "Northeast",    "M3",   10L,               4L,           15.4,
+  "CTY-SE1",   "Southeast",    "M1",   NA,                6L,           20.3,
+  "CTY-SE1",   "Southeast",    "M2",   18L,               8L,           24.1,
+  "CTY-SE1",   "Southeast",    "M3",   22L,               10L,          28.7,
+  "CTY-SE2",   "Southeast",    "M1",   14L,               5L,           18.6,
+  "CTY-SE2",   "Southeast",    "M2",   19L,               7L,           23.4,
+  "CTY-SE2",   "Southeast",    "M3",   25L,               9L,           30.2,
+  "CTY-SE3",   "Southeast",    "M1",   12L,               4L,           17.1,
+  "CTY-SE3",   "Southeast",    "M2",   16L,               6L,           21.8,
+  "CTY-SE3",   "Southeast",    "M3",   21L,               8L,           NA,
+  "CTY-SE4",   "Southeast",    "M1",   15L,               5L,           19.5,
+  "CTY-SE4",   "Southeast",    "M2",   20L,               8L,           25.0,
+  "CTY-SE4",   "Southeast",    "M3",   26L,               10L,          31.4,
+  "CTY-SE5",   "Southeast",    "M1",   13L,               4L,           18.0,
+  "CTY-SE5",   "Southeast",    "M2",   17L,               7L,           22.6,
+  "CTY-SE5",   "Southeast",    "M3",   23L,               9L,           29.1,
+  "CTY-MW1",   "Midwest",      "M1",   10L,               3L,           13.5,
+  "CTY-MW1",   "Midwest",      "M2",   14L,               5L,           16.8,
+  "CTY-MW1",   "Midwest",      "M3",   17L,               7L,           20.4,
+  "CTY-MW2",   "Midwest",      "M1",   8L,                2L,           11.2,
+  "CTY-MW2",   "Midwest",      "M2",   12L,               NA,           15.0,
+  "CTY-MW2",   "Midwest",      "M3",   15L,               6L,           18.3,
+  "CTY-MW3",   "Midwest",      "M1",   9L,                3L,           12.0,
+  "CTY-MW3",   "Midwest",      "M2",   13L,               5L,           16.1,
+  "CTY-MW3",   "Midwest",      "M3",   16L,               6L,           19.5,
+  "CTY-MW4",   "Midwest",      "M1",   7L,                2L,           10.5,
+  "CTY-MW4",   "Midwest",      "M2",   11L,               4L,           14.3,
+  "CTY-MW4",   "Midwest",      "M3",   14L,               5L,           17.6,
+  "CTY-MW5",   "Midwest",      "M1",   8L,                3L,           11.8,
+  "CTY-MW5",   "Midwest",      "M2",   12L,               4L,           15.5,
+  "CTY-MW5",   "Midwest",      "M3",   15L,               6L,           18.9,
+  "CTY-SW1",   "Southwest",    "M1",   5L,                2L,           8.7,
+  "CTY-SW1",   "Southwest",    "M2",   8L,                3L,           11.4,
+  "CTY-SW1",   "Southwest",    "M3",   11L,               4L,           14.0,
+  "CTY-SW2",   "Southwest",    "M1",   6L,                2L,           9.5,
+  "CTY-SW2",   "Southwest",    "M2",   42L,               3L,           12.8,
+  "CTY-SW2",   "Southwest",    "M3",   12L,               5L,           15.3,
+  "CTY-SW3",   "Southwest",    "M1",   4L,                1L,           8.2,
+  "CTY-SW3",   "Southwest",    "M2",   7L,                3L,           10.6,
+  "CTY-SW3",   "Southwest",    "M3",   10L,               4L,           13.1,
+  "CTY-SW4",   "Southwest",    "M1",   5L,                2L,           9.0,
+  "CTY-SW4",   "Southwest",    "M2",   9L,                3L,           NA,
+  "CTY-SW4",   "Southwest",    "M3",   NA,                5L,           14.5,
+  "CTY-SW5",   "Southwest",    "M1",   6L,                2L,           9.8,
+  "CTY-SW5",   "Southwest",    "M2",   10L,               4L,           12.2,
+  "CTY-SW5",   "Southwest",    "M3",   11L,               4L,           14.8
+)
+
+foodborne_surveillance
+```
+
+
+# Task 2
+
+Write a code block that filters **foodborne_surveillance** to just the `"Northeast"` state cluster and then uses `summarize()` to compute the mean, median, and max of **salmonella_cases** (handling missing values appropriately). Store the result in a variable called **northeast_summary** and print it.
+
+```{r}
+```
+
+## Question 1
+
+What is the **mean_salmonella** value for the Northeast state cluster? Round your answer to one decimal place.
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 3
+
+Another analyst wrote a script to calculate the *Salmonella* summary statistics (mean, median, and max) separately for each state cluster. The team lead is sure there is a bug in the code. Inspect the four code blocks below and identify the error.
+
+```{r}
+# Block 1: Northeast
+```
+
+```{r}
+# Block 2: Southeast
+```
+
+```{r}
+# Block 3: Midwest
+```
+
+```{r}
+# Block 4: Southwest
+```
+
+## Question 2
+
+Which code block contains the error?
+
+
+
+
+
+Fix the bug by correcting the filter value in Block 3:
+
+See our course LMS for the answer choices and submit your response.
+
+## Question 3
+
+After fixing the bug in Block 3 so that it correctly filters for the Midwest state cluster, what is the **median_salmonella** value? Round your answer to one decimal place.
+
+See our course LMS for the answer choices and submit your response.
+
+## Question 4
+
+Which of the following is the most plausible reason for the error in Block 3?
+
+See our course LMS for the answer choices and submit your response.
+
+## Question 5
+
+Match each component of an R function with its description.
+
+| Component | Description |
+|----------------------|----------------------------------------------------------------------------------|
+| Name                 | The label assigned to the function so it can be called later                     |
+| `function()` keyword | The R syntax that signals the creation of a new function                         |
+| Arguments            | The inputs listed inside the parentheses that the function accepts               |
+| Body                 | The code inside the curly braces `{ }` that executes when the function is called |
+
+
+# Task 4
+
+Write a function called `summarize_salmonella_by_cluster` that takes a single argument — the state cluster name — and returns a summary tibble containing the mean, median, and max of **salmonella_cases** for that cluster. Call your function for the `"Northeast"` state cluster to verify it produces the correct result.
+
+```{r}
+
+```
+
+## Question 6
+
+What is the **max_salmonella** value returned by `summarize_salmonella_by_cluster("Northeast")`?
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 5
+
+Refactor `summarize_salmonella_by_cluster()` into a new function called `summarize_salmonella_flagged()` that accepts a second argument, **threshold**, with a default value of `15`. The function should return the same summary statistics as before, plus an additional column called **n_high_burden** that counts the number of non-missing *Salmonella* case counts above the threshold. Call your function for the `"Northeast"` state cluster using the default threshold.
+
+```{r}
+
+```
+
+## Question 7
+
+How many high-burden *Salmonella* readings does `summarize_salmonella_flagged()` report for the `"Northeast"` state cluster using the default threshold of 15? Enter a whole number.
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 6
+
+Call `summarize_salmonella_flagged()` on the remaining three state clusters — `"Southeast"`, `"Midwest"`, and `"Southwest"` — using `10` as the threshold value. Run each call in its own code block and examine the results.
+
+```{r}
+```
+
+```{r}
+```
+
+```{r}
+```
+
+## Question 8
+
+Call `summarize_salmonella_flagged()` on the remaining three state clusters — `"Southeast"`, `"Midwest"`, and `"Southwest"` — using `10` as the threshold value. Which region had the fewest number of high-burden *Salmonella* readings?
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 7
+
+A colleague has written a function that wraps `dplyr::group_by()` and `summarize()` to compute grouped means, but it throws an error when called. Run the broken function below to see the error, then fix it.
+
+```{r}
+#| error: true
+#| eval: false
+
+
+```
+
+## Question 9
+
+Which of the following correctly fixes the broken `grouped_mean_broken()` function so that column name arguments are properly forwarded to `dplyr` verbs?
+
+
+
+
+
+Run the corrected function to verify it works:
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 8
+
+Write a function called `compute_grouped_summary` that accepts three arguments: a data frame, a grouping column, and a numeric column (both specified as bare column names). The function should compute the mean, median, and max of the numeric column for each group and return the result as a tibble. Then call the function for three different combinations: **salmonella_cases** grouped by **state_cluster**, **hosp_rate** grouped by **state_cluster**, and **salmonella_cases** grouped by **county_id**.
+
+Define the `compute_grouped_summary()` function:
+
+```{r}
+```
+
+Call the function to summarize **salmonella_cases** grouped by **state_cluster**:
+
+```{r}
+```
+
+## Question 11
+
+What is the **mean_val** for the Southwest state cluster when summarizing **salmonella_cases** by **state_cluster**? Round your answer to one decimal place.
+
+
+Call the function to summarize **hosp_rate** grouped by **state_cluster**:
+
+See our course LMS for the answer choices and submit your response.
+
+## Question 12
+
+What is the **median_val** for the Southwest state cluster when summarizing **hosp_rate** by **state_cluster**? Round your answer to one decimal place.
+
+
+Call the function to summarize **salmonella_cases** grouped by **county_id**:
+
+See our course LMS for the answer choices and submit your response.
+
+## Question 13
+
+What is the **max_val** for county CTY-SW2 when summarizing **salmonella_cases** by **county_id**?
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 9
+
+Create a new tibble called **school_gi_reports** representing gastrointestinal illness reports from school districts. Then apply `compute_grouped_summary()` to this new dataset — grouping by **grade_band** and summarizing **gi_cases** — without making any changes to the function itself.
+
+Create the **school_gi_reports** dataset:
+
+```{r}
+school_gi_reports <- tribble(
+  ~grade_band,    ~district_type, ~semester, ~gi_cases,
+  "Elementary",   "Urban",        "Fall",    34L,
+  "Elementary",   "Urban",        "Spring",  28L,
+  "Elementary",   "Suburban",     "Fall",    22L,
+  "Elementary",   "Suburban",     "Spring",  18L,
+  "Elementary",   "Rural",        "Fall",    15L,
+  "Elementary",   "Rural",        "Spring",  12L,
+  "Middle",       "Urban",        "Fall",    42L,
+  "Middle",       "Urban",        "Spring",  36L,
+  "Middle",       "Suburban",     "Fall",    30L,
+  "Middle",       "Suburban",     "Spring",  25L,
+  "Middle",       "Rural",        "Fall",    20L,
+  "Middle",       "Rural",        "Spring",  16L,
+  "High School",  "Urban",        "Fall",    55L,
+  "High School",  "Urban",        "Spring",  48L,
+  "High School",  "Suburban",     "Fall",    38L,
+  "High School",  "Suburban",     "Spring",  32L,
+  "High School",  "Rural",        "Fall",    26L,
+  "High School",  "Rural",        "Spring",  21L
+)
+```
+
+Apply `compute_grouped_summary()` to the **school_gi_reports** dataset, grouping by **grade_band** and summarizing **gi_cases**:
+
+```{r}
+```
+
+## Question 14
+
+What is the **mean_val** for the High School grade band? Round your answer to one decimal place.
+
+
+Group by **district_type** to cross-check with a different dimension:
+
+See our course LMS for the answer choices and submit your response.
+
+## Question 15
+
+What is the **max_val** for the Urban district type in the **school_gi_reports** dataset?
+
+See our course LMS for the answer choices and submit your response.
+
+## Question 16
+
+Did `compute_grouped_summary()` require any modification to work on the **school_gi_reports** dataset?
+
+See our course LMS for the answer choices and submit your response.
+
