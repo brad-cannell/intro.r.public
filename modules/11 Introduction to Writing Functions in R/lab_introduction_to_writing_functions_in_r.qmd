@@ -1,0 +1,787 @@
+---
+title: "Lab: Introduction to Writing Functions in R"
+author: "Epi-Workbench"
+date-modified: 2026-04-14
+format:
+  html:
+    embed-resources: true
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+```
+
+
+# Overview
+
+You are a data analyst in the Environmental Health Division of the Epi-Workbench Research Consortium (EWBRC), where your team monitors air quality and its relationship to respiratory health outcomes across a network of regional monitoring stations. A junior analyst recently completed a quarterly report summarizing pollution levels and respiratory clinic visits by station and region, but the script they submitted for review takes a troubling approach: rather than writing reusable code, it repeats nearly identical blocks of analysis — computing the same summary statistics, applying the same filters, referencing the same logic — over and over, with only the region name swapped in each time. The team lead has flagged the script as fragile and hard to maintain, and has asked you to audit it, identify a subtle bug introduced by the copy-and-paste approach, and then refactor the entire workflow using custom functions. By the end of this lab, you will have built a flexible, reusable set of functions that can summarize air quality and health data across any grouping variable or pollutant column — and you will have applied those functions to a second dataset to confirm they work beyond the original context.
+
+
+# Task 1
+
+Create the air quality and respiratory health dataset that your team will use throughout this lab. Run the code below to create a tibble called **air_quality_health** containing 60 rows of quarterly monitoring data — PM2.5 concentrations, ozone levels, and respiratory visit counts — for 20 stations across four regions. After creating the dataset, print it to confirm it loaded correctly.
+
+```{r}
+air_quality_health <- tribble(
+  ~station_id, ~region,      ~quarter, ~pm25,  ~ozone, ~resp_visits,
+  "STN-NE1",   "Northeast",  "Q1",     12.3,   45.2,   85L,
+  "STN-NE1",   "Northeast",  "Q2",     15.8,   52.1,   92L,
+  "STN-NE1",   "Northeast",  "Q3",     18.1,   61.4,   110L,
+  "STN-NE2",   "Northeast",  "Q1",     9.7,    40.8,   72L,
+  "STN-NE2",   "Northeast",  "Q2",     14.2,   48.9,   88L,
+  "STN-NE2",   "Northeast",  "Q3",     16.5,   55.3,   95L,
+  "STN-NE3",   "Northeast",  "Q1",     11.0,   43.1,   78L,
+  "STN-NE3",   "Northeast",  "Q2",     NA,     50.7,   90L,
+  "STN-NE3",   "Northeast",  "Q3",     19.4,   58.2,   105L,
+  "STN-NE4",   "Northeast",  "Q1",     8.5,    38.6,   65L,
+  "STN-NE4",   "Northeast",  "Q2",     13.1,   47.3,   82L,
+  "STN-NE4",   "Northeast",  "Q3",     17.9,   56.8,   98L,
+  "STN-NE5",   "Northeast",  "Q1",     10.6,   42.5,   76L,
+  "STN-NE5",   "Northeast",  "Q2",     16.0,   51.4,   94L,
+  "STN-NE5",   "Northeast",  "Q3",     41.7,   63.9,   155L,
+  "STN-SE1",   "Southeast",  "Q1",     NA,     54.3,   120L,
+  "STN-SE1",   "Southeast",  "Q2",     22.6,   62.8,   138L,
+  "STN-SE1",   "Southeast",  "Q3",     28.3,   70.1,   165L,
+  "STN-SE2",   "Southeast",  "Q1",     18.4,   50.6,   112L,
+  "STN-SE2",   "Southeast",  "Q2",     24.1,   59.4,   142L,
+  "STN-SE2",   "Southeast",  "Q3",     30.5,   68.7,   178L,
+  "STN-SE3",   "Southeast",  "Q1",     16.9,   48.2,   105L,
+  "STN-SE3",   "Southeast",  "Q2",     21.3,   57.6,   130L,
+  "STN-SE3",   "Southeast",  "Q3",     26.8,   NA,     160L,
+  "STN-SE4",   "Southeast",  "Q1",     19.7,   52.9,   118L,
+  "STN-SE4",   "Southeast",  "Q2",     25.4,   61.3,   148L,
+  "STN-SE4",   "Southeast",  "Q3",     31.2,   72.5,   185L,
+  "STN-SE5",   "Southeast",  "Q1",     17.5,   49.8,   108L,
+  "STN-SE5",   "Southeast",  "Q2",     23.0,   58.1,   135L,
+  "STN-SE5",   "Southeast",  "Q3",     29.6,   69.4,   172L,
+  "STN-MW1",   "Midwest",    "Q1",     14.8,   36.2,   68L,
+  "STN-MW1",   "Midwest",    "Q2",     19.3,   44.5,   86L,
+  "STN-MW1",   "Midwest",    "Q3",     22.7,   50.8,   102L,
+  "STN-MW2",   "Midwest",    "Q1",     11.5,   NA,     58L,
+  "STN-MW2",   "Midwest",    "Q2",     16.8,   41.3,   75L,
+  "STN-MW2",   "Midwest",    "Q3",     20.1,   48.6,   90L,
+  "STN-MW3",   "Midwest",    "Q1",     13.2,   34.9,   62L,
+  "STN-MW3",   "Midwest",    "Q2",     17.6,   42.7,   80L,
+  "STN-MW3",   "Midwest",    "Q3",     21.4,   49.1,   96L,
+  "STN-MW4",   "Midwest",    "Q1",     10.3,   32.8,   55L,
+  "STN-MW4",   "Midwest",    "Q2",     15.1,   40.6,   73L,
+  "STN-MW4",   "Midwest",    "Q3",     18.9,   46.3,   88L,
+  "STN-MW5",   "Midwest",    "Q1",     12.0,   35.5,   60L,
+  "STN-MW5",   "Midwest",    "Q2",     16.4,   43.1,   78L,
+  "STN-MW5",   "Midwest",    "Q3",     19.8,   47.9,   92L,
+  "STN-WE1",   "West",       "Q1",     7.2,    28.4,   42L,
+  "STN-WE1",   "West",       "Q2",     10.8,   35.6,   55L,
+  "STN-WE1",   "West",       "Q3",     14.3,   42.1,   68L,
+  "STN-WE2",   "West",       "Q1",     8.9,    30.7,   48L,
+  "STN-WE2",   "West",       "Q2",     38.4,   37.9,   195L,
+  "STN-WE2",   "West",       "Q3",     15.6,   44.8,   75L,
+  "STN-WE3",   "West",       "Q1",     6.1,    29.1,   40L,
+  "STN-WE3",   "West",       "Q2",     9.5,    34.2,   50L,
+  "STN-WE3",   "West",       "Q3",     13.0,   41.5,   65L,
+  "STN-WE4",   "West",       "Q1",     7.8,    31.3,   45L,
+  "STN-WE4",   "West",       "Q2",     11.4,   36.8,   58L,
+  "STN-WE4",   "West",       "Q3",     NA,     43.7,   70L,
+  "STN-WE5",   "West",       "Q1",     8.3,    30.0,   46L,
+  "STN-WE5",   "West",       "Q2",     12.1,   38.4,   60L,
+  "STN-WE5",   "West",       "Q3",     14.9,   45.2,   72L
+)
+
+air_quality_health
+```
+
+## Notes for students
+
+1. We use `tribble()` (transposed tibble) to create the dataset row-by-row, which makes it easier to read and verify each observation. The `~` symbol before each column name is required `tribble()` syntax — it tells R that these are column names, not variable references.
+2. Notice the `L` suffix on every value in the **resp_visits** column (e.g., `85L`). This tells R to store the value as an integer rather than a double (decimal number). We do this because visit counts are whole numbers by nature.
+3. There are three `NA` values in the **pm25** column and two in the **ozone** column. These missing values are intentional — they simulate real-world gaps in environmental monitoring data, and we will need to handle them carefully when computing summary statistics in later tasks.
+
+
+# Task 2
+
+The junior analyst's original script computes PM2.5 summary statistics (mean, median, and max) separately for each region by copying and pasting the same code block multiple times, changing only the region name each time. To understand this approach, write a code block that filters **air_quality_health** to just the `"Northeast"` region and then uses `summarize()` to compute the mean, median, and max of **pm25** (with `na.rm = TRUE` to handle missing values). Store the result in a variable called **northeast_summary** and print it.
+
+```{r}
+# Block 1: Northeast
+northeast_summary <- air_quality_health |>
+  filter(region == "Northeast") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+northeast_summary
+```
+
+## Notes for students
+
+1. The code block above computes PM2.5 summary statistics for just one region. In the junior analyst's original script, this same code block was copied and pasted four times — once for each region — with only the region name in `filter()` and the output variable name changed each time. This kind of repetition violates the **DRY principle** ("Don't Repeat Yourself"), which states that every piece of knowledge or logic should have a single, authoritative representation in your code.
+2. When the same logic is repeated four times, any change to the analysis (e.g., adding a new summary statistic or changing `na.rm`) must be made in four places. This is tedious and error-prone — and as we will see in the next task, it invites copy-and-paste bugs that can be very difficult to spot.
+3. A better approach, which we will build toward throughout this lab, is to encapsulate the repeated logic in a **custom function** and call that function once for each region.
+
+## Question 1
+
+What is the **mean_pm25** value for the Northeast region? Round your answer to one decimal place.
+
+* 16.1
+
+
+# Task 3
+
+It turns out that another analyst wrote a script to calculate the PM2.5 summary statistics (mean, median, and max) separately for each region. However, the team lead is sure there is a bug in the code. Inspect the code below and see if you can find the error.
+
+```{r}
+# Block 1: Northeast
+northeast_summary_v2 <- air_quality_health |>
+  filter(region == "Northeast") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+northeast_summary_v2
+```
+
+```{r}
+# Block 2: Southeast
+southeast_summary_v2 <- air_quality_health |>
+  filter(region == "Southeast") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+southeast_summary_v2
+```
+
+```{r}
+# Block 3: Midwest
+midwest_summary_v2 <- air_quality_health |>
+  filter(region == "Southeast") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+midwest_summary_v2
+```
+
+```{r}
+# Block 4: West
+west_summary_v2 <- air_quality_health |>
+  filter(region == "West") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+west_summary_v2
+```
+
+## Question 2
+
+Which code block contains the error?
+
+```{r}
+#| eval: false
+
+# Incorrect: Block 1 correctly filters for "Northeast", which matches its label.
+# Block 1: Northeast
+northeast_summary_v2 <- air_quality_health |>
+  filter(region == "Northeast") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: Block 2 correctly filters for "Southeast", which matches its label.
+# Block 2: Southeast
+southeast_summary_v2 <- air_quality_health |>
+  filter(region == "Southeast") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+```
+
+```{r}
+#| eval: false
+
+# Correct. Block 3 is labeled Midwest, but its filter() call references "Southeast"
+# instead of "Midwest". The analyst copied the Southeast block and forgot to update
+# the region name.
+# Block 3: Midwest
+midwest_summary_v2 <- air_quality_health |>
+  filter(region == "Southeast") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: Block 4 correctly filters for "West", which matches its label.
+# Block 4: West
+west_summary_v2 <- air_quality_health |>
+  filter(region == "West") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+```
+
+
+# Task 4
+
+In the code block below, write updated code that fixes the bug from the previous task. Run the code and review the output before moving on.
+
+```{r}
+# Block 3: Midwest
+midwest_summary_v2 <- air_quality_health |>
+  filter(region == "Midwest") |>
+  summarize(
+    mean_pm25   = mean(pm25, na.rm = TRUE),
+    median_pm25 = median(pm25, na.rm = TRUE),
+    max_pm25    = max(pm25, na.rm = TRUE)
+  )
+midwest_summary_v2
+```
+
+## Question 3
+
+After fixing the bug in Block 3 so that it correctly filters for the Midwest region, what is the **median_pm25** value? Round your answer to one decimal place.
+
+* 16.8
+
+## Question 4
+
+Which of the following is the most plausible reason for the error in Task 3?
+
+```{r}
+#| eval: false
+
+# Incorrect: The region name "Southeast" is spelled correctly — it's valid, just
+# wrong for this block. This looks like a substitution oversight, not a typo.
+# (a) The analyst mistyped the variable name inside filter()
+```
+
+```{r}
+#| eval: false
+
+# Correct. The code is identical to Block 2 except for the variable name on the
+# left side of the assignment. The analyst forgot to change "Southeast" to "Midwest"
+# in the filter() call — a classic copy-and-paste error.
+# (b) The analyst copied the Southeast block and forgot to update the region name
+# inside filter()
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: filter() works perfectly well with string comparisons — the expression
+# region == "Midwest" is valid R code.
+# (c) The filter() function does not accept string values
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: The Midwest region does exist in air_quality_health with 15 rows
+# across 5 stations.
+# (d) The Midwest region does not exist in the dataset
+```
+
+## Notes for students
+
+1. This is a classic copy-and-paste error: the analyst copied the Southeast block to create the Midwest block but forgot to update `"Southeast"` to `"Midwest"` inside `filter()`. The code runs without any error or warning — R has no way to know that the region name does not match the analyst's intent — so the bug silently produces wrong results.
+2. Bugs like this are especially dangerous in public health reporting because the output *looks* reasonable (it is a valid summary of *some* region's data), so they can easily go undetected in a review.
+3. This is one of the strongest practical arguments for writing custom functions: if the filtering logic existed in exactly one place (inside a function), it would be impossible to introduce this kind of substitution error.
+
+## Question 5
+
+Match each component of an R function with its description.
+
+| Component | Description |
+|----------------------|----------------------------------------------------------------------------------|
+| Name                 | The label assigned to the function so it can be called later                     |
+| `function()` keyword | The R syntax that signals the creation of a new function                         |
+| Arguments            | The inputs listed inside the parentheses that the function accepts               |
+| Body                 | The code inside the curly braces `{ }` that executes when the function is called |
+
+
+# Task 5
+
+ow begin refactoring the repetitive script into a custom function. 
+
+1. Write code that computes the mean, median, and max of **pm25** for just the `"Northeast"` region. 
+
+2. Generalize that working code into a function called `summarize_pm25_by_region()` that takes a single argument — the region name — and returns the summary tibble. 
+
+3. Call your function for the `"Northeast"` region to verify it produces the correct result.
+
+```{r}
+summarize_pm25_by_region <- function(region_name) {
+  air_quality_health |>
+    filter(region == region_name) |>
+    summarize(
+      mean_pm25   = mean(pm25, na.rm = TRUE),
+      median_pm25 = median(pm25, na.rm = TRUE),
+      max_pm25    = max(pm25, na.rm = TRUE)
+    )
+}
+
+summarize_pm25_by_region("Northeast")
+```
+
+## Notes for students
+
+1. Every R function has four structural components: a **name** (`summarize_pm25_by_region`), the **`function()` keyword** that tells R we are creating a function, one or more **arguments** (here, `region_name`), and a **body** (the code inside the curly braces `{ }` that executes when the function is called).
+2. We built this function using a recommended step-by-step workflow: (a) write working code for a single concrete case ("Northeast"), (b) identify the part that changes (the region name), (c) replace it with an argument, and (d) wrap everything in `function() { }` and assign it to a name. This workflow is much less error-prone than trying to write a function from scratch.
+3. Notice that the function references the **air_quality_health** dataset directly in its body. This works for now, but it means the function is tightly coupled to one specific dataset — we will make it more generalizable in later tasks.
+4. The mean PM2.5 for the Northeast region (computed with `na.rm = TRUE` to handle the one missing value) is approximately 16.1 µg/m³. Confirm that your function returns this value.
+
+## Question 6
+
+What is the **max_pm25** value returned by `summarize_pm25_by_region("Northeast")`? Round your answer to one decimal place.
+
+* 41.7
+
+
+# Task 6
+
+The EWBRC team wants to flag station-quarters with PM2.5 readings above a high-risk threshold. Currently, if you wanted to add this feature, you would need to hardcode the threshold value (e.g., 35 µg/m³) directly in the function body. 
+
+Instead, refactor `summarize_pm25_by_region()` into a new function called `summarize_pm25_flagged()` that accepts a second argument, **threshold**, with a default value of `35`. 
+
+The function should return the same summary statistics as before, plus an additional column called **n_high_risk** that counts the number of non-missing PM2.5 readings above the threshold.
+
+After creating `summarize_pm25_flagged()`, determine how many high risk PM2.5 readings are present in the `"Northeast"` region.
+
+```{r}
+summarize_pm25_flagged <- function(region_name, threshold = 35) {
+  air_quality_health |>
+    filter(region == region_name) |>
+    summarize(
+      mean_pm25   = mean(pm25, na.rm = TRUE),
+      median_pm25 = median(pm25, na.rm = TRUE),
+      max_pm25    = max(pm25, na.rm = TRUE),
+      n_high_risk = sum(pm25 > threshold, na.rm = TRUE)
+    )
+}
+
+# Call with the default threshold (35)
+summarize_pm25_flagged("Northeast")
+```
+
+## Notes for students
+
+1. The syntax `threshold = 35` in the function definition creates a **default argument**: if the user does not supply a value for **threshold**, R automatically uses `35`. If the user does supply a value (as in the second call above), R uses that value instead.
+2. Default values should be sensible, well-documented choices. Here, 35 µg/m³ corresponds to the EPA's 24-hour PM2.5 standard, which is a widely recognized benchmark in air quality regulation — a natural default for flagging high-risk readings.
+3. When we call the function for the Northeast region with the default threshold, only one reading (STN-NE5, Q3 = 41.7 µg/m³) exceeds 35, so **n_high_risk** should be `1`.
+4. We use `sum(pm25 > threshold, na.rm = TRUE)` to count high-risk readings. The expression `pm25 > threshold` produces a logical vector (`TRUE`/`FALSE`), and `sum()` counts the `TRUE` values. The `na.rm = TRUE` is important here because comparing `NA > 35` produces `NA`, not `FALSE`, and any `NA` in the logical vector would make the sum `NA`.
+
+## Question 7
+
+How many high-risk PM2.5 readings does `summarize_pm25_flagged()` report for the `"Northeast"` region using the default threshold of 35? Enter a whole number.
+
+* 1
+
+
+# Task 7
+
+Now call `summarize_pm25_flagged()` on the remaining three regions — `"Southeast"`, `"Midwest"`, and `"West"` — using `20` as the threshold value. Run each call in its own code block and examine the results.
+
+```{r}
+summarize_pm25_flagged("Southeast", threshold = 20)
+```
+
+```{r}
+summarize_pm25_flagged("Midwest", threshold = 20)
+```
+
+```{r}
+summarize_pm25_flagged("West", threshold = 20)
+```
+
+## Question 8
+
+Call `summarize_pm25_flagged()` on the remaining three regions — `"Southeast"`, `"Midwest"`, and `"West"` — using `20` as the threshold value. Which region had the greatest number of high-risk PM2.5 readings?
+
+* The **Southeast** region had **10** high-risk PM2.5 readings, the **Midwest** region had **3** high-risk PM2.5 readings, and the **Southwest** region had **1** high-risk PM2.5 readings. Therefore, the **Southeast** region had the greatest number of high-risk PM2.5 readings.
+
+
+# Task 8
+
+Before we build our final generalizable function, it is important to understand how R refers to columns in different contexts. 
+
+Write two equivalent code snippets that each compute the mean of **pm25** from **air_quality_health**: one using `dplyr::summarize()` with a bare (unquoted) column name, and one using base R's `$` notation. Run both and compare the results.
+
+First, use `dplyr::summarize()` to compute the mean of **pm25** from **air_quality_health**. Pipe the data frame into `summarize()` and refer to the column by its bare name `pm25` inside the `mean()` call. Remember to include `na.rm = TRUE`.
+
+```{r}
+# Approach 1: dplyr with bare column name (non-standard evaluation / data masking)
+air_quality_health |>
+  summarize(mean_pm25 = mean(pm25, na.rm = TRUE))
+```
+
+Next, compute the same mean using base R's `$` notation. Use `mean()` directly on `air_quality_health$pm25`, again with `na.rm = TRUE`.
+
+```{r}
+# Approach 2: Base R with $ notation (standard evaluation)
+mean(air_quality_health$pm25, na.rm = TRUE)
+```
+
+## Notes for students
+
+1. In Approach 1, we write `pm25` directly — without quotes and without specifying which data frame it belongs to. This works because `dplyr` verbs use **non-standard evaluation** (also called **data masking**): they automatically look for column names inside the data frame that was piped in. The bare name `pm25` is not a variable in our global environment — it only exists as a column of **air_quality_health** — but `dplyr` knows to look there.
+2. In Approach 2, we use `air_quality_health$pm25`, which is **standard evaluation**: we explicitly tell R which object contains `pm25` using the `$` operator. There is no magic lookup — we specify the data frame directly.
+3. Data masking is convenient for interactive analysis because it saves typing, but it creates a challenge when we write custom functions. If we pass a column name as a function argument and try to use it inside a `dplyr` verb, R does not automatically know that the argument refers to a column rather than a regular variable. We will encounter — and solve — this problem in the next task.
+
+## Question 9
+
+Why don't we need to use the `$` operator to refer to the **pm25** column inside `summarize()`?
+
+```{r}
+#| eval: false
+
+# Incorrect: summarize() does not convert anything to strings — it uses data masking
+# to look up bare column names inside the piped data frame.
+# (a) summarize() automatically converts column names to strings
+```
+
+```{r}
+#| eval: false
+
+# Correct. Data masking (also called non-standard evaluation) is the mechanism that
+# lets dplyr verbs resolve bare column names by searching inside the data frame, so
+# you don't need $ notation.
+# (b) dplyr verbs use data masking, which automatically looks for column names inside
+# the piped data frame
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: By default, R does not search inside data frames — it only looks in
+# environments. Data masking is a special feature of dplyr, not a general R behavior.
+# (c) R always searches for variable names inside data frames before checking the
+# global environment
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: The pipe operator passes the left-hand side as the first argument to
+# the right-hand side — it does not modify the global environment or attach columns.
+# (d) The pipe operator |> attaches the data frame's columns to the global environment
+```
+
+
+# Task 9
+
+A colleague has written a function that wraps `dplyr::group_by()` and `summarize()` to compute grouped means, but it throws an error when called. Run the broken function below to see the error, then fix it using the embrace operator (`{{ }}`).
+
+```{r}
+#| error: true
+#| eval: false
+
+# Broken function — column name is not properly forwarded
+grouped_mean_broken <- function(df, group_col, value_col) {
+  df |>
+    group_by(group_col) |>
+    summarize(mean_val = mean(value_col, na.rm = TRUE))
+}
+
+# This will produce an error
+grouped_mean_broken(air_quality_health, region, pm25)
+```
+
+## Question 10
+
+Which of the following correctly fixes the broken `grouped_mean_broken()` function so that column name arguments are properly forwarded to `dplyr` verbs?
+
+```{r}
+#| eval: false
+
+# Incorrect: Putting quotation marks around the argument names tells dplyr to look
+# for columns literally named "group_col" and "value_col", which do not exist in the
+# data frame.
+grouped_mean_fixed <- function(df, group_col, value_col) {
+  df |>
+    group_by("group_col") |>
+    summarize(mean_val = mean("value_col", na.rm = TRUE))
+}
+```
+
+```{r}
+#| eval: false
+
+# Correct. The embrace operator {{ }} tells dplyr to evaluate group_col and value_col
+# as the column names the user passed in, correctly forwarding them through data
+# masking.
+grouped_mean_fixed <- function(df, group_col, value_col) {
+  df |>
+    group_by({{ group_col }}) |>
+    summarize(mean_val = mean({{ value_col }}, na.rm = TRUE))
+}
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: df$group_col tries to access a column literally named "group_col" in
+# the data frame — it does not resolve the argument to the column name the user
+# passed.
+grouped_mean_fixed <- function(df, group_col, value_col) {
+  df |>
+    group_by(df$group_col) |>
+    summarize(mean_val = mean(df$value_col, na.rm = TRUE))
+}
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: Adding parentheses tells R to call group_col and value_col as
+# functions, which will produce an error because they are not functions.
+grouped_mean_fixed <- function(df, group_col, value_col) {
+  df |>
+    group_by(group_col()) |>
+    summarize(mean_val = mean(value_col(), na.rm = TRUE))
+}
+```
+
+Run the corrected function to verify it works:
+
+```{r}
+grouped_mean_fixed <- function(df, group_col, value_col) {
+  df |>
+    group_by({{ group_col }}) |>
+    summarize(mean_val = mean({{ value_col }}, na.rm = TRUE))
+}
+
+# Now it works correctly
+grouped_mean_fixed(air_quality_health, region, pm25)
+```
+
+## Notes for students
+
+1. The broken function fails because `group_by(group_col)` tells `dplyr` to look for a column literally named `group_col` inside the data frame — which does not exist. The user passed the bare name `region`, but without special handling, `dplyr` has no way to know that `group_col` is an *indirect reference* to the `region` column.
+2. The **embrace operator** `{{ }}` (sometimes called "curly-curly") solves this problem. Writing `{{ group_col }}` tells `dplyr`: "The user passed a column name into `group_col` — please evaluate it the same way you would evaluate a bare column name written directly in the pipe." It bridges the gap between the function's argument and `dplyr`'s data masking.
+3. We need to embrace *every* argument that refers to a column name used inside a `dplyr` verb. That is why both `{{ group_col }}` and `{{ value_col }}` require the operator — each one is a column reference that `dplyr` needs to resolve.
+
+
+# Task 10
+
+You are now ready to write the fully generalizable grouped summary function that the team lead requested. 
+
+Write a function called `compute_grouped_summary()` that accepts three arguments: 
+1. a data frame, 
+2. a grouping column, and 
+3. a numeric column (both specified as bare column names). 
+
+The function should compute the **mean**, **median**, and **max** of the numeric column for each group and return the result as a tibble. 
+
+Then call the function for three different combinations: 
+1. **pm25** grouped by **region**, 
+2. **ozone** grouped by **region**, and 
+3. **pm25** grouped by **station_id**.
+
+First, define the `compute_grouped_summary()` function:
+
+```{r}
+compute_grouped_summary <- function(df, group_col, value_col) {
+  df |>
+    group_by({{ group_col }}) |>
+    summarize(
+      mean_val   = mean({{ value_col }}, na.rm = TRUE),
+      median_val = median({{ value_col }}, na.rm = TRUE),
+      max_val    = max({{ value_col }}, na.rm = TRUE),
+      .groups = "drop"
+    )
+}
+```
+
+Now call the function to summarize **pm25** grouped by **region**:
+
+```{r}
+# PM2.5 by region
+compute_grouped_summary(air_quality_health, region, pm25)
+```
+
+## Question 11
+
+What is the **mean_val** for the West region when summarizing **pm25** by **region**? Round your answer to one decimal place.
+
+* 12.7
+
+Next, call the function to summarize **ozone** grouped by **region**:
+
+```{r}
+# Ozone by region
+compute_grouped_summary(air_quality_health, region, ozone)
+```
+
+## Question 12
+
+What is the **median_val** for the West region when summarizing **ozone** by **region**? Round your answer to one decimal place.
+
+* 36.8
+
+Finally, call the function to summarize **pm25** grouped by **station_id**:
+
+```{r}
+# PM2.5 by station
+compute_grouped_summary(air_quality_health, station_id, pm25)
+```
+
+## Question 13
+
+What is the **max_val** for station STN-WE2 when summarizing **pm25** by **station_id**? Round your answer to one decimal place.
+
+* 38.4
+
+## Notes for students
+
+1. This single function replaces all four of the repetitive code blocks from Task 2 — and more. It can summarize *any* numeric column by *any* grouping variable in *any* data frame, all without modifying a single line of the function body.
+2. We include `.groups = "drop"` inside `summarize()` to tell `dplyr` to remove the grouping structure from the output. Without this, the returned tibble would retain a hidden grouping attribute, which can cause unexpected behavior in downstream operations.
+3. The embrace operator `{{ }}` makes this function truly generalizable: the caller can pass `region`, `station_id`, or any other column name, and the function will forward it correctly to `group_by()` and `summarize()`.
+4. For the ozone-by-region call, the median ozone for the West region should be approximately 36.8 ppb. Check your output to confirm this value.
+
+
+# Task 11
+
+To demonstrate that your generalized function works beyond the original air quality dataset, create a new tibble called **ed_visits** representing emergency department visits for respiratory conditions by age group, region, and quarter. Then apply `compute_grouped_summary()` to this new dataset — grouping by **age_group** and summarizing **ed_visits** — without making any changes to the function itself.
+
+First, create the **ed_visits** dataset:
+
+```{r}
+ed_visits <- tribble(
+  ~age_group,   ~region,      ~quarter, ~ed_visits,
+  "Pediatric",  "Northeast",  "Q1",     45L,
+  "Pediatric",  "Northeast",  "Q2",     52L,
+  "Pediatric",  "Northeast",  "Q3",     68L,
+  "Pediatric",  "Southeast",  "Q1",     58L,
+  "Pediatric",  "Southeast",  "Q2",     72L,
+  "Pediatric",  "Southeast",  "Q3",     85L,
+  "Pediatric",  "Midwest",    "Q1",     38L,
+  "Pediatric",  "Midwest",    "Q2",     47L,
+  "Pediatric",  "Midwest",    "Q3",     61L,
+  "Pediatric",  "West",       "Q1",     32L,
+  "Pediatric",  "West",       "Q2",     41L,
+  "Pediatric",  "West",       "Q3",     55L,
+  "Adult",      "Northeast",  "Q1",     82L,
+  "Adult",      "Northeast",  "Q2",     95L,
+  "Adult",      "Northeast",  "Q3",     118L,
+  "Adult",      "Southeast",  "Q1",     105L,
+  "Adult",      "Southeast",  "Q2",     125L,
+  "Adult",      "Southeast",  "Q3",     152L,
+  "Adult",      "Midwest",    "Q1",     70L,
+  "Adult",      "Midwest",    "Q2",     88L,
+  "Adult",      "Midwest",    "Q3",     108L,
+  "Adult",      "West",       "Q1",     55L,
+  "Adult",      "West",       "Q2",     68L,
+  "Adult",      "West",       "Q3",     90L,
+  "Elderly",    "Northeast",  "Q1",     110L,
+  "Elderly",    "Northeast",  "Q2",     128L,
+  "Elderly",    "Northeast",  "Q3",     160L,
+  "Elderly",    "Southeast",  "Q1",     135L,
+  "Elderly",    "Southeast",  "Q2",     158L,
+  "Elderly",    "Southeast",  "Q3",     180L,
+  "Elderly",    "Midwest",    "Q1",     92L,
+  "Elderly",    "Midwest",    "Q2",     115L,
+  "Elderly",    "Midwest",    "Q3",     142L,
+  "Elderly",    "West",       "Q1",     75L,
+  "Elderly",    "West",       "Q2",     95L,
+  "Elderly",    "West",       "Q3",     120L
+)
+```
+
+Now apply `compute_grouped_summary()` to the **ed_visits** dataset, grouping by **age_group** and summarizing the **ed_visits** column:
+
+```{r}
+# Apply the generalized function to the new dataset — no modifications needed
+compute_grouped_summary(ed_visits, age_group, ed_visits)
+```
+
+## Question 14
+
+What is the **mean_val** for the Elderly age group? Round your answer to one decimal place.
+
+* 126
+
+Finally, group by **region** to cross-check with a familiar dimension:
+
+```{r}
+# We can also group by region to cross-check with a familiar dimension
+compute_grouped_summary(ed_visits, region, ed_visits)
+```
+
+## Question 15
+
+What is the **max_val** for the Southeast region in the **ed_visits** dataset?
+
+* 180
+
+## Question 16
+
+Did `compute_grouped_summary()` require any modification to work on the **ed_visits** dataset?
+
+```{r}
+#| eval: false
+
+# Correct. The function worked on the new dataset without any changes because it
+# accepts the data frame, grouping column, and value column as arguments using tidy
+# evaluation. This is the key benefit of writing generalizable functions with the
+# embrace operator.
+# (a) No — the function worked on the new dataset without any changes because it
+# accepts the data frame, grouping column, and value column as arguments
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: The embrace operator {{ }} handles bare column names regardless of
+# whether they share a name with the data frame. No quoting was needed.
+# (b) Yes — the column name ed_visits had to be quoted because it matches the data
+# frame name
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: Having na.rm = TRUE when there are no missing values is harmless — it
+# simply has no effect. There is no need to remove it.
+# (c) Yes — the function body had to be updated to remove na.rm = TRUE because the
+# new dataset has no missing values
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: In R, integers are a subtype of numeric, so mean(), median(), and max()
+# work identically on both. No modification was needed.
+# (d) Yes — a new version of the function had to be written for integer columns
+# because the original was designed for numeric (double) columns
+```
+
+## Notes for students
+
+1. The key takeaway here is that `compute_grouped_summary()` required **zero modifications** to work on this entirely new dataset. The function knows nothing about air quality, PM2.5, monitoring stations, or the specific column names in **air_quality_health** — it only knows how to group a data frame by one column and summarize another, which is exactly the level of generality we designed it for.
+2. This is the payoff of writing generalizable custom functions with tidy evaluation: a function you build for one analysis context can be reused in any context that follows the same pattern (a data frame with a grouping column and a numeric column to summarize).
+3. Notice that the **ed_visits** dataset has no missing values, so the `na.rm = TRUE` in our function is harmless — it simply has no effect. Writing functions that handle missing values by default (rather than requiring the user to pre-clean the data) is a good defensive programming habit.
+4. In a real EWBRC workflow, you might save `compute_grouped_summary()` in a shared utility script and source it at the top of any new analysis file, rather than redefining it each time. This is how teams scale up from one-off scripts to maintainable, collaborative codebases.

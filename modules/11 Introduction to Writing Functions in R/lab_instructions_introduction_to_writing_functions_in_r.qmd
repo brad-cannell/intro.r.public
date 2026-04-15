@@ -1,0 +1,403 @@
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+
+```
+
+
+# Overview
+
+You are a data analyst in the Environmental Health Division of the Epi-Workbench Research Consortium (EWBRC), where your team monitors air quality and its relationship to respiratory health outcomes across a network of regional monitoring stations. A junior analyst recently completed a quarterly report summarizing pollution levels and respiratory clinic visits by station and region, but the script they submitted for review takes a troubling approach: rather than writing reusable code, it repeats nearly identical blocks of analysis — computing the same summary statistics, applying the same filters, referencing the same logic — over and over, with only the region name swapped in each time. The team lead has flagged the script as fragile and hard to maintain, and has asked you to audit it, identify a subtle bug introduced by the copy-and-paste approach, and then refactor the entire workflow using custom functions. By the end of this lab, you will have built a flexible, reusable set of functions that can summarize air quality and health data across any grouping variable or pollutant column — and you will have applied those functions to a second dataset to confirm they work beyond the original context.
+
+
+# Task 1
+
+Create the air quality and respiratory health dataset that your team will use throughout this lab. Run the code below to create a tibble called **air_quality_health** containing 60 rows of quarterly monitoring data — PM2.5 concentrations, ozone levels, and respiratory visit counts — for 20 stations across four regions. After creating the dataset, print it to confirm it loaded correctly.
+
+```{r}
+foodborne_surveillance <- tribble(
+  ~county_id,  ~state_cluster, ~month, ~salmonella_cases, ~ecoli_cases, ~hosp_rate,
+  "CTY-NE1",   "Northeast",    "M1",   8L,                3L,           12.4,
+  "CTY-NE1",   "Northeast",    "M2",   11L,               5L,           15.8,
+  "CTY-NE1",   "Northeast",    "M3",   14L,               6L,           18.2,
+  "CTY-NE2",   "Northeast",    "M1",   6L,                2L,           10.1,
+  "CTY-NE2",   "Northeast",    "M2",   9L,                4L,           13.7,
+  "CTY-NE2",   "Northeast",    "M3",   12L,               5L,           44.6,
+  "CTY-NE3",   "Northeast",    "M1",   7L,                3L,           11.5,
+  "CTY-NE3",   "Northeast",    "M2",   NA,                4L,           14.2,
+  "CTY-NE3",   "Northeast",    "M3",   13L,               6L,           17.0,
+  "CTY-NE4",   "Northeast",    "M1",   5L,                2L,           9.3,
+  "CTY-NE4",   "Northeast",    "M2",   10L,               4L,           12.9,
+  "CTY-NE4",   "Northeast",    "M3",   11L,               5L,           16.1,
+  "CTY-NE5",   "Northeast",    "M1",   7L,                3L,           10.8,
+  "CTY-NE5",   "Northeast",    "M2",   12L,               5L,           14.6,
+  "CTY-NE5",   "Northeast",    "M3",   10L,               4L,           15.4,
+  "CTY-SE1",   "Southeast",    "M1",   NA,                6L,           20.3,
+  "CTY-SE1",   "Southeast",    "M2",   18L,               8L,           24.1,
+  "CTY-SE1",   "Southeast",    "M3",   22L,               10L,          28.7,
+  "CTY-SE2",   "Southeast",    "M1",   14L,               5L,           18.6,
+  "CTY-SE2",   "Southeast",    "M2",   19L,               7L,           23.4,
+  "CTY-SE2",   "Southeast",    "M3",   25L,               9L,           30.2,
+  "CTY-SE3",   "Southeast",    "M1",   12L,               4L,           17.1,
+  "CTY-SE3",   "Southeast",    "M2",   16L,               6L,           21.8,
+  "CTY-SE3",   "Southeast",    "M3",   21L,               8L,           NA,
+  "CTY-SE4",   "Southeast",    "M1",   15L,               5L,           19.5,
+  "CTY-SE4",   "Southeast",    "M2",   20L,               8L,           25.0,
+  "CTY-SE4",   "Southeast",    "M3",   26L,               10L,          31.4,
+  "CTY-SE5",   "Southeast",    "M1",   13L,               4L,           18.0,
+  "CTY-SE5",   "Southeast",    "M2",   17L,               7L,           22.6,
+  "CTY-SE5",   "Southeast",    "M3",   23L,               9L,           29.1,
+  "CTY-MW1",   "Midwest",      "M1",   10L,               3L,           13.5,
+  "CTY-MW1",   "Midwest",      "M2",   14L,               5L,           16.8,
+  "CTY-MW1",   "Midwest",      "M3",   17L,               7L,           20.4,
+  "CTY-MW2",   "Midwest",      "M1",   8L,                2L,           11.2,
+  "CTY-MW2",   "Midwest",      "M2",   12L,               NA,           15.0,
+  "CTY-MW2",   "Midwest",      "M3",   15L,               6L,           18.3,
+  "CTY-MW3",   "Midwest",      "M1",   9L,                3L,           12.0,
+  "CTY-MW3",   "Midwest",      "M2",   13L,               5L,           16.1,
+  "CTY-MW3",   "Midwest",      "M3",   16L,               6L,           19.5,
+  "CTY-MW4",   "Midwest",      "M1",   7L,                2L,           10.5,
+  "CTY-MW4",   "Midwest",      "M2",   11L,               4L,           14.3,
+  "CTY-MW4",   "Midwest",      "M3",   14L,               5L,           17.6,
+  "CTY-MW5",   "Midwest",      "M1",   8L,                3L,           11.8,
+  "CTY-MW5",   "Midwest",      "M2",   12L,               4L,           15.5,
+  "CTY-MW5",   "Midwest",      "M3",   15L,               6L,           18.9,
+  "CTY-SW1",   "Southwest",    "M1",   5L,                2L,           8.7,
+  "CTY-SW1",   "Southwest",    "M2",   8L,                3L,           11.4,
+  "CTY-SW1",   "Southwest",    "M3",   11L,               4L,           14.0,
+  "CTY-SW2",   "Southwest",    "M1",   6L,                2L,           9.5,
+  "CTY-SW2",   "Southwest",    "M2",   42L,               3L,           12.8,
+  "CTY-SW2",   "Southwest",    "M3",   12L,               5L,           15.3,
+  "CTY-SW3",   "Southwest",    "M1",   4L,                1L,           8.2,
+  "CTY-SW3",   "Southwest",    "M2",   7L,                3L,           10.6,
+  "CTY-SW3",   "Southwest",    "M3",   10L,               4L,           13.1,
+  "CTY-SW4",   "Southwest",    "M1",   5L,                2L,           9.0,
+  "CTY-SW4",   "Southwest",    "M2",   9L,                3L,           NA,
+  "CTY-SW4",   "Southwest",    "M3",   NA,                5L,           14.5,
+  "CTY-SW5",   "Southwest",    "M1",   6L,                2L,           9.8,
+  "CTY-SW5",   "Southwest",    "M2",   10L,               4L,           12.2,
+  "CTY-SW5",   "Southwest",    "M3",   11L,               4L,           14.8
+)
+
+foodborne_surveillance
+```
+
+# Task 2
+
+The junior analyst's original script computes PM2.5 summary statistics (mean, median, and max) separately for each region by copying and pasting the same code block multiple times, changing only the region name each time. To understand this approach, write a code block that filters **air_quality_health** to just the `"Northeast"` region and then uses `summarize()` to compute the mean, median, and max of **pm25** (with `na.rm = TRUE` to handle missing values). Store the result in a variable called **northeast_summary** and print it.
+
+```{r}
+# Block 1: Northeast
+```
+
+## Question 1
+
+What is the **mean_pm25** value for the Northeast region? Round your answer to one decimal place.
+
+# Task 3
+
+It turns out that another analyst wrote a script to calculate the PM2.5 summary statistics (mean, median, and max) separately for each region. However, the team lead is sure there is a bug in the code. Inspect the code below and see if you can find the error.
+
+```{r}
+# Block 1: Northeast
+northeast_summary_v2 <- foodborne_surveillance |>
+  filter(state_cluster == "Northeast") |>
+  summarize(
+    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
+    median_salmonella = median(salmonella_cases, na.rm = TRUE),
+    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+  )
+northeast_summary_v2
+```
+
+```{r}
+# Block 2: Southeast
+southeast_summary_v2 <- foodborne_surveillance |>
+  filter(state_cluster == "Northeast") |>
+  summarize(
+    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
+    median_salmonella = median(salmonella_cases, na.rm = TRUE),
+    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+  )
+southeast_summary_v2
+```
+
+```{r}
+# Block 3: Midwest
+midwest_summary_v2 <- foodborne_surveillance |>
+  filter(state_cluster == "Midwest") |>
+  summarize(
+    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
+    median_salmonella = median(salmonella_cases, na.rm = TRUE),
+    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+  )
+midwest_summary_v2
+```
+
+```{r}
+# Block 4: Southwest
+southwest_summary_v2 <- foodborne_surveillance |>
+  filter(state_cluster == "Southwest") |>
+  summarize(
+    mean_salmonella   = mean(salmonella_cases, na.rm = TRUE),
+    median_salmonella = median(salmonella_cases, na.rm = TRUE),
+    max_salmonella    = max(salmonella_cases, na.rm = TRUE)
+  )
+southwest_summary_v2
+```
+
+## Question 2
+
+Which code block contains the error?
+
+# Task 4
+
+In the code block below, write updated code that fixes the bug from the previous task. Run the code and review the output before moving on.
+
+```{r}
+
+```
+
+## Question 3
+
+After fixing the bug in Block 3 so that it correctly filters for the Midwest region, what is the **median_pm25** value? Round your answer to one decimal place.
+
+## Question 4
+
+Which of the following is the most plausible reason for the error in Task 3? See our course LMS for the answer choices and submit your response.
+
+## Question 5
+
+Match each component of an R function with its description. See our course LMS for the answer choices and submit your response.
+
+
+# Task 5
+
+Now begin refactoring the repetitive script into a custom function. 
+
+1. Write code that computes the mean, median, and max of **pm25** for just the `"Northeast"` region. 
+
+2. Generalize that working code into a function called `summarize_pm25_by_region()` that takes a single argument — the region name — and returns the summary tibble. 
+
+3. Call your function for the `"Northeast"` region to verify it produces the correct result.
+
+```{r}
+
+```
+
+## Question 6
+
+What is the **max_pm25** value returned by `summarize_pm25_by_region("Northeast")`? Round your answer to one decimal place.
+
+
+# Task 6
+
+The EWBRC team wants to flag station-quarters with PM2.5 readings above a high-risk threshold. Currently, if you wanted to add this feature, you would need to hardcode the threshold value (e.g., 35 µg/m³) directly in the function body. 
+
+Instead, refactor `summarize_pm25_by_region()` into a new function called `summarize_pm25_flagged()` that accepts a second argument, **threshold**, with a default value of `35`. 
+
+The function should return the same summary statistics as before, plus an additional column called **n_high_risk** that counts the number of non-missing PM2.5 readings above the threshold.
+
+After creating `summarize_pm25_flagged()`, determine how many high risk PM2.5 readings are present in the `"Northeast"` region.
+
+```{r}
+
+```
+
+
+## Question 7
+
+How many high-risk PM2.5 readings does `summarize_pm25_flagged()` report for the `"Northeast"` region using the default threshold of 35? Enter a whole number.
+
+
+# Task 7
+
+Now call `summarize_pm25_flagged()` on the remaining three regions — `"Southeast"`, `"Midwest"`, and `"West"` — using `20` as the threshold value. Run each call in its own code block and examine the results.
+
+```{r}
+```
+
+```{r}
+```
+
+```{r}
+```
+
+
+## Question 8
+
+Call `summarize_pm25_flagged()` on the remaining three regions — `"Southeast"`, `"Midwest"`, and `"West"` — using `20` as the threshold value. Which region had the greatest number of high-risk PM2.5 readings?
+
+
+# Task 8
+
+Before we build our final generalizable function, it is important to understand how R refers to columns in different contexts. Write two equivalent code snippets that each compute the mean of **pm25** from **air_quality_health**: one using `dplyr::summarize()` with a bare (unquoted) column name, and one using base R's `$` notation. Run both and compare the results.
+
+First, use `dplyr::summarize()` to compute the mean of **pm25** from **air_quality_health**. Pipe the data frame into `summarize()` and refer to the column by its bare name `pm25` inside the `mean()` call. Remember to include `na.rm = TRUE`.
+
+```{r}
+# Approach 1: dplyr with bare column name
+```
+
+Next, compute the same mean using base R's `$` notation. Use `mean()` directly on `air_quality_health$pm25`, again with `na.rm = TRUE`.
+
+```{r}
+# Approach 2: Base R with $ notation
+```
+
+## Question 9
+
+Why don't we need to use the `$` operator to refer to the **pm25** column inside `summarize()`? See our course LMS for the answer choices and submit your response.
+
+
+# Task 9
+
+A colleague has written a function that wraps `dplyr::group_by()` and `summarize()` to compute grouped means, but it throws an error when called. Run the broken function below to see the error, then fix it using the embrace operator (`{{ }}`).
+
+```{r}
+#| error: true
+#| eval: false
+
+# Broken function — column name is not properly forwarded
+grouped_mean_broken <- function(df, group_col, value_col) {
+  df |>
+    group_by(group_col) |>
+    summarize(mean_val = mean(value_col, na.rm = TRUE))
+}
+
+# This will produce an error
+grouped_mean_broken(air_quality_health, region, pm25)
+```
+
+## Question 10
+
+Which of the following correctly fixes the broken `grouped_mean_broken()` function so that column name arguments are properly forwarded to `dplyr` verbs? See our course LMS for the answer choices and submit your response.
+
+
+# Task 10
+
+You are now ready to write the fully generalizable grouped summary function that the team lead requested. 
+
+Write a function called `compute_grouped_summary()` that accepts three arguments: 
+1. a data frame, 
+2. a grouping column, and 
+3. a numeric column (both specified as bare column names). 
+
+The function should compute the **mean**, **median**, and **max** of the numeric column for each group and return the result as a tibble. 
+
+Then call the function for three different combinations: 
+1. **pm25** grouped by **region**, 
+2. **ozone** grouped by **region**, and 
+3. **pm25** grouped by **station_id**.
+
+First, define the `compute_grouped_summary()` function:
+
+```{r}
+```
+
+Now call the function to summarize **pm25** grouped by **region**:
+
+```{r}
+# PM2.5 by region
+```
+
+## Question 11
+
+What is the **mean_val** for the West region when summarizing **pm25** by **region**? Round your answer to one decimal place.
+
+Next, call the function to summarize **ozone** grouped by **region**:
+
+```{r}
+# Ozone by region
+```
+
+## Question 12
+
+What is the **median_val** for the West region when summarizing **ozone** by **region**? Round your answer to one decimal place.
+
+Finally, call the function to summarize **pm25** grouped by **station_id**:
+
+```{r}
+# PM2.5 by station
+```
+
+## Question 13
+
+What is the **max_val** for station STN-WE2 when summarizing **pm25** by **station_id**? Round your answer to one decimal place.
+
+
+# Task 11
+
+To demonstrate that your generalized function works beyond the original air quality dataset, create a new tibble called **ed_visits** representing emergency department visits for respiratory conditions by age group, region, and quarter. 
+
+Then apply `compute_grouped_summary()` to this new dataset — grouping by **age_group** and summarizing **ed_visits** — without making any changes to the function itself.
+
+First, create the **ed_visits** dataset:
+
+```{r}
+ed_visits <- tribble(
+  ~age_group,   ~region,      ~quarter, ~ed_visits,
+  "Pediatric",  "Northeast",  "Q1",     45L,
+  "Pediatric",  "Northeast",  "Q2",     52L,
+  "Pediatric",  "Northeast",  "Q3",     68L,
+  "Pediatric",  "Southeast",  "Q1",     58L,
+  "Pediatric",  "Southeast",  "Q2",     72L,
+  "Pediatric",  "Southeast",  "Q3",     85L,
+  "Pediatric",  "Midwest",    "Q1",     38L,
+  "Pediatric",  "Midwest",    "Q2",     47L,
+  "Pediatric",  "Midwest",    "Q3",     61L,
+  "Pediatric",  "West",       "Q1",     32L,
+  "Pediatric",  "West",       "Q2",     41L,
+  "Pediatric",  "West",       "Q3",     55L,
+  "Adult",      "Northeast",  "Q1",     82L,
+  "Adult",      "Northeast",  "Q2",     95L,
+  "Adult",      "Northeast",  "Q3",     118L,
+  "Adult",      "Southeast",  "Q1",     105L,
+  "Adult",      "Southeast",  "Q2",     125L,
+  "Adult",      "Southeast",  "Q3",     152L,
+  "Adult",      "Midwest",    "Q1",     70L,
+  "Adult",      "Midwest",    "Q2",     88L,
+  "Adult",      "Midwest",    "Q3",     108L,
+  "Adult",      "West",       "Q1",     55L,
+  "Adult",      "West",       "Q2",     68L,
+  "Adult",      "West",       "Q3",     90L,
+  "Elderly",    "Northeast",  "Q1",     110L,
+  "Elderly",    "Northeast",  "Q2",     128L,
+  "Elderly",    "Northeast",  "Q3",     160L,
+  "Elderly",    "Southeast",  "Q1",     135L,
+  "Elderly",    "Southeast",  "Q2",     158L,
+  "Elderly",    "Southeast",  "Q3",     180L,
+  "Elderly",    "Midwest",    "Q1",     92L,
+  "Elderly",    "Midwest",    "Q2",     115L,
+  "Elderly",    "Midwest",    "Q3",     142L,
+  "Elderly",    "West",       "Q1",     75L,
+  "Elderly",    "West",       "Q2",     95L,
+  "Elderly",    "West",       "Q3",     120L
+)
+```
+
+Now apply `compute_grouped_summary()` to the **ed_visits** dataset, grouping by **age_group** and summarizing the **ed_visits** column:
+
+```{r}
+# Apply the generalized function to the new dataset — no modifications needed
+```
+
+## Question 14
+
+What is the **mean_val** for the Elderly age group? Round your answer to one decimal place.
+
+Finally, group by **region** to cross-check with a familiar dimension:
+
+```{r}
+# We can also group by region to cross-check with a familiar dimension
+```
+
+## Question 15
+
+What is the **max_val** for the Southeast region in the **ed_visits** dataset?
+
+## Question 16
+
+Did `compute_grouped_summary()` require any modification to work on the **ed_visits** dataset? See our course LMS for the answer choices and submit your response.
