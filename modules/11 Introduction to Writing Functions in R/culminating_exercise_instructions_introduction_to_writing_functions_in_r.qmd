@@ -106,63 +106,8 @@ What is the **mean_salmonella** value for the Northeast state cluster? Round you
 
 See our course LMS for the answer choices and submit your response.
 
+
 # Task 3
-
-Another analyst wrote a script to calculate the *Salmonella* summary statistics (mean, median, and max) separately for each state cluster. The team lead is sure there is a bug in the code. Inspect the four code blocks below and identify the error.
-
-```{r}
-# Block 1: Northeast
-```
-
-```{r}
-# Block 2: Southeast
-```
-
-```{r}
-# Block 3: Midwest
-```
-
-```{r}
-# Block 4: Southwest
-```
-
-## Question 2
-
-Which code block contains the error?
-
-
-
-
-
-Fix the bug by correcting the filter value in Block 3:
-
-See our course LMS for the answer choices and submit your response.
-
-## Question 3
-
-After fixing the bug in Block 3 so that it correctly filters for the Midwest state cluster, what is the **median_salmonella** value? Round your answer to one decimal place.
-
-See our course LMS for the answer choices and submit your response.
-
-## Question 4
-
-Which of the following is the most plausible reason for the error in Block 3?
-
-See our course LMS for the answer choices and submit your response.
-
-## Question 5
-
-Match each component of an R function with its description.
-
-| Component | Description |
-|----------------------|----------------------------------------------------------------------------------|
-| Name                 | The label assigned to the function so it can be called later                     |
-| `function()` keyword | The R syntax that signals the creation of a new function                         |
-| Arguments            | The inputs listed inside the parentheses that the function accepts               |
-| Body                 | The code inside the curly braces `{ }` that executes when the function is called |
-
-
-# Task 4
 
 Write a function called `summarize_salmonella_by_cluster` that takes a single argument — the state cluster name — and returns a summary tibble containing the mean, median, and max of **salmonella_cases** for that cluster. Call your function for the `"Northeast"` state cluster to verify it produces the correct result.
 
@@ -170,15 +115,119 @@ Write a function called `summarize_salmonella_by_cluster` that takes a single ar
 
 ```
 
-## Question 6
+## Question 2
 
 What is the **max_salmonella** value returned by `summarize_salmonella_by_cluster("Northeast")`?
 
 See our course LMS for the answer choices and submit your response.
 
+# Task 4
+
+Refactor `summarize_salmonella_by_cluster()` into a new function called `summarize_salmonella_flagged()` that accepts a second argument, **threshold**, with a default value of `15`. 
+
+The function should return the same summary statistics as before, plus an additional column called **n_high_burden** that counts the number of non-missing *Salmonella* case counts above the threshold. 
+
+Call your function for the `"Northeast"` state cluster using the default threshold.
+
+```{r}
+
+```
+
+## Question 3
+
+How many high-burden *Salmonella* readings does `summarize_salmonella_flagged()` report for the `"Northeast"` state cluster using the default threshold of 15? Enter a whole number.
+
+See our course LMS for the answer choices and submit your response.
+
 # Task 5
 
-Refactor `summarize_salmonella_by_cluster()` into a new function called `summarize_salmonella_flagged()` that accepts a second argument, **threshold**, with a default value of `15`. The function should return the same summary statistics as before, plus an additional column called **n_high_burden** that counts the number of non-missing *Salmonella* case counts above the threshold. Call your function for the `"Northeast"` state cluster using the default threshold.
+Call `summarize_salmonella_flagged()` on the remaining three state clusters — `"Southeast"`, `"Midwest"`, and `"Southwest"` — using `10` as the threshold value. Run each call in its own code block and examine the results.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Question 4
+
+Call `summarize_salmonella_flagged()` on the remaining three state clusters — `"Southeast"`, `"Midwest"`, and `"Southwest"` — using `10` as the threshold value. Which region had the fewest number of high-burden *Salmonella* readings?
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 6
+
+A colleague has written a function that wraps `dplyr::group_by()` and `summarize()` to compute grouped means, but it throws an error when called. 
+
+Run the broken `grouped_mean()` function below to see the error.
+
+```{r}
+#| error: true
+#| eval: false
+
+grouped_mean <- function(df, group_col, value_col) {
+  df |>
+    group_by(group_col) |>
+    summarize(mean_val = mean(value_col, na.rm = TRUE))
+}
+
+grouped_mean(foodborne_surveillance, state_cluster, salmonella_cases)
+```
+
+Copy and paste the `grouped_mean()` function code into the codeblock below, then fix it.
+
+```{r}
+
+```
+
+Run the corrected `grouped_mean()` function to verify it works:
+
+```{r}
+grouped_mean_broken(foodborne_surveillance, state_cluster, salmonella_cases)
+```
+
+## Question 5
+
+Which region had the fewest number of high-burden *Salmonella* readings?
+
+See our course LMS for the answer choices and submit your response.
+
+
+# Task 7
+
+Write a function called `compute_grouped_summary` that accepts three arguments: 
+1. a data frame, 
+2. a grouping column, and 
+3. a numeric column (both specified as bare column names). 
+
+The function should compute the mean, median, and max of the numeric column for each group and return the result as a tibble. 
+
+Then call the function for three different combinations: 
+1. **salmonella_cases** grouped by **state_cluster**, 
+2. **hosp_rate** grouped by **state_cluster**, and 
+3. **salmonella_cases** grouped by **county_id**.
+
+```{r}
+# Define the compute_grouped_summary() function
+```
+
+Call the function to summarize **salmonella_cases** grouped by **state_cluster**:
+
+```{r}
+
+```
+
+## Question 6
+
+What is the **mean_val** for the Southwest state cluster when summarizing **salmonella_cases** by **state_cluster**? Round your answer to one decimal place.
+
+Call the function to summarize **hosp_rate** grouped by **state_cluster**:
 
 ```{r}
 
@@ -186,91 +235,20 @@ Refactor `summarize_salmonella_by_cluster()` into a new function called `summari
 
 ## Question 7
 
-How many high-burden *Salmonella* readings does `summarize_salmonella_flagged()` report for the `"Northeast"` state cluster using the default threshold of 15? Enter a whole number.
+What is the **median_val** for the Southwest state cluster when summarizing **hosp_rate** by **state_cluster**? Round your answer to one decimal place.
 
-See our course LMS for the answer choices and submit your response.
-
-# Task 6
-
-Call `summarize_salmonella_flagged()` on the remaining three state clusters — `"Southeast"`, `"Midwest"`, and `"Southwest"` — using `10` as the threshold value. Run each call in its own code block and examine the results.
+Call the function to summarize **salmonella_cases** grouped by **county_id**:
 
 ```{r}
-```
 
-```{r}
-```
-
-```{r}
 ```
 
 ## Question 8
 
-Call `summarize_salmonella_flagged()` on the remaining three state clusters — `"Southeast"`, `"Midwest"`, and `"Southwest"` — using `10` as the threshold value. Which region had the fewest number of high-burden *Salmonella* readings?
-
-See our course LMS for the answer choices and submit your response.
-
-# Task 7
-
-A colleague has written a function that wraps `dplyr::group_by()` and `summarize()` to compute grouped means, but it throws an error when called. Run the broken function below to see the error, then fix it.
-
-```{r}
-#| error: true
-#| eval: false
-
-
-```
-
-## Question 9
-
-Which of the following correctly fixes the broken `grouped_mean_broken()` function so that column name arguments are properly forwarded to `dplyr` verbs?
-
-
-
-
-
-Run the corrected function to verify it works:
-
-See our course LMS for the answer choices and submit your response.
-
-# Task 8
-
-Write a function called `compute_grouped_summary` that accepts three arguments: a data frame, a grouping column, and a numeric column (both specified as bare column names). The function should compute the mean, median, and max of the numeric column for each group and return the result as a tibble. Then call the function for three different combinations: **salmonella_cases** grouped by **state_cluster**, **hosp_rate** grouped by **state_cluster**, and **salmonella_cases** grouped by **county_id**.
-
-Define the `compute_grouped_summary()` function:
-
-```{r}
-```
-
-Call the function to summarize **salmonella_cases** grouped by **state_cluster**:
-
-```{r}
-```
-
-## Question 11
-
-What is the **mean_val** for the Southwest state cluster when summarizing **salmonella_cases** by **state_cluster**? Round your answer to one decimal place.
-
-
-Call the function to summarize **hosp_rate** grouped by **state_cluster**:
-
-See our course LMS for the answer choices and submit your response.
-
-## Question 12
-
-What is the **median_val** for the Southwest state cluster when summarizing **hosp_rate** by **state_cluster**? Round your answer to one decimal place.
-
-
-Call the function to summarize **salmonella_cases** grouped by **county_id**:
-
-See our course LMS for the answer choices and submit your response.
-
-## Question 13
-
 What is the **max_val** for county CTY-SW2 when summarizing **salmonella_cases** by **county_id**?
 
-See our course LMS for the answer choices and submit your response.
 
-# Task 9
+# Task 8
 
 Create a new tibble called **school_gi_reports** representing gastrointestinal illness reports from school districts. Then apply `compute_grouped_summary()` to this new dataset — grouping by **grade_band** and summarizing **gi_cases** — without making any changes to the function itself.
 
@@ -303,26 +281,25 @@ school_gi_reports <- tribble(
 Apply `compute_grouped_summary()` to the **school_gi_reports** dataset, grouping by **grade_band** and summarizing **gi_cases**:
 
 ```{r}
+
 ```
 
-## Question 14
+## Question 9
 
 What is the **mean_val** for the High School grade band? Round your answer to one decimal place.
 
-
 Group by **district_type** to cross-check with a different dimension:
 
-See our course LMS for the answer choices and submit your response.
+```{r}
+compute_grouped_summary(school_gi_reports, district_type, gi_cases)
+```
 
-## Question 15
+## Question 10
 
 What is the **max_val** for the Urban district type in the **school_gi_reports** dataset?
 
-See our course LMS for the answer choices and submit your response.
-
-## Question 16
+## Question 11
 
 Did `compute_grouped_summary()` require any modification to work on the **school_gi_reports** dataset?
 
 See our course LMS for the answer choices and submit your response.
-
