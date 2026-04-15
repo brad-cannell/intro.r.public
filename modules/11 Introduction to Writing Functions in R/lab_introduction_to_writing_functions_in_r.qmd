@@ -421,7 +421,7 @@ summarize_pm25_flagged("West", threshold = 20)
 
 Call `summarize_pm25_flagged()` on the remaining three regions — `"Southeast"`, `"Midwest"`, and `"West"` — using `20` as the threshold value. Which region had the greatest number of high-risk PM2.5 readings?
 
-* The **Southeast** region had **10** high-risk PM2.5 readings, the **Midwest** region had **3** high-risk PM2.5 readings, and the **Southwest** region had **1** high-risk PM2.5 readings. Therefore, the **Southeast** region had the greatest number of high-risk PM2.5 readings.
+* The Southeast region had 10 high-risk PM2.5 readings, the Midwest region had 3 high-risk PM2.5 readings, and the Southwest region had 1 high-risk PM2.5 readings. Therefore, the Southeast region had the greatest number of high-risk PM2.5 readings.
 
 
 # Task 8
