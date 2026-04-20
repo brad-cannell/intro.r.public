@@ -257,7 +257,7 @@ In **symptom_summary**, what is the standard deviation of **sym_fatigue**, round
 
 ## Question 7
 
-If the `.names` argument were omitted from the `across()` call in Task 6, what would happen to the output?
+If the `.names` argument were omitted from the `across()` call in the Task above, what would happen to the output?
 
 See our course LMS for the answer choices and submit your response.
 
