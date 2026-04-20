@@ -1,0 +1,619 @@
+---
+title: "Lab: Column-wise Operations with dplyr"
+author: "Brad Cannell"
+date-modified: 2026-04-20
+format:
+  html:
+    embed-resources: true
+---
+
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+#| label: load-packages
+library(dplyr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+library(tidyr, warn.conflicts = FALSE)
+library(stringr, warn.conflicts = FALSE)
+library(snakecase, warn.conflicts = FALSE)
+```
+
+
+# Overview
+
+You are a data analyst embedded with the Epi-Workbench Research Consortium's rapid response team, which monitors respiratory illness trends across a network of affiliated health facilities in five geographic regions. Following an uptick in respiratory illness reports this season, the EWBRC has received a weekly situation report dataset from the surveillance network — a wide-format file capturing symptom counts, laboratory test results, and basic patient demographics for dozens of patients per site. 
+
+The dataset is messy in the ways real surveillance data typically are: column names are inconsistent, a sentinel code has been used in place of missing values in some symptom fields, and the lab result columns follow no clear naming convention. Your task is to clean, standardize, and summarize this dataset so that a clear, accurate situation report can be delivered to the relevant decision-makers by end of day. 
+
+Along the way, you will discover that the most straightforward approach — writing out a separate line of code for each column you want to transform or summarize — quickly becomes error-prone and difficult to maintain when a dataset spans dozens of columns. By the end of this lab, you will be able to use `dplyr`'s column-wise operation tools, particularly `across()`, `if_all()`, and `if_any()`, to perform complex data cleaning and summary tasks concisely, accurately, and in a way that scales gracefully as new sites and variables are added to the surveillance network.
+
+
+# Task 1
+
+Run the code below to create the simulated surveillance dataset **surveillance_wide**. This dataset represents weekly respiratory illness surveillance records from five regional health facilities. It contains site identifiers, patient demographics, weekly symptom count columns (some containing the sentinel value `99` and some true `NA` values), and binary laboratory result columns with inconsistently formatted names.
+
+```{r}
+set.seed(42)
+
+surveillance_wide <- tibble(
+  site_id = c(
+    rep("Site_A", 10), rep("Site_B", 9), rep("Site_C", 8),
+    rep("Site_D", 7), rep("Site_E", 6)
+  ),
+  age_group = sample(
+    c("0-17", "18-44", "45-64", "65+"), 40, replace = TRUE
+  ),
+  sex = sample(c("Male", "Female"), 40, replace = TRUE),
+
+  # Symptom columns with prefix sym_
+  sym_fever = as.integer(c(
+    2, 99, 0, 3, 1, NA, 4, 99, 1, 2,
+    3, 0, 1, 99, 5, 2, 0, 3, 1,
+    NA, 4, 2, 0, 1, 3, 5, 2, 1,
+    0, 3, 4, 1, 2, 0, 5, 3, 1, 2, 4, 0
+  )),
+  sym_cough = as.integer(c(
+    1, 3, 99, 0, 2, 4, 1, 0, 3, 5,
+    2, 99, 0, 1, 3, 4, 99, 2, 0,
+    1, 3, NA, 5, 2, 0, 4, 1, 3,
+    2, 0, 1, 4, 3, 5, 2, 0, 1, 3, 2, 4
+  )),
+  sym_sob = as.integer(c(
+    0, 1, 2, 99, 3, 0, 1, NA, 2, 4,
+    99, 3, 0, 1, 2, 99, 4, 0, 1,
+    3, 2, 0, 1, NA, 99, 5, 0, 2,
+    1, 3, 4, 0, 2, 1, 3, 5, 0, 1, 2, 3
+  )),
+  sym_fatigue = as.integer(c(
+    3, 2, 1, 0, 99, 4, 3, 1, 2, 0,
+    99, 1, 3, 2, 0, 4, 5, 99, 1,
+    2, 0, 3, 1, 4, NA, 2, 0, 3,
+    5, 1, 2, 4, 0, 3, 1, 2, 0, 4, 3, 1
+  )),
+  sym_headache = as.integer(c(
+    1, 0, 99, 2, 3, 1, NA, 4, 0, 2,
+    3, 1, 0, 2, 99, 4, 3, 0, 1,
+    99, 2, NA, 3, 1, 0, 4, 5, 2,
+    1, 0, 3, 2, 4, 1, 0, 3, 5, 2, 1, 0
+  )),
+  sym_myalgia = as.integer(c(
+    0, 1, 2, 3, 0, 99, 1, 2, NA, 4,
+    3, 0, 99, 1, 2, 0, 3, 4, 99,
+    1, 0, 2, 3, 99, 5, 0, 1, 2,
+    3, 4, 0, 1, 2, 3, 0, 1, 4, 2, 0, 3
+  )),
+
+  # Lab result columns with inconsistent names
+  labRSV = as.integer(c(
+    0, 1, 0, 0, 0, 1, 0, 0, 0, 1,
+    0, 0, 1, 0, 0, 0, 0, 1, 0,
+    0, 0, 0, 1, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0
+  )),
+  lab_FLU_A = as.integer(c(
+    0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
+    0, 1, 0, 0, 0, 0, 1, 0, 0,
+    0, 0, 0, 0, 1, 0, 0, 0, 0,
+    0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0
+  )),
+  Lab_flu_b = as.integer(c(
+    0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 1, 0, 0,
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0
+  )),
+  COVID19 = as.integer(c(
+    1, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+    0, 0, 0, 1, 0, 0, 0, 0, 0,
+    1, 0, 0, 0, 0, 0, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0
+  )),
+  labAdeno_1 = as.integer(c(
+    0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 0, 0, 0,
+    0, 1, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1
+  ))
+)
+
+surveillance_wide
+```
+
+## Notes for students
+
+1. We use `set.seed(42)` before calling `sample()` so that the random demographic assignments are reproducible — every learner will get the same dataset.
+2. The symptom columns all share the prefix `sym_`, which will make them easy to select programmatically using tidy-select helpers like `starts_with("sym_")` in later tasks.
+3. Notice that the lab result column names are messy: **labRSV** uses camelCase, **lab_FLU_A** has uppercase letters, **Lab_flu_b** has an uppercase first letter, **COVID19** is missing the `lab_` prefix entirely, and **labAdeno** uses camelCase.
+4. The integer `99` in the symptom columns is a sentinel value meaning "not recorded" — it is *not* a real symptom count. We will need to replace these with `NA` before computing any summary statistics.
+
+
+# Task 2
+
+Use `glimpse()` to inspect the structure of **surveillance_wide**. Examine the output to determine how many columns are numeric (integer), which columns are character, and where the sentinel value `99` or true `NA` values might appear. This information will guide your cleaning strategy for the tasks ahead.
+
+```{r}
+surveillance_wide |>
+  glimpse()
+```
+
+```{r}
+# Alternative approach for counting integer columns
+select(surveillance_wide, where(is.integer)) |> ncol()
+```
+
+## Question 1
+
+How many numeric (integer) columns does **surveillance_wide** contain?
+
+* 11
+
+## Notes for students
+
+1. The `glimpse()` function from `dplyr` displays each column as a row in the output, showing the column name, its data type, and the first several values — making it much easier to scan a wide dataset than `print()` would be.
+2. Count the columns labeled `<int>` in the output — these are the numeric columns that `where(is.numeric)` will select in later tasks. You should see 11 integer columns: six `sym_*` columns and five lab result columns.
+3. You can spot some `99` values in the symptom column previews. Remember, these are *not* legitimate counts — they need to be recoded to `NA` before we compute means or other summary statistics.
+
+
+# Task 3
+
+Notice that the lab result column names are messy: **labRSV** uses camel case, **lab_FLU_A** has uppercase letters, **Lab_flu_b** has an uppercase first letter, **COVID19** is missing the `lab_` prefix entirely, and **labAdeno_1** uses a mix of camel case and snake case. Your next task is to standardize the lab column names.
+
+a. Use `rename_with()` to standardize all column names in **surveillance_wide**. Apply `to_snake_case()` from the `snakecase` package to convert every column name to consistent snake_case. 
+
+b. Use `rename()` to add the `lab_` prefix to **covid_19**.
+
+```{r}
+surv_clean_names <- surveillance_wide |>
+  rename_with(to_snake_case) |> 
+  rename(
+    lab_covid_19 = covid_19
+  )
+```
+
+c. Use `names()` to display the column names of **surv_clean_names** and verify that all names are now in consistent snake_case with the `lab_` prefix applied to all lab result columns.
+
+```{r}
+names(surv_clean_names)
+```
+
+## Notes for students
+
+1. The `to_snake_case()` function from the `snakecase` package converts names like `"labRSV"` to `"lab_rsv"`, `"lab_FLU_A"` to `"lab_flu_a"`, `"Lab_flu_b"` to `"lab_flu_b"`, `"COVID19"` to `"covid_19"`, and `"labAdeno_1"` to `"lab_adeno_1"`. This handles most of the inconsistencies automatically.
+2. After `to_snake_case()`, one name still needs adjustment: `"covid_19"` should become `"lab_covid_19"`.
+3. After this step, all lab columns share the prefix `lab_`, and all symptom columns share the prefix `sym_`. This consistent naming convention is what makes tidy-select helpers like `starts_with()` so powerful in the tasks ahead.
+
+## Question 2
+
+After running the Task 3 code, which of the following is a column name in **surv_clean_names**?
+
+```{r}
+#| eval: false
+
+# Incorrect: This is the original, un-standardized name. After to_snake_case(), this name no longer exists.
+labRSV
+```
+
+```{r}
+#| eval: false
+
+# Correct: to_snake_case() converted labRSV to lab_rsv.
+lab_rsv
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: to_snake_case() converted COVID19 to covid_19. Then, adding "lab_" converted it to lab_covid_19.
+lab_covid19
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: to_snake_case() converted labAdeno_1 to lab_adeno_1.
+lab_adeno
+```
+
+
+# Task 4
+
+Use `mutate()` with `across()` to replace the sentinel value `99` with `NA` in all columns whose names start with `"sym_"`. 
+
+a. Use the `starts_with()` helper to select the target columns.
+
+b. Use an anonymous function to perform the replacement.
+
+c. Use the `.names` argument set to `"{.col}_clean"` so that the recoded values appear in new columns alongside the originals. 
+
+d. Store the result as **surv_recoded**.
+
+```{r}
+surv_recoded <- surv_clean_names |>
+  mutate(
+    across(
+      .cols  = starts_with("sym_"),
+      .fns   = \(x) if_else(x == 99L, NA_integer_, x),
+      .names = "{.col}_clean"
+    )
+  )
+```
+
+e. Then, use `select()` with `starts_with()` to display only the original and cleaned symptom columns side by side so you can verify the recode.
+
+```{r}
+surv_recoded |>
+  select(starts_with("sym_"))
+```
+
+## Notes for students
+
+1. We use `99L` (an integer literal) and `NA_integer_` to ensure our comparison and replacement values match the integer type of the symptom columns. Using `99` (a double) or plain `NA` can sometimes cause subtle type coercion issues.
+2. The `.names = "{.col}_clean"` argument tells `across()` to create new columns with `_clean` appended to each original column name rather than overwriting the originals. This is valuable during data cleaning because it lets us compare the before and after values to verify the recode worked correctly.
+3. The `starts_with("sym_")` helper selects all six symptom columns in one concise expression. If the surveillance network later adds a new symptom column named, say, `sym_sore_throat`, this code would automatically include it — no changes needed.
+
+## Question 3
+
+How many sentinel values (`99`) were replaced with `NA` across all six symptom columns?
+
+```{r}
+# Calculate the number of missing values before converting 99 to NA
+missing_count_before <- surv_clean_names |> 
+  select(starts_with("sym_")) |> 
+  pivot_longer(everything()) |> 
+  summarise(missing_count = sum(is.na(value))) # 9
+```
+
+```{r}
+# Calculate the number of missing values after converting 99 to NA
+missing_count_after <- surv_recoded |> 
+  select(ends_with("_clean")) |> 
+  pivot_longer(everything()) |> 
+  summarise(missing_count = sum(is.na(value))) # 
+```
+
+```{r}
+# Calculate the difference
+missing_count_after - missing_count_before
+```
+
+* 20
+
+## Notes for students
+
+1. To count how many sentinel values were replaced, you can compare the original and cleaned columns. Any cell that was `99` in an original column should now be `NA` in the corresponding `_clean` column.
+2. Alternatively, you can calculate the number of `NA` values in **surv_clean_names** to the number in **surv_recoded**. The difference is equal to the number of values converted to `NA`.
+
+
+# Task 5
+
+After checking your data, you feel confident that you correctly replaced the sentinel value `99` with `NA` in all columns whose names start with `"sym_"`. At this point, the `_clean` version of each of the symptom columns no longer serve a purpose. 
+
+a. Rerun your code from Task 4: Use `mutate()` with `across()` to replace the sentinel value `99` with `NA` in all columns whose names start with `"sym_"`.
+
+b. This time, DO NOT use the `.names` argument so that the recoded values will overwrite the existing values in the symptoms columns. 
+
+c. Store the result as **surv_recoded**.
+
+```{r}
+surv_recoded <- surv_clean_names |>
+  mutate(
+    across(
+      .cols  = starts_with("sym_"),
+      .fns   = \(x) if_else(x == 99L, NA_integer_, x)
+    )
+  )
+surv_recoded
+```
+
+## Question 4
+
+The **surv_recoded** data frame contains ____ rows and ____ columns.
+
+* The **surv_recoded** data frame contains 40 rows and 14 columns.
+
+
+# Task 6
+
+Use `filter()` with `if_all()` or `if_any()` to retain only the rows in **surv_recoded** that have no missing values across all recoded symptom columns (those starting with `"sym_"`). 
+
+a. Store the resulting dataset as **surv_complete**. 
+
+```{r}
+surv_complete <- surv_recoded |>
+  filter(
+    if_all(starts_with("sym_"), \(x) !is.na(x))
+  )
+```
+
+b. Calculate the number of rows that were excluded from **surv_complete**.
+
+```{r}
+# Calculate the number of rows that were excluded from surv_complete
+nrow(surv_recoded) - nrow(surv_complete)
+```
+
+## Notes for students
+
+1. The `if_all()` function inside `filter()` requires that the condition — here, `!is.na(x)` — is `TRUE` for *every* column matched by the tidy-select expression. A row is kept only if none of the `_clean` symptom columns contain `NA`.
+2. Remember that the `_clean` columns now contain `NA` in places where either the original data had a true `NA` *or* where we recoded a `99` sentinel in Task 4. So this filter removes rows affected by either type of missingness.
+3. We store the complete-case dataset as **surv_complete** because we will use it again in later tasks for grouped summaries. Working with a complete-case dataset for summary statistics avoids the complication of deciding how to handle `NA` values differently for each summary function.
+
+## Question 5
+
+How many rows were excluded by the `if_all()` complete-case filter in Task 5?
+
+* 21
+
+
+# Task 7
+
+Now that you've cleaned the data, you are ready to perform some analyses. You will start by calculating three summary statistics for every cleaned symptom column: the count of `NA` values, the mean, and the standard deviation.
+
+a. Use `summarise()` with `across()` to compute the mean and the standard deviation of the cleaned symptom columns.
+
+b. Pass a named list of functions to the `.fns` argument so that the output columns follow the `{col}-{.fn}` naming convention.
+
+c. Name the output columns using the `{col}-{.fn}` naming convention (notice the hyphen instead of an underscore).
+
+d. Store the result as **symptom_summary**.
+
+```{r}
+symptom_summary <- surv_complete |>
+  summarise(
+    across(
+      .cols  = starts_with("sym_"),
+      .fns   = list(
+        n_missing = \(x) sum(is.na(x)),
+        mean      = \(x) mean(x),
+        sd        = \(x) sd(x)
+      ),
+      .names = "{.col}-{.fn}"
+    )
+  )
+symptom_summary
+```
+
+e. Use `pivot_longer()` from `tidyr` to reshape **symptom_summary** into long format so you can more easily read the 18 summary columns. 
+  - Pivot all columns.
+  - Pivot the column names into a variable called **statistic** and the values into a variable called **value**.
+
+```{r}
+symptom_summary |>
+  pivot_longer(
+    cols      = everything(),
+    names_to  = c("statistic", ".value"),
+    values_to = "value",
+    names_sep = "-"
+  )
+```
+
+## Notes for students
+
+1. We pass a *named list* of functions to `.fns`. The names we give — `n_missing`, `mean`, `sd` — become the suffixes in the output column names. For example, the mean of **sym_fever** will appear in a column called **sym_fever_mean**.
+2. Because we are working with **surv_complete** (the complete-case dataset from above), none of the `sym_` columns contain `NA` values, so we don't need `na.rm = TRUE` inside `mean()` or `sd()` here. The `n_missing` statistic should confirm this by returning `0` for every column.
+3. The `starts_with("sym_")` helper selects exactly the six recoded symptom columns we created above. This illustrates how thoughtful column naming pays off — we can target precisely the columns we want without listing them by name.
+4. Using `pivot_longer()` on the result makes it easier to read the wide output, since each of the 18 summary columns (6 symptom columns × 3 statistics) is displayed on its own row.
+
+## Question 6
+
+In **symptom_summary**, what is the standard deviation of **sym_fatigue**, rounded to two decimal places?
+
+* 1.57
+
+## Question 7
+
+If the `.names` argument were omitted from the `across()` call in Task 6, what would happen to the output?
+
+```{r}
+#| eval: false
+
+# Incorrect: .names is optional — across() uses a sensible default when it is omitted. 
+# "The code would error because .names is required whenever a named list of functions is passed to .fns."
+```
+
+```{r}
+#| eval: false
+
+# Correct: When a named list of functions is passed, across() defaults to {.col}_{.fn}, so specifying .names = "{.col}_{.fn}" is redundant here. 
+# "The output column names would follow the default {.col}_{.fn} pattern."
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: Overwriting only happens inside mutate() when a single unnamed function is used and no .names is supplied — and even then, summarise() produces a new tibble, not a modified one. 
+# "The output columns would overwrite the original symptom columns."
+```
+
+```{r}
+#| eval: false
+
+# Incorrect: The default naming pattern includes both the column and the function name.
+# "The output columns would be named only by the function name, losing the column identity."
+```
+
+
+# Task 8
+
+Your next task is to determine which sites, if any, have particularly high rates of each symptom.
+
+a. Group **surv_complete** by **site_id** and use `summarise()` with `across()` to compute the mean and median for all cleaned symptom columns by site.
+
+b. Pass a named list of functions to produce output columns following the `{col}-{fn}` pattern. 
+
+c. Store the result as **site_summary_wide**.
+
+```{r}
+site_summary_wide <- surv_complete |>
+  group_by(site_id) |>
+  summarise(
+    across(
+      starts_with("sym_"),
+      list(
+        mean   = \(x) mean(x),
+        median = \(x) median(x)
+      ),
+      .names = "{.col}-{.fn}"
+    )
+  )
+
+site_summary_wide
+```
+
+d. Use `pivot_longer()` from `tidyr` to reshape **site_summary_wide** into long format so you can more easily read the 12 summary columns. 
+  - Pivot all columns except **site_id**.
+  - Pivot the column names into a variable called **symptom** and the values into variables named to reflect the statistic (mean/median) they contain.
+
+e. Store the pivotted result as **site_summary_long**.
+
+```{r}
+site_summary_long <- site_summary_wide |> 
+  pivot_longer(
+    cols = -site_id,
+    names_to = c("symptom", ".value"),
+    names_sep = "-"
+  )
+site_summary_long
+```
+
+## Question 8
+
+Which site had the highest mean cough count?
+
+```{r}
+site_summary_long |> 
+  filter(str_detect(symptom, "cough")) |> 
+  arrange(desc(mean))
+```
+
+* Site_C (3.25)
+
+Site_C = 3.25
+Site_A = 3
+Site_D = 2.57
+Site_E = 2
+
+
+# Task 9
+
+Produce the same site-level mean and median symptom summary from the previous task, but this time use a reshape-then-summarize approach. 
+
+a. Start with **surv_complete**.
+
+b. Use `pivot_longer()` to reshape all cleaned symptom columns into long format with columns named **symptom** and **count**.
+
+c. Use `group_by()` and `summarise()` to compute the mean and median for each site–symptom combination. 
+
+d. Store the result as **site_summary_long**.
+
+```{r}
+site_summary_long <- surv_complete |>
+  pivot_longer(
+    cols      = starts_with("sym_"),
+    names_to  = "symptom",
+    values_to = "count"
+  ) |>
+  group_by(site_id, symptom) |>
+  summarise(
+    mean   = mean(count),
+    median = median(count),
+    .groups = "drop"
+  )
+site_summary_long
+```
+
+## Notes for students
+
+1. The `pivot_longer()` function from `tidyr` takes multiple columns and stacks them into two columns: one for the column names (**symptom**) and one for the values (**count**). This converts our wide dataset into a tidy long format where each row represents one symptom measurement for one patient at one site.
+2. After reshaping, we group by both **site_id** and **symptom** so that `summarise()` computes statistics for each unique site–symptom combination. The result is a tidy table with one row per combination — much easier to read, filter, and plot than the wide version.
+3. We include `.groups = "drop"` in `summarise()` to remove the grouping structure from the output. This is good practice to avoid unexpected grouped behavior in subsequent operations.
+4. Both the `across()` first approach (previous task) and the `pivot_longer()` first approach (this task) produce the same information.
+
+## Question 9
+
+Which site had the lowest median fatigue count?
+
+```{r}
+site_summary_long |> 
+  filter(str_detect(symptom, "fatigue")) |> 
+  arrange(median)
+```
+
+* Site_C (0.5)
+
+Site_C = 0.75
+Site_A = 1.5
+Site_E = 1.83
+Site_D = 2.57
+
+
+# Task 10
+
+Your next task is to start analyzing the lab results. Specifically, you want to calculate the number of patients who had at least one positive lab result. 
+
+a. Use `filter()` with `if_all()` or `if_any()` to identify patients in **surv_complete** who had at least one positive result (value of 1) across all binary lab result columns (those starting with `"lab_"`). 
+
+b. Store the result as **any_positive**.
+
+```{r}
+any_positive <- surv_complete |>
+  filter(
+    if_any(starts_with("lab_"), \(x) x == 1)
+  )
+any_positive |> nrow()
+```
+
+## Notes for students
+
+1. The `if_any()` function is the counterpart to `if_all()`: it returns `TRUE` for a row if *at least one* of the selected columns meets the condition. Here, we keep a row if any lab result column equals `1`.
+2. Contrast this with `if_all()`: if we replaced `if_any()` with `if_all()` in this call, we would keep only rows where *every* lab result column equals `1` — meaning patients who tested positive for all five pathogens simultaneously. That would return zero rows.
+
+## Question 10
+
+How many patients in **surv_complete** had at least one positive result across all binary lab result columns?
+
+* 16
+
+
+# Task 11
+
+Your next task is to calculate z-score–normalized versions of all numeric columns in **surv_complete**. A z-score tells you how many standard deviations a value is above or below the column mean. A z-score of 0 means the value equals the mean; positive values are above the mean; negative values are below. This normalization is useful when comparing columns that may have different scales or units.
+
+a. Use `mutate()` with `across()` and `where(is.numeric)` to create z-score–normalized versions of all numeric columns in **surv_complete**. 
+
+b. Use the anonymous function shorthand `\(x)` to compute the z-score as `(x - mean(x)) / sd(x)`, and set the `.names` argument to `"{.col}_z"` so that each new column name ends with `_z`. 
+
+c. Store the result as **surv_z**.
+
+```{r}
+surv_z <- surv_complete |>
+  mutate(
+    across(
+      where(is.numeric),
+      \(x) (x - mean(x)) / sd(x),
+      .names = "{.col}_z"
+    )
+  )
+```
+
+```{r}
+# View the first 10 rows of the z-score columns
+surv_z |>
+  select(ends_with("_z")) |>
+  head(10)
+```
+
+## Notes for students
+
+1. The `where(is.numeric)` selector applies a predicate function to every column and selects those that return `TRUE`. 
+2. Because we are working with **surv_complete** (the complete-case dataset from above), none of the `sym_` columns contain `NA` values, so we don't need `na.rm = TRUE` inside `mean()` or `sd()` here.
+3. The `.names = "{.col}_z"` argument appends `_z` to each column name, creating new columns like **sym_fever_clean_z** and **lab_rsv_z** alongside the originals.
+
+## Question 11
+
+In **surv_z**, what is the value in **sym_fever_clean_z** for the first row, rounded to two decimal places?
+
+* -0.09
