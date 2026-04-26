@@ -1,0 +1,233 @@
+---
+title: "Lab: Writing For Loops in R"
+author: "[Your Name]"
+date-modified: [Enter Date]
+format:
+  html:
+    embed-resources: true
+---
+
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+library(readr, warn.conflicts = FALSE)
+```
+
+
+# Overview
+
+You are a data analyst on the Surveillance and Analytics team at the Epi-Workbench Research Consortium (EWBRC), supporting a multi-site initiative called the Community Chronic Disease Risk Factor Survey. Over the past year, EWBRC field teams at three regional sites have collected structured survey data on chronic disease risk factors — including biometric measurements, self-reported health behaviors, and demographic characteristics — from community members at each location. As the consortium prepares to consolidate and summarize these site-level datasets for a progress report, your team has run into a familiar problem: analysts are copying and pasting the same processing steps over and over again, once per variable and once per site, and small inconsistencies in those repeated blocks are making their way into the results. Your task is to replace that fragile, copy-paste workflow with for loops that perform the same operations systematically and correctly across every column and every site.
+
+By the end of this lab, you will know how to pre-allocate results containers, iterate over data frame columns by position and by name, dynamically create and name objects in your environment, construct column names programmatically, tabulate categorical variables in a loop, accumulate results across iterations, and wrap a completed loop into a reusable function — a toolkit that will serve you in nearly any repeated-processing scenario you encounter in public health data work.
+
+
+# Task 1
+
+Your first step is to import the primary survey dataset for EWBRC Site A so you have something concrete to iterate over in later tasks. Do the following:
+
+- Use `read_csv()` from `readr` to import **survey_site_a.csv** into an object named **survey_site_a**.
+- Print the tibble to confirm it imported correctly.
+
+```{r}
+# Import the data from Survey Site A
+
+
+# View the data from Survey Site A
+
+```
+
+## Question 1
+
+After completing Task 1, how many rows are in **survey_site_a**?
+
+
+# Task 2
+
+Next, import the two additional per-site datasets using a for loop, so you have all three site datasets available for the per-site operations in Task 5. Do the following:
+
+- Create a character vector **site_files** containing `"survey_site_b.csv"` and `"survey_site_c.csv"`.
+- Create a matching character vector **site_objects** containing the object names `"survey_site_b"` and `"survey_site_c"`.
+- Write a `for()` loop that iterates over positions `seq_along(site_files)`, reads each CSV with `read_csv()`, and uses `assign()` to bind the resulting tibble to the corresponding object name.
+- Print **survey_site_b** and **survey_site_c** to confirm they imported correctly.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Question 2
+
+After completing Task 2, how many rows are in **survey_site_c**?
+
+
+# Task 3
+
+Use a for loop to compute the mean of every numeric risk-factor column in **survey_site_a**. Specifically:
+
+- Identify the five numeric risk-factor columns: **bmi**, **sbp**, **glucose**, **activity_hrs**, and **diet_score**.
+- Pre-initialize a numeric vector named **column_means** of the appropriate length, with names matching the target columns.
+- Write a for loop that iterates over the columns by position and stores each column's mean in **column_means** using `[[ ]]` assignment.
+- Print the result.
+
+```{r}
+
+```
+
+## Question 3
+
+After completing Task 3, what is the value stored in **column_means** for **sbp** (rounded to one decimal place)?
+
+
+# Task 4
+
+Generalize the loop from Task 3 so it works on a data frame of any width. Specifically:
+
+- Rewrite the loop using `seq_along()` instead of `1:length()` so it handles edge cases gracefully.
+- Test it on a wider version of **survey_site_a** that also includes **age** as a numeric column.
+
+```{r}
+
+```
+
+## Question 4
+
+After completing Task 4, what is the value stored in **column_means** for **diet_score** (rounded to one decimal place)?
+
+
+# Task 5
+
+Use a for loop with `assign()` to dynamically create cleaned, renamed copies of each site's dataset. Specifically:
+
+- Create a character vector named **site_codes** containing `"a"`, `"b"`, and `"c"`.
+- Loop over **site_codes**, and at each iteration:
+    - Use `paste0()` to build the source object name (e.g., `"survey_site_a"`) and the target object name (e.g., `"survey_clean_a"`).
+    - Use `get()` to retrieve the source dataset and `assign()` to create the cleaned copy.
+- For now, "cleaning" means dropping rows with `NA` values in any numeric column, which we can do with `tidyr::drop_na()`.
+
+```{r}
+
+```
+
+## Question 5
+
+After completing Task 5, how many rows are in `survey_clean_a`?
+
+
+# Task 6
+
+Extend **survey_clean_a** with paired baseline and follow-up columns, then use a for loop to compute change scores. Specifically:
+
+- Add the six new columns (**bmi_pre**, **bmi_post**, **sbp_pre**, **sbp_post**, **glucose_pre**, **glucose_post**) using the code provided.
+- Create a character vector of stems: `c("bmi", "sbp", "glucose")`.
+- Write a for loop that, at each iteration, uses `paste0()` to build the names of the `_pre`, `_post`, and `_change` columns, and assigns the change score (`post` minus `pre`) to the new column.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Question 6
+
+After completing Task 6, what is the value of **bmi_change** for the respondent with **respondent_id** equal to "A-001" (rounded to one decimal place)?
+
+
+# Task 7
+
+Use a for loop with the `.data` pronoun to print a frequency table for each categorical demographic variable in **survey_clean_a**. Specifically:
+
+- Create a character vector **categorical_cols** containing `"sex"`, `"smoking_status"`, and `"health_rating"`.
+- Write a for loop that iterates over **categorical_cols** and uses `count()` from `dplyr` together with `.data[[i]]` to tabulate each variable.
+- Print each result inside the loop.
+
+```{r}
+
+```
+
+## Question 7
+
+In Task 7, why does writing `count(col_name)` (without `.data[[ ]]`) produce incorrect output, while `count(.data[[col_name]])` works?
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 8
+
+Build a single stacked frequency table that consolidates the per-variable counts from Task 7 into one long-format data frame. Specifically:
+
+- Pre-initialize an empty tibble named **summary_table** with columns **variable**, **level**, and **n**.
+- Write a for loop over **categorical_cols** that, at each iteration, computes the counts for that variable, reshapes them to match **summary_table**, and row-binds them to the accumulating result.
+- Print the final **summary_table**.
+
+```{r}
+categorical_cols <- c("sex", "smoking_status", "health_rating")
+
+summary_table <- tibble(
+  variable = character(),
+  level = character(),
+  n = integer()
+)
+
+for (col_name in categorical_cols) {
+  counts <- survey_clean_a |>
+    count(.data[[col_name]]) |>
+    rename(level = 1) |>
+    mutate(variable = col_name, level = as.character(level)) |>
+    select(variable, level, n)
+  
+  summary_table <- bind_rows(summary_table, counts)
+}
+
+summary_table
+```
+
+## Question 8
+
+After completing Task 8, how many rows are in **summary_table**?
+
+
+# Task 9
+
+Reproduce the column-mean computation from Task 4 using `dplyr::summarise()` with `across()`, so you can compare the two approaches. Specifically:
+
+- Use `summarise()` and `across()` on **survey_clean_a** to compute the mean of all five numeric risk-factor columns (**bmi**, **sbp**, **glucose**, **activity_hrs**, **diet_score**) in a single call.
+- Make sure to pass `na.rm = TRUE` to `mean()`.
+
+```{r}
+
+```
+
+## Question 9
+
+Which of the following tasks would be better handled by `dplyr::across()` than a for loop?
+
+See our course LMS for the answer choices and submit your response.
+
+# Task 10
+
+Wrap the stacked-summary loop from Task 8 into a reusable function. Specifically:
+
+- Define a function named **stacked_counts** that takes two arguments: a data frame **df** and a character vector **cols**.
+- Inside the function, use the same accumulator pattern from Task 8 to return a long-format summary table.
+- Test the function by calling it on **survey_clean_b** with the same three categorical columns.
+
+```{r}
+
+```
+
+## Question 10
+
+After completing Task 10, how many people reported being a current smoker?

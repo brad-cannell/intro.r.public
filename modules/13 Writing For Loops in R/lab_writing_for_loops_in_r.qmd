@@ -1,0 +1,396 @@
+---
+title: "Lab: Writing For Loops in R"
+author: "Brad Cannell"
+date-modified: 2026-04-26
+format:
+  html:
+    embed-resources: true
+---
+
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+library(readr, warn.conflicts = FALSE)
+```
+
+
+# Overview
+
+You are a data analyst on the Surveillance and Analytics team at the Epi-Workbench Research Consortium (EWBRC), supporting a multi-site initiative called the Community Chronic Disease Risk Factor Survey. Over the past year, EWBRC field teams at three regional sites have collected structured survey data on chronic disease risk factors — including biometric measurements, self-reported health behaviors, and demographic characteristics — from community members at each location. As the consortium prepares to consolidate and summarize these site-level datasets for a progress report, your team has run into a familiar problem: analysts are copying and pasting the same processing steps over and over again, once per variable and once per site, and small inconsistencies in those repeated blocks are making their way into the results. Your task is to replace that fragile, copy-paste workflow with for loops that perform the same operations systematically and correctly across every column and every site.
+
+By the end of this lab, you will know how to pre-allocate results containers, iterate over data frame columns by position and by name, dynamically create and name objects in your environment, construct column names programmatically, tabulate categorical variables in a loop, accumulate results across iterations, and wrap a completed loop into a reusable function — a toolkit that will serve you in nearly any repeated-processing scenario you encounter in public health data work.
+
+
+# Task 1
+
+Your first step is to import the primary survey dataset for EWBRC Site A so you have something concrete to iterate over in later tasks. Do the following:
+
+- Use `read_csv()` from `readr` to import **survey_site_a.csv** into an object named **survey_site_a**.
+- Print the tibble to confirm it imported correctly.
+
+```{r}
+# Import the data from Survey Site A
+survey_site_a <- read_csv("survey_site_a.csv", show_col_types = FALSE)
+
+# View the data from Survey Site A
+survey_site_a
+```
+
+## Notes for students
+
+1. We set `show_col_types = FALSE` to suppress the column specification message that `read_csv()` prints by default. In a real analysis you'd often want to see that message at least once to confirm the column types were inferred correctly.
+
+## Question 1
+
+After completing Task 1, how many rows are in **survey_site_a**?
+
+* 45
+
+
+# Task 2
+
+Next, import the two additional per-site datasets using a for loop, so you have all three site datasets available for the per-site operations in Task 5. Do the following:
+
+- Create a character vector **site_files** containing `"survey_site_b.csv"` and `"survey_site_c.csv"`.
+- Create a matching character vector **site_objects** containing the object names `"survey_site_b"` and `"survey_site_c"`.
+- Write a `for()` loop that iterates over positions `seq_along(site_files)`, reads each CSV with `read_csv()`, and uses `assign()` to bind the resulting tibble to the corresponding object name.
+- Print **survey_site_b** and **survey_site_c** to confirm they imported correctly.
+
+```{r}
+site_files <- c("survey_site_b.csv", "survey_site_c.csv")
+site_objects <- c("survey_site_b", "survey_site_c")
+
+for (i in seq_along(site_files)) {
+  imported_data <- read_csv(site_files[i], show_col_types = FALSE)
+  assign(site_objects[i], imported_data)
+}
+```
+
+```{r}
+survey_site_b
+```
+
+```{r}
+survey_site_c
+```
+
+## Notes for students
+
+1. In a real EWBRC workflow, each site's file typically arrives as a separate CSV and is read in as its own object. Looping over the file names — rather than writing three separate `read_csv()` calls — is exactly the kind of repetitive workflow that for loops are designed to eliminate.
+2. `assign("survey_site_b", imported_data)` creates an object in the environment whose name is given as a string. This is how you generate object names programmatically inside a loop rather than hardcoding them, and we'll use the same pattern again in Task 5.
+3. Notice that the three datasets have different numbers of rows (45, 30, and 28). That's intentional — it lets you verify that your per-site loop in Task 5 doesn't accidentally assume every dataset has the same size.
+
+## Question 2
+
+After completing Task 2, how many rows are in **survey_site_c**?
+
+* 28
+
+
+# Task 3
+
+Use a for loop to compute the mean of every numeric risk-factor column in **survey_site_a**. Specifically:
+
+- Identify the five numeric risk-factor columns: **bmi**, **sbp**, **glucose**, **activity_hrs**, and **diet_score**.
+- Pre-initialize a numeric vector named **column_means** of the appropriate length, with names matching the target columns.
+- Write a for loop that iterates over the columns by position and stores each column's mean in **column_means** using `[[ ]]` assignment.
+- Print the result.
+
+```{r}
+numeric_cols <- c("bmi", "sbp", "glucose", "activity_hrs", "diet_score")
+
+column_means <- numeric(length(numeric_cols))
+names(column_means) <- numeric_cols
+
+for (i in 1:length(numeric_cols)) {
+  column_means[[i]] <- mean(survey_site_a[[numeric_cols[i]]], na.rm = TRUE)
+}
+
+column_means
+```
+
+## Notes for students
+
+1. **Pre-initializing the results container** before the loop — `column_means <- numeric(length(numeric_cols))` — is one of the most important habits to develop. Pre-allocating a vector of the right length means R does not have to repeatedly grow the object during each iteration, which would be slow and error-prone.
+2. The `[[ ]]` operator is doing two important things here: pulling a column out of the data frame as a plain vector (`survey_site_a[[numeric_cols[i]]]`), and assigning into a single position of our results vector (`column_means[[i]]`).
+
+## Question 3
+
+After completing Task 3, what is the value stored in **column_means** for **sbp** (rounded to one decimal place)?
+
+* 138.7
+
+
+# Task 4
+
+Generalize the loop from Task 3 so it works on a data frame of any width. Specifically:
+
+- Rewrite the loop using `seq_along()` instead of `1:length()` so it handles edge cases gracefully.
+- Test it on a wider version of **survey_site_a** that also includes **age** as a numeric column.
+
+```{r}
+numeric_cols <- c("age", "bmi", "sbp", "glucose", "activity_hrs", "diet_score")
+
+column_means <- numeric(length(numeric_cols))
+names(column_means) <- numeric_cols
+
+for (i in seq_along(numeric_cols)) {
+  column_means[[i]] <- mean(survey_site_a[[numeric_cols[i]]], na.rm = TRUE)
+}
+
+column_means
+```
+
+## Notes for students
+
+1. `seq_along(numeric_cols)` produces the integer sequence `1, 2, ..., length(numeric_cols)` — but with one important advantage over `1:length(numeric_cols)`: if `numeric_cols` ever happens to be empty (length 0), `seq_along()` returns an empty integer vector and the loop simply does nothing. By contrast, `1:length(numeric_cols)` would produce `c(1, 0)` and the loop would run twice with bad indices. This bug is very hard to spot, so `seq_along()` is the safer default.
+2. Notice how little had to change to handle a wider input — only the `numeric_cols` vector was updated. That is exactly the payoff of writing loops that adapt to the size of their input.
+
+## Question 4
+
+After completing Task 4, what is the value stored in **column_means** for **diet_score** (rounded to one decimal place)?
+
+* 4.9
+
+
+# Task 5
+
+Use a for loop with `assign()` to dynamically create cleaned, renamed copies of each site's dataset. Specifically:
+
+- Create a character vector named **site_codes** containing `"a"`, `"b"`, and `"c"`.
+- Loop over **site_codes**, and at each iteration:
+    - Use `paste0()` to build the source object name (e.g., `"survey_site_a"`) and the target object name (e.g., `"survey_clean_a"`).
+    - Use `get()` to retrieve the source dataset and `assign()` to create the cleaned copy.
+- For now, "cleaning" means dropping rows with `NA` values in any numeric column, which we can do with `tidyr::drop_na()`.
+
+```{r}
+site_codes <- c("a", "b", "c")
+
+for (code in site_codes) {
+  source_name <- paste0("survey_site_", code)
+  target_name <- paste0("survey_clean_", code)
+  
+  cleaned <- get(source_name) |>
+    tidyr::drop_na()
+  
+  assign(target_name, cleaned)
+}
+
+survey_clean_a
+```
+
+## Notes for students
+
+1. `assign()` and `get()` are the base R tools for working with object names that are *constructed at runtime* (i.e., from strings). `get("survey_site_a")` retrieves the object whose name is `"survey_site_a"`, and `assign("survey_clean_a", cleaned)` creates an object named `"survey_clean_a"` containing the value of `cleaned`.
+2. `paste0()` concatenates strings without any separator — it is the natural way to glue together a fixed prefix and a variable suffix to construct an object or column name programmatically.
+3. In modern tidyverse workflows, you would more often store multiple datasets in a list (`list(a = ..., b = ..., c = ...)`) and use `lapply()` or `purrr::map()`. But `assign()` and `get()` are still useful — and you will see them in older code, so it is important to recognize the pattern.
+
+## Question 5
+
+After completing Task 5, how many rows are in `survey_clean_a`?
+
+* 35
+
+
+# Task 6
+
+Extend **survey_clean_a** with paired baseline and follow-up columns, then use a for loop to compute change scores. Specifically:
+
+- Add the six new columns (**bmi_pre**, **bmi_post**, **sbp_pre**, **sbp_post**, **glucose_pre**, **glucose_post**) using the code provided.
+- Create a character vector of stems: `c("bmi", "sbp", "glucose")`.
+- Write a for loop that, at each iteration, uses `paste0()` to build the names of the `_pre`, `_post`, and `_change` columns, and assigns the change score (`post` minus `pre`) to the new column.
+
+```{r}
+set.seed(2026)
+
+survey_clean_a$bmi_pre <- round(survey_clean_a$bmi + runif(35, -0.5, 0.5), 1)
+survey_clean_a$bmi_post <- round(survey_clean_a$bmi_pre + runif(35, -1.5, 1.5), 1)
+survey_clean_a$sbp_pre <- round(survey_clean_a$sbp + runif(35, -2, 2))
+survey_clean_a$sbp_post <- round(survey_clean_a$sbp_pre + runif(35, -5, 5))
+survey_clean_a$glucose_pre <- round(survey_clean_a$glucose + runif(35, -2, 2), 1)
+survey_clean_a$glucose_post <- round(survey_clean_a$glucose_pre + runif(35, -8, 8), 1)
+```
+
+```{r}
+stems <- c("bmi", "sbp", "glucose")
+
+for (stem in stems) {
+  pre_col <- paste0(stem, "_pre")
+  post_col <- paste0(stem, "_post")
+  change_col <- paste0(stem, "_change")
+  
+  survey_clean_a[[change_col]] <- survey_clean_a[[post_col]] - survey_clean_a[[pre_col]]
+}
+
+survey_clean_a |>
+  dplyr::select(respondent_id, bmi_pre, bmi_post, bmi_change,
+                sbp_pre, sbp_post, sbp_change,
+                glucose_pre, glucose_post, glucose_change) |>
+  head()
+```
+
+## Notes for students
+
+1. The `_pre` / `_post` naming convention is what makes this loop possible. Because every paired variable follows the same pattern, we can construct all three column names from a single stem with `paste0()`. This is exactly the kind of situation where consistent naming pays off — and it is why analysts at EWBRC put effort into naming conventions early in a project.
+2. Notice that `survey_clean_a[[change_col]] <- ...` *creates* a new column when one with that name does not already exist. This is the same `[[ ]]` assignment pattern from Task 3, but applied to a data frame instead of a vector.
+
+## Question 6
+
+After completing Task 6, what is the value of **bmi_change** for the respondent with **respondent_id** equal to "A-001" (rounded to one decimal place)?
+
+* -0.2
+
+
+# Task 7
+
+Use a for loop with the `.data` pronoun to print a frequency table for each categorical demographic variable in **survey_clean_a**. Specifically:
+
+- Create a character vector **categorical_cols** containing `"sex"`, `"smoking_status"`, and `"health_rating"`.
+- Write a for loop that iterates over **categorical_cols** and uses `count()` from `dplyr` together with `.data[[i]]` to tabulate each variable.
+- Print each result inside the loop.
+
+```{r}
+categorical_cols <- c("sex", "smoking_status", "health_rating")
+
+for (col_name in categorical_cols) {
+  result <- survey_clean_a |>
+    count(.data[[col_name]])
+  
+  print(result)
+}
+```
+
+## Notes for students
+
+1. The `.data` pronoun comes from the `rlang` package (re-exported by `dplyr`) and is the recommended way to refer to a column *by name* inside tidyverse functions. Writing `count(.data[[col_name]])` tells `dplyr` to look up the column whose name is stored in the variable `col_name`.
+2. Why not just write `count(col_name)`? Because `dplyr` uses **non-standard evaluation** — it would interpret `col_name` as the literal column name `"col_name"` rather than looking up its value. The `.data[[ ]]` pronoun is what bridges that gap.
+3. We must use `print()` explicitly inside loops because R only auto-prints results at the top level of the console, not inside `for` loops. Forgetting `print()` is one of the most common reasons a loop appears to "do nothing."
+
+## Question 7
+
+In Task 7, why does writing `count(col_name)` (without `.data[[ ]]`) produce incorrect output, while `count(.data[[col_name]])` works?
+
+* Because `dplyr` uses non-standard evaluation and treats `col_name` as a literal column name rather than looking up the value stored in the variable; `.data[[col_name]]` tells `dplyr` to look up the column whose name is stored in `col_name`.
+
+
+# Task 8
+
+Build a single stacked frequency table that consolidates the per-variable counts from Task 7 into one long-format data frame. Specifically:
+
+- Pre-initialize an empty tibble named **summary_table** with columns **variable**, **level**, and **n**.
+- Write a for loop over **categorical_cols** that, at each iteration, computes the counts for that variable, reshapes them to match **summary_table**, and row-binds them to the accumulating result.
+- Print the final **summary_table**.
+
+```{r}
+categorical_cols <- c("sex", "smoking_status", "health_rating")
+
+summary_table <- tibble(
+  variable = character(),
+  level = character(),
+  n = integer()
+)
+
+for (col_name in categorical_cols) {
+  counts <- survey_clean_a |>
+    count(.data[[col_name]]) |>
+    rename(level = 1) |>
+    mutate(variable = col_name, level = as.character(level)) |>
+    select(variable, level, n)
+  
+  summary_table <- bind_rows(summary_table, counts)
+}
+
+summary_table
+```
+
+## Notes for students
+
+1. This pattern — initialize an empty container, then `bind_rows()` (or equivalent) inside the loop — is sometimes called the "accumulator pattern." It is essential whenever you need a single combined result rather than separate per-iteration results.
+2. We use `rename(level = 1)` to rename the first column — whose name varies across iterations — to a fixed name (`level`). This is what allows `bind_rows()` to stack the per-iteration tibbles cleanly.
+3. Note that pre-initializing the tibble with the right column types (`character()`, `character()`, `integer()`) avoids type-coercion warnings during `bind_rows()`.
+
+## Question 8
+
+After completing Task 8, how many rows are in **summary_table**?
+
+* 10
+
+
+# Task 9
+
+Reproduce the column-mean computation from Task 4 using `dplyr::summarise()` with `across()`, so you can compare the two approaches. Specifically:
+
+- Use `summarise()` and `across()` on **survey_clean_a** to compute the mean of all five numeric risk-factor columns (**bmi**, **sbp**, **glucose**, **activity_hrs**, **diet_score**) in a single call.
+- Make sure to pass `na.rm = TRUE` to `mean()`.
+
+```{r}
+survey_clean_a |>
+  summarise(
+    across(
+      c(bmi, sbp, glucose, activity_hrs, diet_score),
+      \(x) mean(x, na.rm = TRUE)
+    )
+  )
+```
+
+## Notes for students
+
+1. `across()` is the tidyverse's idiomatic answer to "apply the same operation to several columns." When all you want to do is produce a one-row summary of several columns at once, `across()` is shorter, cleaner, and more readable than a for loop.
+2. The `\(x) mean(x, na.rm = TRUE)` syntax is R's shorthand for an anonymous function — equivalent to `function(x) mean(x, na.rm = TRUE)`. We need an anonymous function (rather than just `mean`) because we want to specify the `na.rm = TRUE` argument.
+3. So when *do* you need a for loop? Loops are still the right choice when each iteration's logic is more complex than a single function call — for example, when you need to construct multiple column names per iteration (Task 6), assign objects to the global environment (Task 5), or accumulate results into a different shape than the input (Task 8).
+
+## Question 9
+
+Which of the following tasks would be better handled by `dplyr::across()` than a for loop?
+
+* Computing the mean and standard deviation of every numeric column in a data frame and returning the result as a single one-row summary.
+
+
+# Task 10
+
+Wrap the stacked-summary loop from Task 8 into a reusable function. Specifically:
+
+- Define a function named **stacked_counts** that takes two arguments: a data frame **df** and a character vector **cols**.
+- Inside the function, use the same accumulator pattern from Task 8 to return a long-format summary table.
+- Test the function by calling it on **survey_clean_b** with the same three categorical columns.
+
+```{r}
+stacked_counts <- function(df, cols) {
+  summary_table <- tibble(
+    variable = character(),
+    level = character(),
+    n = integer()
+  )
+  
+  for (col_name in cols) {
+    counts <- df |>
+      count(.data[[col_name]]) |>
+      rename(level = 1) |>
+      mutate(variable = col_name, level = as.character(level)) |>
+      select(variable, level, n)
+    
+    summary_table <- bind_rows(summary_table, counts)
+  }
+  
+  summary_table
+}
+
+stacked_counts(survey_clean_b, c("sex", "smoking_status", "health_rating"))
+```
+
+## Notes for students
+
+1. Wrapping a loop into a function is one of the highest-leverage refactorings in R. It turns a one-off block of code into a reusable tool that can be applied to any data frame and any set of columns — exactly what we need when we want to produce the same summary for each EWBRC field site.
+2. Notice that the **logic inside the function is identical to the loop in Task 8** — only the input objects have been replaced with the function's parameters (`df` and `cols`). This is the typical workflow: get the loop working on a concrete example first, then generalize it into a function once you trust it.
+3. A good function does one thing well, has clear inputs, and returns a predictable output. Once you have a function like `stacked_counts()` in your toolkit, you can call it from inside *another* loop — for example, one that produces a stacked summary for every site — without any copy-pasting.
+
+## Question 10
+
+After completing Task 10, how many people reported being a current smoker?
+
+* 10
