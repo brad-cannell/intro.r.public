@@ -1,0 +1,152 @@
+---
+title: "Culminating Exercise: Writing For Loops in R"
+author: "[Your Name]"
+date-modified: [Enter Date]
+format:
+  html:
+    embed-resources: true
+---
+
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+library(readr, warn.conflicts = FALSE)
+library(tidyr, warn.conflicts = FALSE)
+```
+
+
+# Overview
+
+You are a data analyst on the Surveillance and Analytics team at the Epi-Workbench Research Consortium (EWBRC), supporting a multi-site initiative called the Maternal and Infant Health Monitoring Program. Over the past year, EWBRC field teams at three regional clinics have collected structured intake data on pregnant and recently postpartum individuals — including clinical measurements, self-reported health behaviors, and demographic characteristics — from participants enrolled at each location. As the consortium prepares to consolidate and summarize these clinic-level datasets for an interim program evaluation, your team has run into a familiar problem: analysts are copying and pasting the same processing steps over and over again, once per variable and once per clinic, and small inconsistencies in those repeated blocks are introducing errors into the results. Your task is to replace that fragile, copy-paste workflow with for loops that perform the same operations systematically and correctly across every column and every clinic.
+
+
+# Task 1
+
+Import **intake_clinic_a.csv** into an object named **intake_clinic_a** and print it.
+
+```{r}
+
+```
+
+## Question 1
+
+How many rows are in **intake_clinic_a**?
+
+
+# Task 2
+
+Use a for loop with `assign()` to import **intake_clinic_b.csv** and **intake_clinic_c.csv** into objects named **intake_clinic_b** and **intake_clinic_c**.
+
+```{r}
+
+```
+
+```{r}
+```
+
+```{r}
+```
+
+## Question 2
+
+How many rows are in **intake_clinic_c**?
+
+
+# Task 3
+
+Use a for loop to compute the mean of each of the five numeric clinical columns in **intake_clinic_a**: **gestational_age_wks**, **weight_kg**, **systolic_bp**, **hemoglobin**, and **sleep_hrs**. Store the results in a pre-initialized named numeric vector called **column_means**.
+
+```{r}
+
+```
+
+## Question 3
+
+What is the value stored in **column_means** for **systolic_bp** (rounded to one decimal place)?
+
+
+# Task 4
+
+Rewrite the loop from Task 3 using `seq_along()` and add **age** to the set of numeric columns.
+
+```{r}
+
+```
+
+## Question 4
+
+What is the value stored in **column_means** for **sleep_hrs** (rounded to one decimal place)?
+
+
+# Task 5
+
+Use a for loop with `assign()` and `get()` to create three cleaned datasets — **intake_clean_a**, **intake_clean_b**, and **intake_clean_c** — by dropping rows with `NA` values from each clinic dataset.
+
+```{r}
+
+```
+
+## Question 5
+
+How many rows are in **intake_clean_a**?
+
+
+# Task 6
+
+Add the six paired columns shown below to **intake_clean_a**, then write a for loop that uses the stems `c("weight_kg", "systolic_bp", "hemoglobin")` to create three new change-score columns (**weight_kg_change**, **systolic_bp_change**, **hemoglobin_change**) computed as `_post` minus `_pre`.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Question 6
+
+What is the value of **weight_kg_change** for the participant with **participant_id** equal to "A-004" (rounded to one decimal place)?
+
+
+# Task 7
+
+Write a for loop that prints a frequency table for each of the categorical demographic variables **insurance_type**, **parity**, and **food_security** in **intake_clean_a**. Use `count()` together with the `.data` pronoun.
+
+```{r}
+
+```
+
+## Question 7
+
+After completing Task 7, how many participants in **intake_clean_a** reported being uninsured?
+
+
+# Task 8
+
+Build a single stacked frequency table named **summary_table** with columns **variable**, **level**, and **n** by accumulating per-variable counts inside a for loop.
+
+```{r}
+
+```
+
+## Question 8
+
+How many rows are in **summary_table**?
+
+
+# Task 9
+
+Wrap the loop from Task 8 into a reusable function named **stacked_counts** that takes a data frame **df** and a character vector **cols**. Test it on **intake_clean_b** with the same three categorical columns.
+
+```{r}
+
+```
+
+## Question 9
+
+After completing Task 9, how many participants in **intake_clean_b** reported being marginally food insecure?
