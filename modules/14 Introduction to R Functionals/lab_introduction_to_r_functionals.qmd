@@ -1,0 +1,329 @@
+---
+title: "Lab: Introduction to R Functionals"
+author: "Brad Cannell"
+date-modified: 2026-05-05
+format:
+  html:
+    embed-resources: true
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+#| label: load-packages
+
+library(dplyr, warn.conflicts = FALSE)
+library(tibble, warn.conflicts = FALSE)
+library(readr, warn.conflicts = FALSE)
+library(purrr, warn.conflicts = FALSE)
+```
+
+
+# Overview
+
+You are a data analyst in the Respiratory Surveillance Unit at the Epi-Workbench Research Consortium (EWBRC), where your team produces a weekly briefing summarizing influenza-like illness activity across a network of partner clinics in four geographic regions. This week, you have inherited a fragmented set of reports from a colleague who recently left the unit — each clinic submitted its weekly case data as a separate file, and because no standardized template was enforced, the files use slightly different column naming conventions and require clinic-specific adjustment factors before counts are considered comparable across sites. Working through these files one at a time using repeated, copy-pasted code is error-prone and difficult to audit, and your team's Friday briefing deadline does not leave room for that kind of rework.
+
+In this project, you will use the `purrr` package to build a streamlined, reproducible pipeline that imports all clinic files at once, resolves the inconsistencies between them, applies each clinic's adjustment factor in a single coordinated step, and iterates a summary function across the variables your unit tracks — producing a clean, analysis-ready dataset and a formatted summary table ready for the briefing.
+
+
+# Task 1
+
+Before you can work with the clinic files, you need a reference table that ties each clinic to its geographic region and its adjustment factor. The adjustment factor is a clinic-specific multiplier your unit uses to make raw case counts comparable across sites — without it, differences in reporting practices between clinics would make the numbers misleading.
+
+You are building this roster first because the rest of the project depends on it: later we will apply each clinic's multiplier to its data, pairing each clinic's data frame with its adjustment factor from this table. Storing both pieces of information together in a single tibble — rather than as separate vectors — keeps the relationship between clinics and their factors explicit and prevents them from getting out of sync as the pipeline grows.
+
+- Use `tibble()` to construct a tibble called **clinic_roster** using the values in the table below.
+- Print **clinic_roster** to confirm it was built correctly.
+
+| clinic_id | region    | adjustment_factor |
+|-----------|-----------|-------------------|
+| CLN01     | Northeast | 0.80              |
+| CLN02     | Northeast | 0.95              |
+| CLN03     | Southeast | 1.10              |
+| CLN04     | Southeast | 1.25              |
+| CLN05     | West      | 1.40              |
+
+```{r}
+clinic_roster <- tibble(
+  clinic_id = c("CLN01", "CLN02", "CLN03", "CLN04", "CLN05"),
+  region = c("Northeast", "Northeast", "Southeast", "Southeast", "West"),
+  adjustment_factor = c(0.80, 0.95, 1.10, 1.25, 1.40)
+)
+
+clinic_roster
+```
+
+
+# Task 2
+
+Click the links below to download the five clinic data files to your computer:
+
+- [CLN01.csv](https://www.dropbox.com/scl/fi/c2bb00xz90m2y1c36aept/CLN01.csv?rlkey=8xdas2t9835435hgtnsmiq9ys&dl=1)
+- [CLN02.csv](https://www.dropbox.com/scl/fi/p1xcvhnuylo7hnrqg4kf8/CLN02.csv?rlkey=cy38tp5lisuqs1istecgn42bk&dl=1)
+- [CLN03.csv](https://www.dropbox.com/scl/fi/jm8fthyuwui60gavyr9wp/CLN03.csv?rlkey=uc8q840q32lx41lq1olw9qrgj&dl=1)
+- [CLN04.csv](https://www.dropbox.com/scl/fi/jod7djyd2qwhfb129j202/CLN04.csv?rlkey=temgj4pmk7i8g59mk17phx1kw&dl=1)
+- [CLN05.csv](https://www.dropbox.com/scl/fi/ugxyew9tsiaqx0gv5x3gt/CLN05.csv?rlkey=0jwt1mojqk6abrxttceehel52&dl=1)
+
+
+# Task 3
+
+Each partner clinic has submitted its weekly data as a CSV file. Because no standardized template was enforced, the files use slightly different column naming conventions.
+
+Read all five files into a single combined data frame using `purrr` functionals.
+
+- Create a character vector called **clinics** containing the five clinic IDs: `"CLN01"`, `"CLN02"`, `"CLN03"`, `"CLN04"`, and `"CLN05"`.
+- Use `map()` to iterate over **clinics**. Inside the anonymous function, use `paste0(clinic, ".csv")` to construct a file path — for example, `"CLN01"` becomes `"CLN01.csv"` — then pipe that path directly to `read_csv()`.
+- Use `set_names()` to name each element of the resulting list with the clinic ID.
+- Use `list_rbind()` to combine the list into a single data frame.
+- Save the result as **surveillance_raw**.
+- Print **surveillance_raw**.
+
+```{r}
+clinics <- c("CLN01", "CLN02", "CLN03", "CLN04", "CLN05")
+```
+
+```{r}
+surveillance_raw <- clinics |>
+  map(\(clinic) paste0(clinic, ".csv") |> read_csv(show_col_types = FALSE)) |>
+  set_names(clinics) |>
+  list_rbind()
+
+surveillance_raw
+```
+
+## Notes for students
+
+1. Storing clinic IDs in `clinics` makes it the single source of truth. When a new clinic joins the network, only `clinics` needs to be updated — the file path construction, the list names, and all downstream steps follow automatically.
+2. Inside the anonymous function, `paste0(clinic, ".csv") |> read_csv(show_col_types = FALSE)` constructs the file path as a string and pipes it directly into `read_csv()`. Because `read_csv()`'s first argument is a file path, the pipe passes the string straight through without needing an intermediate variable.
+
+## Question 1
+
+After completing Task 3, how many rows are in **surveillance_raw**?
+
+* 65
+
+## Question 2
+
+The maximum number of columns in any individual clinic file is 4. After completing Task 3, how many columns are in **surveillance_raw**?
+
+* 7
+
+## Question 3
+
+Why does **surveillance_raw** have more columns than any single clinic file?
+
+- [x] Because the clinic files use inconsistent column names for the same underlying variables, `list_rbind()` keeps every unique column and fills missing values with `NA`.
+  - Selected: Correct! `list_rbind()` preserves every unique column name it finds across the clinic files. Because different clinics used different names for the same underlying variables, the combined data frame has extra columns, with `NA` filled in where a clinic did not have that column.
+- [ ] Because `read_csv()` automatically adds extra metadata columns when reading multiple files.
+  - Selected: Good thought! This is incorrect because `read_csv()` reads the columns that are present in each CSV file; it does not automatically add extra metadata columns just because multiple files are being read.
+- [ ] Because `set_names()` adds a new column for each clinic ID.
+  - Selected: Nice connection! This is incorrect because `set_names()` names the elements of the list before they are combined. It does not create new columns inside the clinic data frames.
+- [ ] Because `list_rbind()` duplicates columns whenever any value is missing.
+  - Selected: Good reasoning! This is incorrect because `list_rbind()` does not duplicate columns whenever values are missing. The extra columns appear because the files have different column names, and `list_rbind()` keeps each unique column name.
+
+
+# Task 4
+
+In the previous task, `list_rbind()` combined all five clinic files, but the result is not yet analysis-ready. Because the clinics used different names for the same variables, **surveillance_raw** contains multiple columns that all represent the same underlying information.
+
+For example, the case count is spread across **cases**, **case_count**, and **ili_cases**. For any given row, only one of those columns contains the real value; the others are `NA`. The same issue occurs with **pct_positive** and **percent_positive**.
+
+Use `coalesce()` to collapse these duplicate columns into one clean version of each variable.
+
+- Start with **surveillance_raw**.
+- Use `mutate()` to create a clean **cases** column by coalescing **cases**, **case_count**, and **ili_cases**.
+- Use `mutate()` to create a clean **pct_positive** column by coalescing **pct_positive** and **percent_positive**.
+- Use `select()` to keep only the analysis-ready columns: **clinic_id**, **epi_week**, **cases**, and **pct_positive**.
+- Save the result as **surveillance_combined**.
+- Print **surveillance_combined**.
+
+```{r}
+surveillance_combined <- surveillance_raw |>
+  mutate(
+    cases = coalesce(cases, case_count, ili_cases),
+    pct_positive = coalesce(pct_positive, percent_positive)
+  ) |>
+  select(clinic_id, epi_week, cases, pct_positive)
+
+surveillance_combined
+```
+
+## Notes for students
+
+1. `coalesce()` returns the first non-missing value from a set of columns. Here, each row has a value in only one of the case-count columns, so `coalesce(cases, case_count, ili_cases)` gathers those values into one standard **cases** column.
+2. We use the same idea for **pct_positive**. Rows from clinics that already used **pct_positive** keep that value, while rows from the clinic that used **percent_positive** pull from that alternate column instead.
+3. After the values are combined, `select()` removes the old duplicate columns so the final data frame has one column per variable. This gives us the clean structure needed for the adjustment and summary steps that come next.
+
+## Question 4
+
+After completing Task 4, ____ is the name of the harmonized column that combines **cases**, **case_count**, and **ili_cases** in **surveillance_combined**.
+
+- Blank 1: cases
+  - Correct: Correct! The harmonized case-count column is named cases.
+  - Incorrect: Not quite! Check the names of the columns retained by `select()` in your code.
+
+
+# Task 5
+
+Apply each clinic's adjustment factor to its raw case counts. The adjustment factors live in **clinic_roster**, and both data frames have a **clinic_id** column, so the cleanest approach is to join the roster onto the surveillance data.
+
+After the adjustment factor is attached to each row, use `mutate()` to calculate the adjusted case count.
+
+- Start with **surveillance_combined**.
+- Use `left_join()` to add the **region** and **adjustment_factor** columns from **clinic_roster**, matching rows by **clinic_id**.
+- Use `mutate()` to create a new column called **adjusted_cases** by multiplying **cases** by **adjustment_factor**.
+- Use `select()` to keep the analysis-ready columns: **clinic_id**, **region**, **epi_week**, **cases**, **pct_positive**, and **adjusted_cases**.
+- Save the result as **surveillance_adjusted**.
+- Print **surveillance_adjusted**.
+
+```{r}
+surveillance_adjusted <- surveillance_combined |>
+  left_join(clinic_roster, by = "clinic_id") |>
+  mutate(adjusted_cases = cases * adjustment_factor) |>
+  select(clinic_id, region, epi_week, cases, pct_positive, adjusted_cases)
+
+surveillance_adjusted
+```
+
+## Notes for students
+
+1. This is a join problem because **clinic_id** is the key that links the weekly surveillance rows to the clinic-level roster. `left_join()` keeps every row from **surveillance_combined** and adds the matching roster information where the clinic IDs agree.
+2. Once **adjustment_factor** is attached to each row, `mutate(adjusted_cases = cases * adjustment_factor)` works row by row automatically. We do not need to split the data frame or manually pair clinics with factors.
+3. The final `select()` keeps the columns needed for downstream analysis and removes **adjustment_factor** after it has been used. Keeping **region** is useful because it lets us summarize or compare results by geography later.
+
+## Question 5
+
+After completing Task 5, what is the value of **adjusted_cases** for the row in **surveillance_adjusted** where **clinic_id** is `"CLN03"` and **epi_week** is 1? Round to one decimal place.
+
+```{r}
+surveillance_adjusted |> 
+  filter(clinic_id == "CLN03" & epi_week == 1) |> 
+  pull(adjusted_cases)
+```
+
+* 11.0
+
+
+## Question 6
+
+Why is the join-and-mutate approach in Task 5 appropriate for applying clinic-specific adjustment factors, rather than using `walk2()` or a typed `map_*()` variant?
+
+- [x] We need a returned data frame with the adjusted values attached to each row, and once **adjustment_factor** is joined onto **surveillance_combined**, `mutate()` performs the per-row multiplication automatically.
+  - Selected: Correct! The goal is to keep a full data frame and add adjusted case counts to each row. After `left_join()` brings **adjustment_factor** into **surveillance_combined**, `mutate()` can calculate **adjusted_cases** directly for every row.
+- [ ] `walk2()` would be the better choice because we want to apply a function with two inputs to each clinic in lockstep.
+  - Selected: Good connection! This is incorrect because `walk2()` is mainly used for side effects, such as writing files, not for returning a modified data frame. In Task 5, we want the adjusted values saved in **surveillance_adjusted**.
+- [ ] A typed `map_dbl()` is required here because the adjusted case counts are numeric.
+  - Selected: Nice thought! This is incorrect because `map_dbl()` returns a numeric vector, not the full data frame needed for downstream analysis. Even though **adjusted_cases** is numeric, the task is about adding that numeric column to the existing data frame.
+- [ ] `map()` over the clinic IDs is required because each clinic must be processed in isolation before being recombined.
+  - Selected: Reasonable instinct! This is incorrect because the clinics do not need to be processed separately once the adjustment factors have been joined by **clinic_id**. `mutate()` can do the row-by-row calculation inside one combined data frame.
+
+
+# Task 6
+
+Compute a typed column summary across the numeric variables in **surveillance_adjusted**. The unit lead wants a single mean for each numeric column to include in the briefing.
+
+- Select only the numeric columns from **surveillance_adjusted** using `select()` with `where(is.numeric)`.
+- Use `map_dbl()` to compute the mean of each column, passing `na.rm = TRUE` to handle the missing **pct_positive** values.
+
+```{r}
+numeric_means <- surveillance_adjusted |>
+  select(where(is.numeric)) |>
+  map_dbl(\(x) mean(x, na.rm = TRUE))
+
+numeric_means
+```
+
+## Notes for students
+
+1. `map_dbl()` requires that each iteration return a single numeric (double) value. If we accidentally fed it a non-numeric column — say, **clinic_id** — it would raise a clear type-mismatch error rather than silently returning garbage. This type discipline is one of the main advantages of the typed `map_*()` variants over a plain `for` loop.
+
+## Question 7
+
+After completing Task 6, what is the value of the mean of **pct_positive** in **numeric_means**? Round to two decimal places.
+
+* 0.17
+
+
+# Task 7
+
+You have been given the following tidy-evaluation summary function, which uses the embrace operator `{{ }}` to accept a bare column name:
+
+```{r}
+summarize_variable_tidyeval <- function(df, var) {
+  df |>
+    summarize(
+      variable = rlang::englue("{{ var }}"),
+      mean = mean({{ var }}, na.rm = TRUE),
+      median = median({{ var }}, na.rm = TRUE),
+      n_missing = sum(is.na({{ var }}))
+    )
+}
+```
+
+This function works fine when called interactively (e.g. `summarize_variable_tidyeval(surveillance_adjusted, cases)`), but it is awkward to call inside `map()` because it expects a bare name rather than a string.
+
+Rewrite the function so it accepts a **string** column name and looks the column up using `.data[[var]]`.
+
+```{r}
+summarize_variable <- function(df, var) {
+  df |>
+    summarize(
+      variable = var,
+      mean = mean(.data[[var]], na.rm = TRUE),
+      median = median(.data[[var]], na.rm = TRUE),
+      n_missing = sum(is.na(.data[[var]]))
+    )
+}
+```
+
+Now call `summarize_variable()` on the **cases** column of **surveillance_adjusted**.
+
+```{r}
+summarize_variable(surveillance_adjusted, "cases")
+```
+
+## Notes for students
+
+1. The `.data` pronoun lets us look up a column by a string name from inside a tidyverse verb. This is the standard pattern for writing functions that will be called programmatically — for example, inside `map()` over a vector of column names.
+2. The string-based version is easier to compose with iteration tools because vectors of strings are natural inputs to `map()`. Tidy-eval functions that require bare names force us to use awkward workarounds like `rlang::syms()` to iterate over them.
+
+## Question 8
+
+After calling `summarize_variable(surveillance_adjusted, "cases")` in Task 7, what is the value of the **median** column in the returned tibble?
+
+* 44
+
+
+# Task 8
+
+Use your rewritten function to compute the same summary across multiple variables of interest, then combine the results into a single tidy summary table.
+
+- Define a character vector of variable names to summarize: **cases**, **adjusted_cases**, and **pct_positive**.
+- Use `map()` to call `summarize_variable()` once per variable.
+- Use `list_rbind()` to combine the resulting list of one-row tibbles into a single tibble.
+- Save the result as **summary_table** and print it.
+
+```{r}
+vars_to_summarize <- c("cases", "adjusted_cases", "pct_positive")
+```
+
+```{r}
+summary_table <- vars_to_summarize |>
+  map(\(v) summarize_variable(surveillance_adjusted, v)) |>
+  list_rbind()
+
+summary_table
+```
+
+## Notes for students
+
+1. Each call to `summarize_variable()` returns a one-row tibble with the same column structure. `list_rbind()` stacks those rows into a single multi-row tibble — exactly the kind of long-format summary table that is easy to print, format, or feed into a plot.
+2. Compare this final table to the briefing-ready output we set out to produce at the start of this project. Beginning with a folder of inconsistently-formatted clinic files, we have used `purrr` functionals — `map()`, `map2()`, `walk2()`, `map_dbl()`, and `list_rbind()` — to import, harmonize, adjust, save, and summarize the data without a single explicit loop. That is the payoff of functional iteration: a pipeline that is readable, auditable, and easy to extend when a sixth clinic joins the network next quarter.
+
+## Question 9
+
+After completing Task 8, what is the value of the **median** column in **summary_table** for the row where **variable** is `"adjusted_cases"`? Round to one decimal place.
+
+* 53.2
