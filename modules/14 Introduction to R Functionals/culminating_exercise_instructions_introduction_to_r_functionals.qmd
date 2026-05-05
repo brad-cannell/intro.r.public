@@ -1,0 +1,149 @@
+---
+title: "Culminating Exercise: Introduction to R Functionals"
+author: "[Your Name]"
+date-modified: [Enter Date]
+format:
+  html:
+    embed-resources: true
+---
+
+# Load packages
+
+Remember, it's considered a best practice to load all the packages that our file will use at the top of the file. If we have not yet installed a package, we will need to do so by running `install.packages("package name")` in the R console. For example, to install the `dplyr` package, we would run `install.packages("dplyr")`. However, we typically **do not** want to type the code to install the package here in our Quarto file because we only need to install the package once on a given computer. Not every time we run our R code.
+
+```{r}
+
+```
+
+
+# Overview
+
+You are a data analyst in the Environmental Exposures Monitoring Unit at the Epi-Workbench Research Consortium (EWBRC), where your team produces a monthly report summarizing blood lead level (BLL) screening results across a network of community health centers serving pediatric populations in four urban districts. This month, you have inherited a fragmented set of reports from a field coordinator who recently transitioned to a new role — each health center submitted its monthly screening data as a separate file, and because no standardized reporting template was ever enforced, the files use inconsistent column naming conventions and require site-specific calibration factors before BLL measurements are considered comparable across locations. Manually reconciling these files one at a time through repeated copy-and-paste would be error-prone and impossible to audit before your team's end-of-month reporting deadline. In this exercise, you will use the `purrr` package to build a reproducible pipeline that imports all site files at once, resolves naming inconsistencies, applies each site's calibration factor in a single coordinated step, iterates a summary function across the variables your unit tracks, and assembles a clean, analysis-ready dataset and formatted summary table ready for the monthly report.
+
+
+# Task 1
+
+Build a reference table called **site_roster** as a tibble using the values below, then print it.
+
+| site_id | district  | calibration_factor |
+|---------|-----------|--------------------|
+| HCN01   | Northside | 0.85               |
+| HCN02   | Northside | 0.92               |
+| HCN03   | Eastside  | 1.08               |
+| HCN04   | Eastside  | 1.20               |
+| HCN05   | Westside  | 1.35               |
+
+```{r}
+
+```
+
+
+# Task 2
+
+Click the links below to download the five site data files to your computer:
+
+- [HCN01.csv](https://www.dropbox.com/scl/fi/2ek354opfmonhnu6png35/HCN01.csv?rlkey=e50ifw662msbfhi2u7g3hvbce&dl=1)
+- [HCN02.csv](https://www.dropbox.com/scl/fi/b2spfz5kse2bfnnuqzhwu/HCN02.csv?rlkey=htpbrkuigw32holk24edpgv0i&dl=1)
+- [HCN03.csv](https://www.dropbox.com/scl/fi/d40zw2yv9jcbgbg71z86c/HCN03.csv?rlkey=525wbh6095ekesn9dg3thhjcm&dl=1)
+- [HCN04.csv](https://www.dropbox.com/scl/fi/5cah9fwx96h8bfs6szxvy/HCN04.csv?rlkey=pzv4crfsd3659lqibs1jamba3&dl=1)
+- [HCN05.csv](https://www.dropbox.com/scl/fi/48y4lfcndwq8utq0azbss/HCN05.csv?rlkey=imwxo8p3h4eisekmspkm7cfp8&dl=1)
+
+
+# Task 3
+
+Read all five site files into a single combined data frame using `purrr` functionals. Store the site IDs in a character vector called **sites**, then use `map()`, `set_names()`, and `list_rbind()` to import and combine the files. Save the result as **screening_raw** and print it.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Question 1
+
+After completing Task 3, how many rows are in **screening_raw**?
+
+## Question 2
+
+The maximum number of columns in any individual site file is 4. After completing Task 3, how many columns are in **screening_raw**?
+
+
+# Task 4
+
+The case measurement is split across **mean_bll**, **avg_bll**, and **bll_mean**, and the elevated proportion is split across **pct_elevated** and **percent_elevated**. Use `coalesce()` inside `mutate()` to harmonize these columns, keep only **site_id**, **report_month**, **mean_bll**, and **pct_elevated**, save the result as **screening_combined**, and print it.
+
+```{r}
+
+```
+
+## Question 3
+
+After completing Task 4, ____ is the name of the harmonized column that combines **mean_bll**, **avg_bll**, and **bll_mean** in **screening_combined**.
+
+
+# Task 5
+
+Apply each site's calibration factor to its raw mean BLL. Join **site_roster** onto **screening_combined** by **site_id**, compute **adjusted_bll** as **mean_bll** times **calibration_factor**, keep **site_id**, **district**, **report_month**, **mean_bll**, **pct_elevated**, and **adjusted_bll**, save the result as **screening_adjusted**, and print it.
+
+```{r}
+
+```
+
+## Question 4
+
+After completing Task 5, what is the value of **adjusted_bll** for the row in **screening_adjusted** where **site_id** is `"HCN03"` and **report_month** is 1? Round to two decimal places.
+
+
+# Task 6
+
+Compute a typed column-wise mean across the numeric variables in **screening_adjusted** using `select()` with `where(is.numeric)` and `map_dbl()`. Handle missing values appropriately. Save the result as **numeric_means** and print it.
+
+```{r}
+
+```
+
+## Question 5
+
+After completing Task 6, what is the mean value of **pct_elevated**? Round to two decimal places.
+
+
+# Task 7
+
+You have been given the following tidy-evaluation summary function:
+
+```{r}
+
+```
+
+Rewrite this function as `summarize_variable()` so that it accepts a string column name and uses `.data[[var]]` for column lookup. Then call your rewritten function on the **mean_bll** column of **screening_adjusted**.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Question 6
+
+After calling `summarize_variable(screening_adjusted, "mean_bll")` in Task 7, what does the **n_missing** column equal in the returned tibble?
+
+
+# Task 8
+
+Define a character vector of variables to summarize — **mean_bll**, **adjusted_bll**, and **pct_elevated** — then use `map()` with your `summarize_variable()` function and `list_rbind()` to assemble a single tidy summary table. Save the result as **summary_table** and print it.
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Question 7
+
+After completing Task 8, what is the value of the **n_missing** column in **summary_table** for the row where **variable** is `"pct_elevated"`?
