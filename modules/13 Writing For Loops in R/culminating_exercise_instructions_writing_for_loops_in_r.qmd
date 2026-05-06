@@ -101,7 +101,16 @@ How many rows are in **intake_clean_a**?
 Add the six paired columns shown below to **intake_clean_a**, then write a for loop that uses the stems `c("weight_kg", "systolic_bp", "hemoglobin")` to create three new change-score columns (**weight_kg_change**, **systolic_bp_change**, **hemoglobin_change**) computed as `_post` minus `_pre`.
 
 ```{r}
+set.seed(2026)
 
+n <- nrow(intake_clean_a)
+
+intake_clean_a$weight_kg_pre <- round(intake_clean_a$weight_kg + runif(n, -0.5, 0.5), 1)
+intake_clean_a$weight_kg_post <- round(intake_clean_a$weight_kg_pre + runif(n, -1.5, 1.5), 1)
+intake_clean_a$systolic_bp_pre <- round(intake_clean_a$systolic_bp + runif(n, -2, 2))
+intake_clean_a$systolic_bp_post <- round(intake_clean_a$systolic_bp_pre + runif(n, -5, 5))
+intake_clean_a$hemoglobin_pre <- round(intake_clean_a$hemoglobin + runif(n, -0.3, 0.3), 1)
+intake_clean_a$hemoglobin_post <- round(intake_clean_a$hemoglobin_pre + runif(n, -1, 1), 1)
 ```
 
 ```{r}
